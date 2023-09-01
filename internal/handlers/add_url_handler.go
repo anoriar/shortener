@@ -7,10 +7,6 @@ import (
 )
 
 func AddURL(w http.ResponseWriter, req *http.Request) {
-	if req.Header.Get("Content-Type") != "text/plain" {
-		http.Error(w, "Content type must be text/plain", http.StatusBadRequest)
-		return
-	}
 	_, err := io.ReadAll(req.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
