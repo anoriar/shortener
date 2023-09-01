@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func AddUrl(w http.ResponseWriter, req *http.Request) {
+func AddURL(w http.ResponseWriter, req *http.Request) {
 	if req.Header.Get("Content-Type") != "text/plain" {
 		http.Error(w, "Content type must be text/plain", http.StatusBadRequest)
 		return
@@ -17,14 +17,14 @@ func AddUrl(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	shortUrl := "http://localhost:8080/" + util.GenerateShortKey()
+	shortURL := "http://localhost:8080/" + util.GenerateShortKey()
 
-	_, err = w.Write([]byte(shortUrl))
+	w.Header().Set("content-type", "text/plain")
+	w.WriteHeader(http.StatusCreated)
+
+	_, err = w.Write([]byte(shortURL))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 }

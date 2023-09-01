@@ -13,9 +13,9 @@ func handleFunc(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case http.MethodPost:
-		handlers.AddUrl(w, req)
+		handlers.AddURL(w, req)
 	case http.MethodGet:
-		handlers.GetUrl(w, req)
+		handlers.GetURL(w, req)
 	default:
 		http.Error(w, "Method must be POST or GET", http.StatusBadRequest)
 	}
