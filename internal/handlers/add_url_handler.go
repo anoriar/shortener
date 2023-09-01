@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/anoriar/shortener/internal/util"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -11,7 +11,7 @@ func AddUrl(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Content type must be text/plain", http.StatusBadRequest)
 		return
 	}
-	_, err := ioutil.ReadAll(req.Body)
+	_, err := io.ReadAll(req.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
