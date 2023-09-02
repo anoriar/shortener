@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"github.com/anoriar/shortener/internal/storage"
 	"net/http"
 	"strings"
 )
@@ -12,8 +12,11 @@ func GetURL(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Short key is empty", http.StatusBadRequest)
 	}
 
-	fmt.Println(shortKey)
+	url, exists := storage.GlobalUrlStorage.FindUrlByKey(shortKey)
+	if !exists {
+		http.Error(w, "Url does not exists", http.StatusBadRequest)
+	}
 
-	w.Header().Set("Location", "https://practicum.yandex.ru/")
+	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
