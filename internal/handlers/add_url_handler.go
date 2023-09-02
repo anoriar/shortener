@@ -14,8 +14,8 @@ func AddURL(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	parsedUrl, err := neturl.Parse(string(url))
-	if err != nil || parsedUrl.Scheme == "" || parsedUrl.Host == "" {
+	parsedURL, err := neturl.Parse(string(url))
+	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
 		http.Error(w, "Not valid URL", http.StatusBadRequest)
 		return
 	}
