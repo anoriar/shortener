@@ -12,9 +12,9 @@ func GetURL(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Short key is empty", http.StatusBadRequest)
 	}
 
-	url, exists := storage.GlobalUrlStorage.FindUrlByKey(shortKey)
+	url, exists := storage.GetInstance().FindURLByKey(shortKey)
 	if !exists {
-		http.Error(w, "Url does not exists", http.StatusBadRequest)
+		http.Error(w, "URL does not exists", http.StatusBadRequest)
 	}
 
 	w.Header().Set("Location", url)

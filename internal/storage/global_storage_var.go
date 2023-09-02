@@ -1,7 +1,6 @@
 package storage
 
-var GlobalUrlStorage UrlStorageInterface
+import "sync"
 
-func init() {
-	GlobalUrlStorage = NewUrlStorage()
-}
+var urlStorageInstance URLStorageInterface
+var once sync.Once

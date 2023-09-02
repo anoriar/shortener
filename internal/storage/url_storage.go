@@ -4,16 +4,23 @@ import (
 	"fmt"
 )
 
-type UrlStorage struct {
+type URLStorage struct {
 	urls map[string]string
 }
 
-func NewUrlStorage() *UrlStorage {
-	return &UrlStorage{urls: make(map[string]string)}
+func newURLStorage() *URLStorage {
+	return &URLStorage{urls: make(map[string]string)}
 }
 
-func (storage *UrlStorage) AddUrl(url string, key string) error {
-	if _, exists := storage.FindUrlByKey(key); exists {
+func GetInstance() URLStorageInterface {
+	once.Do(func() {
+		urlStorageInstance = newURLStorage()
+	})
+	return urlStorageInstance
+}
+
+func (storage *URLStorage) AddURL(url string, key string) error {
+	if _, exists := storage.FindURLByKey(key); exists {
 		return fmt.Errorf("url with key %v exists", key)
 	}
 	storage.urls[key] = url
@@ -21,7 +28,7 @@ func (storage *UrlStorage) AddUrl(url string, key string) error {
 	return nil
 }
 
-func (storage *UrlStorage) FindUrlByKey(key string) (string, bool) {
+func (storage *URLStorage) FindURLByKey(key string) (string, bool) {
 	url, exists := storage.urls[key]
 	return url, exists
 }
