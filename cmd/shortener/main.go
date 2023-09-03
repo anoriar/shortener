@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/anoriar/shortener/internal/handlers"
+	"github.com/anoriar/shortener/internal/storage"
+	"github.com/anoriar/shortener/internal/util"
 	"net/http"
 )
 
@@ -13,9 +15,9 @@ func handleFunc(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Method {
 	case http.MethodPost:
-		handlers.AddURL(w, req)
+		handlers.NewAddHandler(storage.GetInstance(), util.NewKeyGen()).AddURL(w, req)
 	case http.MethodGet:
-		handlers.GetURL(w, req)
+		handlers.NewGetHandler(storage.GetInstance()).GetURL(w, req)
 	default:
 		http.Error(w, "Method must be POST or GET", http.StatusBadRequest)
 	}

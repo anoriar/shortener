@@ -6,13 +6,25 @@ import (
 	"strings"
 )
 
-func GetURL(w http.ResponseWriter, req *http.Request) {
+type GetHandler struct {
+	urlRepository storage.URLRepositoryInterface
+}
+
+func NewGetHandler(urlRepository storage.URLRepositoryInterface) *GetHandler {
+	return &GetHandler{
+		urlRepository: urlRepository,
+	}
+}
+
+func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("content-type", "text/plain")
+
 	shortKey := strings.Trim(req.URL.Path, "/")
 	if shortKey == "" {
 		http.Error(w, "Short key is empty", http.StatusBadRequest)
 	}
 
-	url, exists := storage.GetInstance().FindURLByKey(shortKey)
+	url, exists := handler.urlRepository.FindURLByKey(shortKey)
 	if !exists {
 		http.Error(w, "URL does not exists", http.StatusBadRequest)
 	}

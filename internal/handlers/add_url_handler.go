@@ -8,7 +8,21 @@ import (
 	neturl "net/url"
 )
 
-func AddURL(w http.ResponseWriter, req *http.Request) {
+type AddHandler struct {
+	urlRepository storage.URLRepositoryInterface
+	keyGen        util.KeyGenInterface
+}
+
+func NewAddHandler(urlRepository storage.URLRepositoryInterface, keyGen util.KeyGenInterface) *AddHandler {
+	return &AddHandler{
+		urlRepository: urlRepository,
+		keyGen:        keyGen,
+	}
+}
+
+func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("content-type", "text/plain")
+
 	url, err := io.ReadAll(req.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -20,15 +34,14 @@ func AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	shortKey := util.GenerateShortKey()
-	err = storage.GetInstance().AddURL(string(url), shortKey)
+	shortKey := handler.keyGen.Generate()
+	err = handler.urlRepository.AddURL(string(url), shortKey)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("content-type", "text/plain")
 	w.WriteHeader(http.StatusCreated)
 
 	_, err = w.Write([]byte("http://localhost:8080/" + shortKey))
