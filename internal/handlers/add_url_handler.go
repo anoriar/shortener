@@ -11,12 +11,14 @@ import (
 type AddHandler struct {
 	urlRepository storage.URLRepositoryInterface
 	keyGen        util.KeyGenInterface
+	baseURL       string
 }
 
-func NewAddHandler(urlRepository storage.URLRepositoryInterface, keyGen util.KeyGenInterface) *AddHandler {
+func NewAddHandler(urlRepository storage.URLRepositoryInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
 	return &AddHandler{
 		urlRepository: urlRepository,
 		keyGen:        keyGen,
+		baseURL:       baseURL,
 	}
 }
 
@@ -44,7 +46,7 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 
-	_, err = w.Write([]byte("http://localhost:8080/" + shortKey))
+	_, err = w.Write([]byte(handler.baseURL + "/" + shortKey))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

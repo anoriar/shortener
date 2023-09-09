@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/anoriar/shortener/internal/config"
 	"github.com/anoriar/shortener/internal/handlers"
 	"github.com/anoriar/shortener/internal/router"
 	"github.com/anoriar/shortener/internal/storage"
@@ -13,10 +14,13 @@ func main() {
 }
 
 func run() {
+	conf := config.NewConfig()
+	parseFlags(conf)
+
 	r := router.NewRouter(
-		handlers.NewAddHandler(storage.GetInstance(), util.NewKeyGen()),
+		handlers.NewAddHandler(storage.GetInstance(), util.NewKeyGen(), conf.BaseURL),
 		handlers.NewGetHandler(storage.GetInstance()),
 	)
 
-	http.ListenAndServe("localhost:8080", r.Route())
+	http.ListenAndServe(conf.Host, r.Route())
 }

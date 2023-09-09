@@ -12,8 +12,8 @@ import (
 
 const expectedShortKey = "etw73C"
 const successRequestBody = "https://github.com"
-const baseURL = "http://localhost:8080/"
-const successExpectedBody = baseURL + expectedShortKey
+const baseURL = "http://localhost:8080"
+const successExpectedBody = baseURL + "/" + expectedShortKey
 
 // TODO MENTOR Как лучше организовывать моки? Они видны во всем пакете и могут мешать друг другу
 type mockURLRepositoryAddHandler struct{}
@@ -94,7 +94,7 @@ func TestAddURL(t *testing.T) {
 
 			keyGenMock := new(mockKeyGenAddHandler)
 
-			NewAddHandler(tt.repositoryMock, keyGenMock).AddURL(w, r)
+			NewAddHandler(tt.repositoryMock, keyGenMock, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))
