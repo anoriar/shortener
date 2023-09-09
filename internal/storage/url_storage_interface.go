@@ -1,6 +1,6 @@
 package storage
 
-type URLRepositoryInterface interface {
+type URLStorageInterface interface {
 	AddURL(url string, key string) error
 	FindURLByKey(key string) (string, bool)
 }

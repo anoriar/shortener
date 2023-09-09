@@ -41,7 +41,7 @@ func TestURLRepository_AddURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			storage := &URLRepository{
+			storage := &URLStorage{
 				urls: tt.existedURLs,
 			}
 
@@ -91,7 +91,7 @@ func TestURLRepository_FindURLByKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			storage := &URLRepository{
+			storage := &URLStorage{
 				urls: tt.existedURLs,
 			}
 

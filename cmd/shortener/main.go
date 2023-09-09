@@ -22,5 +22,8 @@ func run() {
 		handlers.NewGetHandler(storage.GetInstance()),
 	)
 
-	http.ListenAndServe(conf.Host, r.Route())
+	err := http.ListenAndServe(conf.Host, r.Route())
+	if err != nil {
+		return
+	}
 }

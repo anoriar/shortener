@@ -9,12 +9,12 @@ import (
 )
 
 type AddHandler struct {
-	urlRepository storage.URLRepositoryInterface
+	urlRepository storage.URLStorageInterface
 	keyGen        util.KeyGenInterface
 	baseURL       string
 }
 
-func NewAddHandler(urlRepository storage.URLRepositoryInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
+func NewAddHandler(urlRepository storage.URLStorageInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
 	return &AddHandler{
 		urlRepository: urlRepository,
 		keyGen:        keyGen,

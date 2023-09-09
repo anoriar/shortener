@@ -7,10 +7,10 @@ import (
 )
 
 type GetHandler struct {
-	urlRepository storage.URLRepositoryInterface
+	urlRepository storage.URLStorageInterface
 }
 
-func NewGetHandler(urlRepository storage.URLRepositoryInterface) *GetHandler {
+func NewGetHandler(urlRepository storage.URLStorageInterface) *GetHandler {
 	return &GetHandler{
 		urlRepository: urlRepository,
 	}

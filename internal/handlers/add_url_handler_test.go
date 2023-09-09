@@ -15,24 +15,24 @@ const successRequestBody = "https://github.com"
 const baseURL = "http://localhost:8080"
 const successExpectedBody = baseURL + "/" + expectedShortKey
 
-// TODO MENTOR Как лучше организовывать моки? Они видны во всем пакете и могут мешать друг другу
-type mockURLRepositoryAddHandler struct{}
+// TODO MENTOR Как лучше организовывать моки в структуре проекта? Они видны во всем пакете и могут мешать друг другу.
+type mockURLStorageAddHandler struct{}
 
-func (mcr *mockURLRepositoryAddHandler) AddURL(url string, key string) error {
+func (mcr *mockURLStorageAddHandler) AddURL(url string, key string) error {
 	return nil
 }
 
-func (mcr *mockURLRepositoryAddHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockURLStorageAddHandler) FindURLByKey(key string) (string, bool) {
 	return "https://github.com", true
 }
 
-type mockURLRepositoryErrorAddHandler struct{}
+type mockURLStorageErrorAddHandler struct{}
 
-func (mcr *mockURLRepositoryErrorAddHandler) AddURL(url string, key string) error {
+func (mcr *mockURLStorageErrorAddHandler) AddURL(url string, key string) error {
 	return errors.New("test")
 }
 
-func (mcr *mockURLRepositoryErrorAddHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockURLStorageErrorAddHandler) FindURLByKey(key string) (string, bool) {
 	return "https://github.com", true
 }
 
@@ -52,13 +52,13 @@ func TestAddURL(t *testing.T) {
 	tests := []struct {
 		name           string
 		requestBody    string
-		repositoryMock storage.URLRepositoryInterface
+		repositoryMock storage.URLStorageInterface
 		want           want
 	}{
 		{
 			name:           "success",
 			requestBody:    successRequestBody,
-			repositoryMock: new(mockURLRepositoryAddHandler),
+			repositoryMock: new(mockURLStorageAddHandler),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -68,7 +68,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:           "not valid url",
 			requestBody:    "/dd",
-			repositoryMock: new(mockURLRepositoryAddHandler),
+			repositoryMock: new(mockURLStorageAddHandler),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -78,7 +78,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:           "repository error",
 			requestBody:    successRequestBody,
-			repositoryMock: new(mockURLRepositoryErrorAddHandler),
+			repositoryMock: new(mockURLStorageErrorAddHandler),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
