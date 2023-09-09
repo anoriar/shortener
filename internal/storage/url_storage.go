@@ -2,11 +2,13 @@ package storage
 
 import (
 	"fmt"
-	"sync"
 )
 
 var urlStorage URLStorageInterface
-var urlStorageSyncOnce sync.Once
+
+func init() {
+	urlStorage = newURLStorage(make(map[string]string))
+}
 
 type URLStorage struct {
 	urls map[string]string
@@ -17,9 +19,6 @@ func newURLStorage(urls map[string]string) *URLStorage {
 }
 
 func GetInstance() URLStorageInterface {
-	urlStorageSyncOnce.Do(func() {
-		urlStorage = newURLStorage(make(map[string]string))
-	})
 	return urlStorage
 }
 
