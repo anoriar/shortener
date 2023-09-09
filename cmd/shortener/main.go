@@ -26,4 +26,9 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
+
+	err = ctn.Clean()
+	if err != nil {
+		panic(err)
+	}
 }
