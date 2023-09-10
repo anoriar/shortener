@@ -4,6 +4,7 @@ import (
 	"github.com/anoriar/shortener/internal/config"
 	"github.com/anoriar/shortener/internal/di"
 	"github.com/anoriar/shortener/internal/router"
+	"github.com/caarlos0/env/v6"
 	"net/http"
 )
 
@@ -14,6 +15,11 @@ func main() {
 func run() {
 	conf := config.NewConfig()
 	parseFlags(conf)
+
+	err := env.Parse(&conf)
+	if err != nil {
+		return
+	}
 
 	ctn, err := di.NewContainer(conf)
 	if err != nil {

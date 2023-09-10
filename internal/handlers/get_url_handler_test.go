@@ -20,13 +20,13 @@ func (mcr *mockURLStorageGetHandler) FindURLByKey(key string) (string, bool) {
 	return successRedirectLocation, true
 }
 
-type mockURLRepositoryNotExistsGetHandler struct{}
+type mockURLStorageNotExistsGetHandler struct{}
 
-func (mcr *mockURLRepositoryNotExistsGetHandler) AddURL(url string, key string) error {
+func (mcr *mockURLStorageNotExistsGetHandler) AddURL(url string, key string) error {
 	return nil
 }
 
-func (mcr *mockURLRepositoryNotExistsGetHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockURLStorageNotExistsGetHandler) FindURLByKey(key string) (string, bool) {
 	return "", false
 }
 
@@ -65,7 +65,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:           "empty short key",
 			request:        "/",
-			repositoryMock: new(mockURLRepositoryNotExistsGetHandler),
+			repositoryMock: new(mockURLStorageNotExistsGetHandler),
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",

@@ -50,15 +50,15 @@ func TestAddURL(t *testing.T) {
 		contentType string
 	}
 	tests := []struct {
-		name           string
-		requestBody    string
-		repositoryMock storage.URLStorageInterface
-		want           want
+		name        string
+		requestBody string
+		storageMock storage.URLStorageInterface
+		want        want
 	}{
 		{
-			name:           "success",
-			requestBody:    successRequestBody,
-			repositoryMock: new(mockURLStorageAddHandler),
+			name:        "success",
+			requestBody: successRequestBody,
+			storageMock: new(mockURLStorageAddHandler),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -66,9 +66,9 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:           "not valid url",
-			requestBody:    "/dd",
-			repositoryMock: new(mockURLStorageAddHandler),
+			name:        "not valid url",
+			requestBody: "/dd",
+			storageMock: new(mockURLStorageAddHandler),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -76,9 +76,9 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:           "repository error",
-			requestBody:    successRequestBody,
-			repositoryMock: new(mockURLStorageErrorAddHandler),
+			name:        "storage error",
+			requestBody: successRequestBody,
+			storageMock: new(mockURLStorageErrorAddHandler),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -94,7 +94,7 @@ func TestAddURL(t *testing.T) {
 
 			keyGenMock := new(mockKeyGenAddHandler)
 
-			NewAddHandler(tt.repositoryMock, keyGenMock, baseURL).AddURL(w, r)
+			NewAddHandler(tt.storageMock, keyGenMock, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

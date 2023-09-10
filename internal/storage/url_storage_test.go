@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestURLRepository_AddURL(t *testing.T) {
+func TestURLStorage_AddURL(t *testing.T) {
 	type args struct {
 		url string
 		key string
@@ -53,7 +53,7 @@ func TestURLRepository_AddURL(t *testing.T) {
 	}
 }
 
-func TestURLRepository_FindURLByKey(t *testing.T) {
+func TestURLStorage_FindURLByKey(t *testing.T) {
 
 	type want struct {
 		url   string
