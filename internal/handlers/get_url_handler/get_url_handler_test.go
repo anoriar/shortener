@@ -1,4 +1,4 @@
-package handlers
+package get_url_handler
 
 import (
 	"github.com/anoriar/shortener/internal/storage"
@@ -10,23 +10,23 @@ import (
 
 const successRedirectLocation = "https://github.com"
 
-type mockURLStorageGetHandler struct{}
+type mockGetHandlerUrlStorage struct{}
 
-func (mcr *mockURLStorageGetHandler) AddURL(url string, key string) error {
+func (mcr *mockGetHandlerUrlStorage) AddURL(url string, key string) error {
 	return nil
 }
 
-func (mcr *mockURLStorageGetHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockGetHandlerUrlStorage) FindURLByKey(key string) (string, bool) {
 	return successRedirectLocation, true
 }
 
-type mockURLStorageNotExistsGetHandler struct{}
+type mockGetHandlerURLStorageNotExists struct{}
 
-func (mcr *mockURLStorageNotExistsGetHandler) AddURL(url string, key string) error {
+func (mcr *mockGetHandlerURLStorageNotExists) AddURL(url string, key string) error {
 	return nil
 }
 
-func (mcr *mockURLStorageNotExistsGetHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockGetHandlerURLStorageNotExists) FindURLByKey(key string) (string, bool) {
 	return "", false
 }
 
@@ -45,7 +45,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:           "success",
 			request:        "/sHde1e",
-			repositoryMock: new(mockURLStorageGetHandler),
+			repositoryMock: new(mockGetHandlerUrlStorage),
 			want: want{
 				status:      http.StatusTemporaryRedirect,
 				contentType: "text/plain",
@@ -55,7 +55,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:           "empty short key",
 			request:        "/",
-			repositoryMock: new(mockURLStorageGetHandler),
+			repositoryMock: new(mockGetHandlerUrlStorage),
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -65,7 +65,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:           "empty short key",
 			request:        "/",
-			repositoryMock: new(mockURLStorageNotExistsGetHandler),
+			repositoryMock: new(mockGetHandlerURLStorageNotExists),
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",

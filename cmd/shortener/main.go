@@ -16,7 +16,7 @@ func run() {
 	conf := config.NewConfig()
 	parseFlags(conf)
 
-	err := env.Parse(&conf)
+	err := env.Parse(conf)
 	if err != nil {
 		return
 	}

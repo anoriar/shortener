@@ -2,11 +2,20 @@ package di
 
 import (
 	"github.com/anoriar/shortener/internal/config"
-	"github.com/anoriar/shortener/internal/handlers"
+	"github.com/anoriar/shortener/internal/handlers/add_url_handler"
+	"github.com/anoriar/shortener/internal/handlers/get_url_handler"
 	"github.com/anoriar/shortener/internal/router"
 	"github.com/anoriar/shortener/internal/storage"
 	"github.com/anoriar/shortener/internal/util"
 	"github.com/sarulabs/di"
+)
+
+const (
+	StorageDef    = "storage"
+	KeygenDef     = "keygen"
+	AddHandlerDef = "add_url_handler"
+	GetHandlerDef = "get_handler"
+	RouterDef     = "router"
 )
 
 type Container struct {
@@ -20,37 +29,37 @@ func NewContainer(cnf *config.Config) (*Container, error) {
 	}
 	err = builder.Add([]di.Def{
 		{
-			Name: "storage",
+			Name: StorageDef,
 			Build: func(ctn di.Container) (interface{}, error) {
 				return storage.GetInstance(), nil
 			},
 		},
 		{
-			Name: "keygen",
+			Name: KeygenDef,
 			Build: func(ctn di.Container) (interface{}, error) {
 				return util.NewKeyGen(), nil
 			},
 		},
 		{
-			Name: "addHandler",
+			Name: AddHandlerDef,
 			Build: func(ctn di.Container) (interface{}, error) {
-				storageVar := ctn.Get("storage").(storage.URLStorageInterface)
-				keygen := ctn.Get("keygen").(util.KeyGenInterface)
-				return handlers.NewAddHandler(storageVar, keygen, cnf.BaseURL), nil
+				storageVar := ctn.Get(StorageDef).(storage.URLStorageInterface)
+				keygen := ctn.Get(KeygenDef).(util.KeyGenInterface)
+				return add_url_handler.NewAddHandler(storageVar, keygen, cnf.BaseURL), nil
 			},
 		},
 		{
-			Name: "getHandler",
+			Name: GetHandlerDef,
 			Build: func(ctn di.Container) (interface{}, error) {
-				storageVar := ctn.Get("storage").(storage.URLStorageInterface)
-				return handlers.NewGetHandler(storageVar), nil
+				storageVar := ctn.Get(StorageDef).(storage.URLStorageInterface)
+				return get_url_handler.NewGetHandler(storageVar), nil
 			},
 		},
 		{
-			Name: "router",
+			Name: RouterDef,
 			Build: func(ctn di.Container) (interface{}, error) {
-				addHandlerVar := ctn.Get("addHandler").(*handlers.AddHandler)
-				getHandlerVar := ctn.Get("getHandler").(*handlers.GetHandler)
+				addHandlerVar := ctn.Get(AddHandlerDef).(*add_url_handler.AddHandler)
+				getHandlerVar := ctn.Get(GetHandlerDef).(*get_url_handler.GetHandler)
 				return router.NewRouter(addHandlerVar, getHandlerVar), nil
 			},
 		},

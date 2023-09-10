@@ -1,4 +1,4 @@
-package handlers
+package add_url_handler
 
 import (
 	"errors"
@@ -16,29 +16,29 @@ const baseURL = "http://localhost:8080"
 const successExpectedBody = baseURL + "/" + expectedShortKey
 
 // TODO MENTOR Как лучше организовывать моки в структуре проекта? Они видны во всем пакете и могут мешать друг другу.
-type mockURLStorageAddHandler struct{}
+type mockAddHandlerURLStorage struct{}
 
-func (mcr *mockURLStorageAddHandler) AddURL(url string, key string) error {
+func (mcr *mockAddHandlerURLStorage) AddURL(url string, key string) error {
 	return nil
 }
 
-func (mcr *mockURLStorageAddHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockAddHandlerURLStorage) FindURLByKey(key string) (string, bool) {
 	return "https://github.com", true
 }
 
-type mockURLStorageErrorAddHandler struct{}
+type mockAddHandlerURLStorageError struct{}
 
-func (mcr *mockURLStorageErrorAddHandler) AddURL(url string, key string) error {
+func (mcr *mockAddHandlerURLStorageError) AddURL(url string, key string) error {
 	return errors.New("test")
 }
 
-func (mcr *mockURLStorageErrorAddHandler) FindURLByKey(key string) (string, bool) {
+func (mcr *mockAddHandlerURLStorageError) FindURLByKey(key string) (string, bool) {
 	return "https://github.com", true
 }
 
-type mockKeyGenAddHandler struct{}
+type mockAddHandlerKeyGen struct{}
 
-func (mock *mockKeyGenAddHandler) Generate() string {
+func (mock *mockAddHandlerKeyGen) Generate() string {
 	return expectedShortKey
 }
 
@@ -58,7 +58,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "success",
 			requestBody: successRequestBody,
-			storageMock: new(mockURLStorageAddHandler),
+			storageMock: new(mockAddHandlerURLStorage),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -68,7 +68,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "not valid url",
 			requestBody: "/dd",
-			storageMock: new(mockURLStorageAddHandler),
+			storageMock: new(mockAddHandlerURLStorage),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -78,7 +78,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "storage error",
 			requestBody: successRequestBody,
-			storageMock: new(mockURLStorageErrorAddHandler),
+			storageMock: new(mockAddHandlerURLStorageError),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -92,7 +92,7 @@ func TestAddURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tt.requestBody))
 			w := httptest.NewRecorder()
 
-			keyGenMock := new(mockKeyGenAddHandler)
+			keyGenMock := new(mockAddHandlerKeyGen)
 
 			NewAddHandler(tt.storageMock, keyGenMock, baseURL).AddURL(w, r)
 
