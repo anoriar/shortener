@@ -1,17 +1,17 @@
 package router
 
 import (
-	"github.com/anoriar/shortener/internal/handlers/add_url_handler"
-	"github.com/anoriar/shortener/internal/handlers/get_url_handler"
+	"github.com/anoriar/shortener/internal/handlers/addURLHandler"
+	"github.com/anoriar/shortener/internal/handlers/getURLHandler"
 	"github.com/go-chi/chi/v5"
 )
 
 type Router struct {
-	addHandler *add_url_handler.AddHandler
-	getHandler *get_url_handler.GetHandler
+	addHandler *addURLHandler.AddHandler
+	getHandler *getURLHandler.GetHandler
 }
 
-func NewRouter(addHandler *add_url_handler.AddHandler, getHandler *get_url_handler.GetHandler) *Router {
+func NewRouter(addHandler *addURLHandler.AddHandler, getHandler *getURLHandler.GetHandler) *Router {
 	return &Router{
 		addHandler: addHandler,
 		getHandler: getHandler,
