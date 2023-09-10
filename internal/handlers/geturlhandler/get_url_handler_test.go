@@ -10,13 +10,13 @@ import (
 
 const successRedirectLocation = "https://github.com"
 
-type mockGetHandlerUrlStorage struct{}
+type mockGetHandlerURLStorage struct{}
 
-func (mcr *mockGetHandlerUrlStorage) AddURL(url string, key string) error {
+func (mcr *mockGetHandlerURLStorage) AddURL(url string, key string) error {
 	return nil
 }
 
-func (mcr *mockGetHandlerUrlStorage) FindURLByKey(key string) (string, bool) {
+func (mcr *mockGetHandlerURLStorage) FindURLByKey(key string) (string, bool) {
 	return successRedirectLocation, true
 }
 
@@ -45,7 +45,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:           "success",
 			request:        "/sHde1e",
-			repositoryMock: new(mockGetHandlerUrlStorage),
+			repositoryMock: new(mockGetHandlerURLStorage),
 			want: want{
 				status:      http.StatusTemporaryRedirect,
 				contentType: "text/plain",
@@ -55,7 +55,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:           "empty short key",
 			request:        "/",
-			repositoryMock: new(mockGetHandlerUrlStorage),
+			repositoryMock: new(mockGetHandlerURLStorage),
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
