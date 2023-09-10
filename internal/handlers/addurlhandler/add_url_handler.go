@@ -1,4 +1,4 @@
-package addURLHandler
+package addurlhandler
 
 import (
 	"github.com/anoriar/shortener/internal/storage"

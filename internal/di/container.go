@@ -2,8 +2,8 @@ package di
 
 import (
 	"github.com/anoriar/shortener/internal/config"
-	"github.com/anoriar/shortener/internal/handlers/addURLHandler"
-	"github.com/anoriar/shortener/internal/handlers/getURLHandler"
+	"github.com/anoriar/shortener/internal/handlers/addurlhandler"
+	"github.com/anoriar/shortener/internal/handlers/geturlhandler"
 	"github.com/anoriar/shortener/internal/router"
 	"github.com/anoriar/shortener/internal/storage"
 	"github.com/anoriar/shortener/internal/util"
@@ -45,21 +45,21 @@ func NewContainer(cnf *config.Config) (*Container, error) {
 			Build: func(ctn di.Container) (interface{}, error) {
 				storageVar := ctn.Get(StorageDef).(storage.URLStorageInterface)
 				keygen := ctn.Get(KeygenDef).(util.KeyGenInterface)
-				return addURLHandler.NewAddHandler(storageVar, keygen, cnf.BaseURL), nil
+				return addurlhandler.NewAddHandler(storageVar, keygen, cnf.BaseURL), nil
 			},
 		},
 		{
 			Name: GetHandlerDef,
 			Build: func(ctn di.Container) (interface{}, error) {
 				storageVar := ctn.Get(StorageDef).(storage.URLStorageInterface)
-				return getURLHandler.NewGetHandler(storageVar), nil
+				return geturlhandler.NewGetHandler(storageVar), nil
 			},
 		},
 		{
 			Name: RouterDef,
 			Build: func(ctn di.Container) (interface{}, error) {
-				addHandlerVar := ctn.Get(AddHandlerDef).(*addURLHandler.AddHandler)
-				getHandlerVar := ctn.Get(GetHandlerDef).(*getURLHandler.GetHandler)
+				addHandlerVar := ctn.Get(AddHandlerDef).(*addurlhandler.AddHandler)
+				getHandlerVar := ctn.Get(GetHandlerDef).(*geturlhandler.GetHandler)
 				return router.NewRouter(addHandlerVar, getHandlerVar), nil
 			},
 		},
