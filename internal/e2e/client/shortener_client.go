@@ -3,7 +3,7 @@ package client
 import (
 	"bytes"
 	"fmt"
-	"github.com/anoriar/shortener/cmd/e2e/client/dto"
+	dto2 "github.com/anoriar/shortener/internal/e2e/client/dto"
 	"io"
 	"net/http"
 )
@@ -20,7 +20,7 @@ func NewShortenerClient(httpClient *http.Client, baseURL string) *ShortenerClien
 	}
 }
 
-func (client *ShortenerClient) AddURL(url string) (*dto.AddResponseDto, error) {
+func (client *ShortenerClient) AddURL(url string) (*dto2.AddResponseDto, error) {
 	request, err := http.NewRequest(http.MethodPost, client.baseURL, bytes.NewReader([]byte(url)))
 	if err != nil {
 		return nil, err
@@ -39,14 +39,14 @@ func (client *ShortenerClient) AddURL(url string) (*dto.AddResponseDto, error) {
 		return nil, err
 	}
 
-	return dto.NewShortenerResponseDto(
+	return dto2.NewShortenerResponseDto(
 		response.StatusCode,
 		response.Header.Get("Content-Type"),
 		string(body),
 	), nil
 }
 
-func (client *ShortenerClient) GetURL(key string) (*dto.GetResponseDto, error) {
+func (client *ShortenerClient) GetURL(key string) (*dto2.GetResponseDto, error) {
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, key), nil)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (client *ShortenerClient) GetURL(key string) (*dto.GetResponseDto, error) {
 	}
 	defer response.Body.Close()
 
-	return dto.NewGetResponseDto(
+	return dto2.NewGetResponseDto(
 		response.StatusCode,
 		response.Header.Get("Location"),
 	), nil

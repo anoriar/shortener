@@ -1,8 +1,8 @@
-package main
+package e2e
 
 import (
-	"github.com/anoriar/shortener/cmd/e2e/client"
-	"github.com/anoriar/shortener/cmd/e2e/config"
+	"github.com/anoriar/shortener/internal/e2e/client"
+	"github.com/anoriar/shortener/internal/e2e/config"
 	"github.com/caarlos0/env/v6"
 	"github.com/stretchr/testify/assert"
 	"net/http"

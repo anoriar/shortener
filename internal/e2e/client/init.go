@@ -1,7 +1,7 @@
 package client
 
 import (
-	"github.com/anoriar/shortener/cmd/e2e/config"
+	"github.com/anoriar/shortener/internal/e2e/config"
 	"net/http"
 )
 
