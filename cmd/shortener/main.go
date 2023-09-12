@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/anoriar/shortener/internal/config"
-	"github.com/anoriar/shortener/internal/router"
+	"github.com/anoriar/shortener/internal/shortener/config"
+	"github.com/anoriar/shortener/internal/shortener/router"
 	"github.com/caarlos0/env/v6"
 	"net/http"
 )

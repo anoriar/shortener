@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/anoriar/shortener/internal/config"
+	"github.com/anoriar/shortener/internal/shortener/config"
 )
 
 func parseFlags(config *config.Config) {

@@ -1,8 +1,8 @@
 package addurlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/storage"
-	"github.com/anoriar/shortener/internal/util"
+	"github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/util"
 	"io"
 	"net/http"
 	neturl "net/url"

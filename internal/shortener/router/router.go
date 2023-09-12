@@ -1,8 +1,8 @@
 package router
 
 import (
-	"github.com/anoriar/shortener/internal/handlers/addurlhandler"
-	"github.com/anoriar/shortener/internal/handlers/geturlhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/addurlhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/geturlhandler"
 	"github.com/go-chi/chi/v5"
 )
 

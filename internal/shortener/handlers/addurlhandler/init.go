@@ -1,9 +1,9 @@
 package addurlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/config"
-	"github.com/anoriar/shortener/internal/storage"
-	"github.com/anoriar/shortener/internal/util"
+	"github.com/anoriar/shortener/internal/shortener/config"
+	"github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
 func InitializeAddHandler(cnf *config.Config) *AddHandler {

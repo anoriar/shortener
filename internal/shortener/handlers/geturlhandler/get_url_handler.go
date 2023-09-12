@@ -1,7 +1,7 @@
 package geturlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/storage"
+	"github.com/anoriar/shortener/internal/shortener/storage"
 	"net/http"
 	"strings"
 )

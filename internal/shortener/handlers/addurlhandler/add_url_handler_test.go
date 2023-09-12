@@ -2,7 +2,7 @@ package addurlhandler
 
 import (
 	"errors"
-	"github.com/anoriar/shortener/internal/storage"
+	storage2 "github.com/anoriar/shortener/internal/shortener/storage"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -41,13 +41,13 @@ func TestAddURL(t *testing.T) {
 	tests := []struct {
 		name        string
 		requestBody string
-		urlStorage  storage.URLStorageInterface
+		urlStorage  storage2.URLStorageInterface
 		want        want
 	}{
 		{
 			name:        "success",
 			requestBody: successRequestBody,
-			urlStorage:  storage.GetInstance(),
+			urlStorage:  storage2.GetInstance(),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -57,7 +57,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "not valid url",
 			requestBody: "/dd",
-			urlStorage:  storage.GetInstance(),
+			urlStorage:  storage2.GetInstance(),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
