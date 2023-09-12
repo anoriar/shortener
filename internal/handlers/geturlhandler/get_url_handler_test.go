@@ -9,16 +9,7 @@ import (
 )
 
 const successRedirectLocation = "https://github.com"
-
-type mockGetHandlerURLStorage struct{}
-
-func (mcr *mockGetHandlerURLStorage) AddURL(url string, key string) error {
-	return nil
-}
-
-func (mcr *mockGetHandlerURLStorage) FindURLByKey(key string) (string, bool) {
-	return successRedirectLocation, true
-}
+const existedKey = "sHde1e"
 
 type mockGetHandlerURLStorageNotExists struct{}
 
@@ -31,21 +22,25 @@ func (mcr *mockGetHandlerURLStorageNotExists) FindURLByKey(key string) (string, 
 }
 
 func TestGetHandler_GetURL(t *testing.T) {
+	urlStorage := storage.GetInstance()
+	err := urlStorage.AddURL(successRedirectLocation, existedKey)
+	assert.NoError(t, err)
+
 	type want struct {
 		status      int
 		contentType string
 		location    string
 	}
 	tests := []struct {
-		name           string
-		request        string
-		repositoryMock storage.URLStorageInterface
-		want           want
+		name       string
+		request    string
+		urlStorage storage.URLStorageInterface
+		want       want
 	}{
 		{
-			name:           "success",
-			request:        "/sHde1e",
-			repositoryMock: new(mockGetHandlerURLStorage),
+			name:       "success",
+			request:    "/" + existedKey,
+			urlStorage: urlStorage,
 			want: want{
 				status:      http.StatusTemporaryRedirect,
 				contentType: "text/plain",
@@ -53,9 +48,9 @@ func TestGetHandler_GetURL(t *testing.T) {
 			},
 		},
 		{
-			name:           "empty short key",
-			request:        "/",
-			repositoryMock: new(mockGetHandlerURLStorage),
+			name:       "empty short key",
+			request:    "/",
+			urlStorage: urlStorage,
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -63,9 +58,9 @@ func TestGetHandler_GetURL(t *testing.T) {
 			},
 		},
 		{
-			name:           "empty short key",
-			request:        "/",
-			repositoryMock: new(mockGetHandlerURLStorageNotExists),
+			name:       "empty short key",
+			request:    "/",
+			urlStorage: new(mockGetHandlerURLStorageNotExists),
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -79,7 +74,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 
-			NewGetHandler(tt.repositoryMock).GetURL(w, r)
+			NewGetHandler(tt.urlStorage).GetURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

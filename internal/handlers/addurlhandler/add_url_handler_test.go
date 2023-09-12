@@ -15,17 +15,6 @@ const successRequestBody = "https://github.com"
 const baseURL = "http://localhost:8080"
 const successExpectedBody = baseURL + "/" + expectedShortKey
 
-// TODO MENTOR Как лучше организовывать моки в структуре проекта? Они видны во всем пакете и могут мешать друг другу.
-type mockAddHandlerURLStorage struct{}
-
-func (mcr *mockAddHandlerURLStorage) AddURL(url string, key string) error {
-	return nil
-}
-
-func (mcr *mockAddHandlerURLStorage) FindURLByKey(key string) (string, bool) {
-	return "https://github.com", true
-}
-
 type mockAddHandlerURLStorageError struct{}
 
 func (mcr *mockAddHandlerURLStorageError) AddURL(url string, key string) error {
@@ -52,13 +41,13 @@ func TestAddURL(t *testing.T) {
 	tests := []struct {
 		name        string
 		requestBody string
-		storageMock storage.URLStorageInterface
+		urlStorage  storage.URLStorageInterface
 		want        want
 	}{
 		{
 			name:        "success",
 			requestBody: successRequestBody,
-			storageMock: new(mockAddHandlerURLStorage),
+			urlStorage:  storage.GetInstance(),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -68,7 +57,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "not valid url",
 			requestBody: "/dd",
-			storageMock: new(mockAddHandlerURLStorage),
+			urlStorage:  storage.GetInstance(),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -78,7 +67,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "storage error",
 			requestBody: successRequestBody,
-			storageMock: new(mockAddHandlerURLStorageError),
+			urlStorage:  new(mockAddHandlerURLStorageError),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -94,7 +83,7 @@ func TestAddURL(t *testing.T) {
 
 			keyGenMock := new(mockAddHandlerKeyGen)
 
-			NewAddHandler(tt.storageMock, keyGenMock, baseURL).AddURL(w, r)
+			NewAddHandler(tt.urlStorage, keyGenMock, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))
