@@ -28,10 +28,11 @@ func (client *ShortenerClient) AddURL(url string) (*dto.AddResponseDto, error) {
 
 	request.Header.Add("Content-Type", "text/plain")
 	response, err := client.httpClient.Do(request)
-	defer response.Body.Close()
+
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -53,10 +54,10 @@ func (client *ShortenerClient) GetURL(key string) (*dto.GetResponseDto, error) {
 
 	request.Header.Add("Content-Type", "text/plain")
 	response, err := client.httpClient.Do(request)
-	defer response.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer response.Body.Close()
 
 	return dto.NewGetResponseDto(
 		response.StatusCode,
