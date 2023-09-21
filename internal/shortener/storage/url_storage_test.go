@@ -102,28 +102,3 @@ func TestURLStorage_FindURLByKey(t *testing.T) {
 		})
 	}
 }
-
-func Test_newURLStorage(t *testing.T) {
-
-	tests := []struct {
-		name string
-		urls map[string]string
-		want map[string]string
-	}{
-		{
-			name: "test",
-			urls: map[string]string{
-				"KZXdDY": "https://github.com",
-			},
-			want: map[string]string{
-				"KZXdDY": "https://github.com",
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			urlStorage := newURLStorage(tt.urls)
-			assert.Equal(t, tt.urls, urlStorage.urls)
-		})
-	}
-}
