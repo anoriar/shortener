@@ -6,6 +6,6 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
-func InitializeAddHandler(cnf *config.Config) *AddHandler {
-	return NewAddHandler(storage.GetInstance(), util.NewKeyGen(), cnf.BaseURL)
+func InitializeAddHandler(cnf *config.Config, storage storage.URLStorageInterface) *AddHandler {
+	return NewAddHandler(storage, util.NewKeyGen(), cnf.BaseURL)
 }

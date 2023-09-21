@@ -4,22 +4,12 @@ import (
 	"fmt"
 )
 
-var urlStorage URLStorageInterface
-
-func init() {
-	urlStorage = newURLStorage(make(map[string]string))
-}
-
 type URLStorage struct {
 	urls map[string]string
 }
 
-func newURLStorage(urls map[string]string) *URLStorage {
-	return &URLStorage{urls: urls}
-}
-
-func GetInstance() URLStorageInterface {
-	return urlStorage
+func NewURLStorage() *URLStorage {
+	return &URLStorage{urls: make(map[string]string)}
 }
 
 func (storage *URLStorage) AddURL(url string, key string) error {

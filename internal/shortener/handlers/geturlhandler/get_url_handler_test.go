@@ -22,7 +22,7 @@ func (mcr *mockGetHandlerURLStorageNotExists) FindURLByKey(key string) (string, 
 }
 
 func TestGetHandler_GetURL(t *testing.T) {
-	urlStorage := storage2.GetInstance()
+	urlStorage := storage2.NewURLStorage()
 	err := urlStorage.AddURL(successRedirectLocation, existedKey)
 	assert.NoError(t, err)
 

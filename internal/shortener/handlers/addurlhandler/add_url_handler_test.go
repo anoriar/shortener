@@ -47,7 +47,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "success",
 			requestBody: successRequestBody,
-			urlStorage:  storage2.GetInstance(),
+			urlStorage:  storage2.NewURLStorage(),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -57,7 +57,7 @@ func TestAddURL(t *testing.T) {
 		{
 			name:        "not valid url",
 			requestBody: "/dd",
-			urlStorage:  storage2.GetInstance(),
+			urlStorage:  storage2.NewURLStorage(),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
