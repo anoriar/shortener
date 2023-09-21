@@ -1,7 +1,3 @@
-# go-musthave-shortener-tpl
-
-Шаблон репозитория для трека «Сервис сокращения URL».
-
 ## Начало работы
 
 1. Склонируйте репозиторий в любую подходящую директорию на вашем компьютере.
@@ -30,3 +26,22 @@ git fetch template && git checkout template/main .github
 При мёрже ветки с инкрементом в основную ветку `main` будут запускаться все автотесты.
 
 Подробнее про локальный и автоматический запуск читайте в [README автотестов](https://github.com/Yandex-Practicum/go-autotests).
+
+
+## Паспорт сервиса:
+
+* cmd/shortener/main.go - rest-сервер на Golang (API методы)
+* cmd/e2e/shortener_test.go - сквозной тест
+
+## Запуск проекта:
+
+1. В Goland Add Configuration -> go build
+2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/shortener```
+3. ENVIRONMENT скопировать из ```.env.server-example```
+
+
+## Запуск e2e теста:
+
+1. В Goland Add Configuration -> go build
+2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/e2e```
+3. ENVIRONMENT скопировать из ```.env.e2e-example```
