@@ -45,3 +45,32 @@ git fetch template && git checkout template/main .github
 1. В Goland Add Configuration -> go build
 2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/e2e```
 3. ENVIRONMENT скопировать из ```.env.e2e-example```
+
+
+
+## Запуск автотестов локально
+Подготовка:
+1 Скачать тест и положить в корень проекта
+https://github.com/Yandex-Practicum/go-autotests/releases/tag/v0.9.16
+
+2 sudo chmod a+x shortenertestbeta
+
+Запуск:
+
+1 Скомпилировать сервер в папке cmd/shortener
+go build -o shortener *.go
+
+В Goland: Edit configurations -> Add -> Go Build
+Run kind = Directory
+Directory = {your home directory}/shortener/cmd/shortener
+Run after build отключить
+
+2 выполнить в корне проекта:
+./shortenertestbeta -test.v -test.run=^TestIteration1$ -binary-path=cmd/shortener/shortener
+
+В Goland:
+Edit configurations -> Add -> Shell Script
+Script text = ./shortenertestbeta -test.v -test.run=^TestIteration1$ -binary-path=cmd/shortener/shortener
+Script брать из .github/workflows/shortenertest.yaml и менять для каждой итерации
+Пример с переменной окружения SERVER_PORT
+SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^TestIteration5$ -binary-path=cmd/shortener/shortener -server-port=$SERVER_PORT
