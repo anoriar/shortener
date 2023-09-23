@@ -19,10 +19,13 @@ func run() {
 
 	err := env.Parse(conf)
 	if err != nil {
-		return
+		panic(err)
 	}
 
 	logger, err := logger.Initialize(conf.LogLevel)
+	if err != nil {
+		panic(err)
+	}
 
 	defer logger.Sync()
 
