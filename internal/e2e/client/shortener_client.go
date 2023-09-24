@@ -68,13 +68,13 @@ func (client *ShortenerClient) GetURL(key string) (*dtoResponsePkg.GetResponseDt
 }
 
 func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponseV2Dto, error) {
-	requestDto := dtoRequestPkg.AddURLRequestDto{Url: url}
-	requestJson, err := json.Marshal(requestDto)
+	requestDto := dtoRequestPkg.AddURLRequestDto{URL: url}
+	requestJSON, err := json.Marshal(requestDto)
 	if err != nil {
 		return nil, err
 	}
 
-	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten", bytes.NewReader(requestJson))
+	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten", bytes.NewReader(requestJSON))
 	if err != nil {
 		return nil, err
 	}

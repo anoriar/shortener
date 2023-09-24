@@ -1,5 +1,5 @@
 package request
 
 type AddURLRequestDto struct {
-	Url string `json:"url"`
+	URL string `json:"url"`
 }

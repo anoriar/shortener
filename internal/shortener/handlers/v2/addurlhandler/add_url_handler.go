@@ -26,20 +26,20 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	addUrlRequestDto := request.AddURLRequestDto{}
+	addURLRequestDto := request.AddURLRequestDto{}
 
-	if err = json.Unmarshal(requestBody, &addUrlRequestDto); err != nil {
+	if err = json.Unmarshal(requestBody, &addURLRequestDto); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if _, err = govalidator.ValidateStruct(&addUrlRequestDto); err != nil {
+	if _, err = govalidator.ValidateStruct(&addURLRequestDto); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	shortKey := handler.keyGen.Generate()
-	err = handler.urlRepository.AddURL(addUrlRequestDto.Url, shortKey)
+	err = handler.urlRepository.AddURL(addURLRequestDto.URL, shortKey)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
