@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	dtoRequestPkg "github.com/anoriar/shortener/internal/e2e/client/dto/request"
 	dtoResponsePkg "github.com/anoriar/shortener/internal/e2e/client/dto/response"
@@ -90,6 +91,14 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		return nil, errors.New(string(body))
+	}
+
+	if resp.Header.Get("Content-Type") != "application/json" {
+		return nil, errors.New("not expected content type in response")
 	}
 
 	var addURLResponseDto dtoResponsePkg.AddURLResponseDTO
