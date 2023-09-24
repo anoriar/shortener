@@ -1,10 +1,11 @@
 package client
 
 import (
-	dto2 "github.com/anoriar/shortener/internal/e2e/client/dto"
+	"github.com/anoriar/shortener/internal/e2e/client/dto/response"
 )
 
 type ShortenerClientInterface interface {
-	AddURL(url string) (*dto2.AddResponseDto, error)
-	GetURL(key string) (*dto2.GetResponseDto, error)
+	AddURL(url string) (*response.AddResponseDto, error)
+	AddURLv2(url string) (*response.AddResponseV2Dto, error)
+	GetURL(key string) (*response.GetResponseDto, error)
 }

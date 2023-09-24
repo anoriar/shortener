@@ -2,8 +2,10 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
-	dto2 "github.com/anoriar/shortener/internal/e2e/client/dto"
+	dtoRequestPkg "github.com/anoriar/shortener/internal/e2e/client/dto/request"
+	dtoResponsePkg "github.com/anoriar/shortener/internal/e2e/client/dto/response"
 	"io"
 	"net/http"
 )
@@ -20,7 +22,7 @@ func NewShortenerClient(httpClient *http.Client, baseURL string) *ShortenerClien
 	}
 }
 
-func (client *ShortenerClient) AddURL(url string) (*dto2.AddResponseDto, error) {
+func (client *ShortenerClient) AddURL(url string) (*dtoResponsePkg.AddResponseDto, error) {
 	request, err := http.NewRequest(http.MethodPost, client.baseURL, bytes.NewReader([]byte(url)))
 	if err != nil {
 		return nil, err
@@ -39,14 +41,14 @@ func (client *ShortenerClient) AddURL(url string) (*dto2.AddResponseDto, error) 
 		return nil, err
 	}
 
-	return dto2.NewShortenerResponseDto(
+	return dtoResponsePkg.NewShortenerResponseDto(
 		response.StatusCode,
 		response.Header.Get("Content-Type"),
 		string(body),
 	), nil
 }
 
-func (client *ShortenerClient) GetURL(key string) (*dto2.GetResponseDto, error) {
+func (client *ShortenerClient) GetURL(key string) (*dtoResponsePkg.GetResponseDto, error) {
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, key), nil)
 	if err != nil {
 		return nil, err
@@ -59,8 +61,46 @@ func (client *ShortenerClient) GetURL(key string) (*dto2.GetResponseDto, error) 
 	}
 	defer response.Body.Close()
 
-	return dto2.NewGetResponseDto(
+	return dtoResponsePkg.NewGetResponseDto(
 		response.StatusCode,
 		response.Header.Get("Location"),
+	), nil
+}
+
+func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponseV2Dto, error) {
+	requestDto := dtoRequestPkg.AddURLRequestDto{Url: url}
+	requestJson, err := json.Marshal(requestDto)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten", bytes.NewReader(requestJson))
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "text/plain")
+	resp, err := client.httpClient.Do(request)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var addURLResponseDto dtoResponsePkg.AddURLResponseDTO
+	err = json.Unmarshal(body, &addURLResponseDto)
+	if err != nil {
+		return nil, err
+	}
+
+	return dtoResponsePkg.NewAddResponseV2Dto(
+		resp.StatusCode,
+		resp.Header.Get("Content-Type"),
+		addURLResponseDto,
 	), nil
 }

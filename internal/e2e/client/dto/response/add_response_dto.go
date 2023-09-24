@@ -1,4 +1,4 @@
-package dto
+package response
 
 type AddResponseDto struct {
 	StatusCode  int

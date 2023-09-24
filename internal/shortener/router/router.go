@@ -1,8 +1,9 @@
 package router
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/handlers/addurlhandler"
-	"github.com/anoriar/shortener/internal/shortener/handlers/geturlhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
+	addURLHandlerV2 "github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/shared/response"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -11,16 +12,18 @@ import (
 )
 
 type Router struct {
-	addHandler *addurlhandler.AddHandler
-	getHandler *geturlhandler.GetHandler
-	logger     *zap.Logger
+	addHandler   *addurlhandler.AddHandler
+	getHandler   *geturlhandler.GetHandler
+	addHandlerV2 *addURLHandlerV2.AddHandler
+	logger       *zap.Logger
 }
 
-func NewRouter(addHandler *addurlhandler.AddHandler, getHandler *geturlhandler.GetHandler, logger *zap.Logger) *Router {
+func NewRouter(addHandler *addurlhandler.AddHandler, getHandler *geturlhandler.GetHandler, addHandlerV2 *addURLHandlerV2.AddHandler, logger *zap.Logger) *Router {
 	return &Router{
-		addHandler: addHandler,
-		getHandler: getHandler,
-		logger:     logger,
+		addHandler:   addHandler,
+		getHandler:   getHandler,
+		addHandlerV2: addHandlerV2,
+		logger:       logger,
 	}
 }
 
@@ -31,6 +34,7 @@ func (r *Router) Route() chi.Router {
 
 	router.Post("/", r.addHandler.AddURL)
 	router.Get("/{id}", r.getHandler.GetURL)
+	router.Post("/api/shorten", r.addHandlerV2.AddURL)
 
 	return router
 }
