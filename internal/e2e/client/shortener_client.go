@@ -2,11 +2,13 @@ package client
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"fmt"
 	dtoRequestPkg "github.com/anoriar/shortener/internal/e2e/client/dto/request"
 	dtoResponsePkg "github.com/anoriar/shortener/internal/e2e/client/dto/response"
+	"github.com/anoriar/shortener/internal/e2e/config"
 	"io"
 	"net/http"
 )
@@ -80,7 +82,8 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 		return nil, err
 	}
 
-	request.Header.Add("Content-Type", "text/plain")
+	request.Header.Add("Content-Type", "application/json")
+	request.Header.Add("Accept-Encoding", "gzip")
 	resp, err := client.httpClient.Do(request)
 
 	if err != nil {
@@ -88,7 +91,17 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	reader := resp.Body
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		gzReader, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		defer gzReader.Close()
+		reader = gzReader
+	}
+
+	body, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +123,19 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	return dtoResponsePkg.NewAddResponseV2Dto(
 		resp.StatusCode,
 		resp.Header.Get("Content-Type"),
+		resp.Header.Get("Content-Encoding"),
 		addURLResponseDto,
 	), nil
+}
+
+func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface {
+	return &ShortenerClient{
+		httpClient: &http.Client{
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				// Disable automatic redirects
+				return http.ErrUseLastResponse
+			},
+		},
+		baseURL: cnf.BaseURL,
+	}
 }

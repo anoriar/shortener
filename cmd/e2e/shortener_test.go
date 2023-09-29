@@ -54,6 +54,7 @@ func Test_ShortenerV2(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, addResponse.StatusCode)
 	assert.Equal(t, "application/json", addResponse.ContentType)
+	assert.Equal(t, "gzip", addResponse.ContentEncoding)
 	assert.True(t, strings.HasPrefix(addResponse.Body.Result, cnf.BaseURL))
 
 	splittedURL := strings.Split(addResponse.Body.Result, "/")
