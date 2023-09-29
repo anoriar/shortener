@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	applicationJson = "application/json"
-	textHtml        = "text/html"
+	applicationJSON = "application/json"
+	textHTML        = "text/html"
 )
 
 type CompressMiddleware struct {
@@ -22,13 +22,9 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ow := w
 
-		supportCompress := false
 		contentType := r.Header.Get("Content-Type")
-		if contentType == applicationJson || contentType == textHtml {
-			supportCompress = true
-		}
 
-		if supportCompress == true {
+		if contentType == applicationJSON || contentType == textHTML {
 			acceptEncoding := r.Header.Get("Accept-Encoding")
 			supportsGzip := strings.Contains(acceptEncoding, "gzip")
 			if supportsGzip {
