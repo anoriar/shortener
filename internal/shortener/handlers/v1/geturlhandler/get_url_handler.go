@@ -26,13 +26,19 @@ func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 	shortKey := strings.Trim(req.URL.Path, "/")
 	if shortKey == "" {
 		http.Error(w, "Short key is empty", http.StatusBadRequest)
+		return
 	}
 
-	url, exists := handler.urlRepository.FindURLByKey(shortKey)
-	if !exists {
+	url, err := handler.urlRepository.FindURLByKey(shortKey)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if url == nil {
 		http.Error(w, "URL does not exists", http.StatusBadRequest)
+		return
 	}
 
-	w.Header().Set("Location", url)
+	w.Header().Set("Location", url.OriginalURL)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

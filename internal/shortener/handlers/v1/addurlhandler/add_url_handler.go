@@ -42,7 +42,7 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	}
 
 	shortKey := handler.keyGen.Generate()
-	err = handler.urlRepository.AddURL(string(url), shortKey)
+	_, err = handler.urlRepository.AddURL(string(url), shortKey)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

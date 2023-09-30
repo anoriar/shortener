@@ -1,6 +1,7 @@
 package geturlhandler
 
 import (
+	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -10,20 +11,21 @@ import (
 
 const successRedirectLocation = "https://github.com"
 const existedKey = "sHde1e"
+const notExistedKey = "sdJ2f3"
 
-type mockGetHandlerURLStorageNotExists struct{}
+type mockGetHandlerURLRepositoryNotExists struct{}
 
-func (mcr *mockGetHandlerURLStorageNotExists) AddURL(url string, key string) error {
-	return nil
+func (mcr *mockGetHandlerURLRepositoryNotExists) AddURL(url string, key string) (*entity.Url, error) {
+	return nil, nil
 }
 
-func (mcr *mockGetHandlerURLStorageNotExists) FindURLByKey(key string) (string, bool) {
-	return "", false
+func (mcr *mockGetHandlerURLRepositoryNotExists) FindURLByKey(key string) (*entity.Url, error) {
+	return nil, nil
 }
 
 func TestGetHandler_GetURL(t *testing.T) {
-	urlStorage := repository.NewInMemoryURLRepository()
-	err := urlStorage.AddURL(successRedirectLocation, existedKey)
+	urlRepository := repository.NewInMemoryURLRepository()
+	_, err := urlRepository.AddURL(successRedirectLocation, existedKey)
 	assert.NoError(t, err)
 
 	type want struct {
@@ -32,15 +34,15 @@ func TestGetHandler_GetURL(t *testing.T) {
 		location    string
 	}
 	tests := []struct {
-		name       string
-		request    string
-		urlStorage repository.URLRepositoryInterface
-		want       want
+		name          string
+		request       string
+		urlRepository repository.URLRepositoryInterface
+		want          want
 	}{
 		{
-			name:       "success",
-			request:    "/" + existedKey,
-			urlStorage: urlStorage,
+			name:          "success",
+			request:       "/" + existedKey,
+			urlRepository: urlRepository,
 			want: want{
 				status:      http.StatusTemporaryRedirect,
 				contentType: "text/plain",
@@ -48,9 +50,9 @@ func TestGetHandler_GetURL(t *testing.T) {
 			},
 		},
 		{
-			name:       "empty short key",
-			request:    "/",
-			urlStorage: urlStorage,
+			name:          "empty short key",
+			request:       "/",
+			urlRepository: urlRepository,
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -58,9 +60,19 @@ func TestGetHandler_GetURL(t *testing.T) {
 			},
 		},
 		{
-			name:       "empty short key",
-			request:    "/",
-			urlStorage: new(mockGetHandlerURLStorageNotExists),
+			name:          "not existed short key",
+			request:       "/" + notExistedKey,
+			urlRepository: urlRepository,
+			want: want{
+				status:      http.StatusBadRequest,
+				contentType: "text/plain; charset=utf-8",
+				location:    "",
+			},
+		},
+		{
+			name:          "error when fetching",
+			request:       "/" + notExistedKey,
+			urlRepository: new(mockGetHandlerURLRepositoryNotExists),
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -74,7 +86,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 
-			NewGetHandler(tt.urlStorage).GetURL(w, r)
+			NewGetHandler(tt.urlRepository).GetURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

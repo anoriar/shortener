@@ -2,6 +2,7 @@ package addurlhandler
 
 import (
 	"errors"
+	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/stretchr/testify/assert"
 	"net/http"
@@ -17,12 +18,12 @@ const successExpectedBody = `{"result":"http://localhost:8080/etw73C"}`
 
 type mockAddHandlerURLRepositoryError struct{}
 
-func (mcr *mockAddHandlerURLRepositoryError) AddURL(url string, key string) error {
-	return errors.New("test")
+func (mcr *mockAddHandlerURLRepositoryError) AddURL(url string, key string) (*entity.Url, error) {
+	return nil, errors.New("test")
 }
 
-func (mcr *mockAddHandlerURLRepositoryError) FindURLByKey(key string) (string, bool) {
-	return "https://github.com", true
+func (mcr *mockAddHandlerURLRepositoryError) FindURLByKey(key string) (*entity.Url, error) {
+	return nil, nil
 }
 
 type mockAddHandlerKeyGen struct{}

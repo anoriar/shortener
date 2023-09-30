@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -12,14 +13,18 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		existedURLs map[string]string
+		existedURLs map[string]*entity.Url
 		args        args
 		wantErr     bool
 	}{
 		{
 			name: "add item simple",
-			existedURLs: map[string]string{
-				"KZXdDY": "https://github.com",
+			existedURLs: map[string]*entity.Url{
+				"KZXdDY": &entity.Url{
+					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+					ShortURL:    "KZXdDY",
+					OriginalURL: "https://github.com",
+				},
 			},
 			args: args{
 				url: "https://google.com",
@@ -29,8 +34,12 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 		},
 		{
 			name: "item exists",
-			existedURLs: map[string]string{
-				"KZXdDY": "https://github.com",
+			existedURLs: map[string]*entity.Url{
+				"KZXdDY": &entity.Url{
+					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+					ShortURL:    "KZXdDY",
+					OriginalURL: "https://github.com",
+				},
 			},
 			args: args{
 				url: "https://google.com",
@@ -45,7 +54,7 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 				urls: tt.existedURLs,
 			}
 
-			err := repository.AddURL(tt.args.url, tt.args.key)
+			_, err := repository.AddURL(tt.args.url, tt.args.key)
 
 			assert.Equal(t, tt.wantErr, err != nil)
 			assert.Contains(t, repository.urls, tt.args.key)
@@ -56,36 +65,45 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 func TestInMemoryURLRepository_FindURLByKey(t *testing.T) {
 
 	type want struct {
-		url   string
-		exist bool
+		url *entity.Url
 	}
 
 	tests := []struct {
 		name        string
-		existedURLs map[string]string
+		existedURLs map[string]*entity.Url
 		key         string
 		want        want
 	}{
 		{
 			name: "item exists",
-			existedURLs: map[string]string{
-				"KZXdDY": "https://github.com",
+			existedURLs: map[string]*entity.Url{
+				"KZXdDY": &entity.Url{
+					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+					ShortURL:    "KZXdDY",
+					OriginalURL: "https://github.com",
+				},
 			},
 			key: "KZXdDY",
 			want: want{
-				url:   "https://github.com",
-				exist: true,
+				url: &entity.Url{
+					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+					ShortURL:    "KZXdDY",
+					OriginalURL: "https://github.com",
+				},
 			},
 		},
 		{
 			name: "item not exists",
-			existedURLs: map[string]string{
-				"KZXdDY": "https://github.com",
+			existedURLs: map[string]*entity.Url{
+				"KZXdDY": &entity.Url{
+					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+					ShortURL:    "KZXdDY",
+					OriginalURL: "https://github.com",
+				},
 			},
 			key: "1111",
 			want: want{
-				url:   "",
-				exist: false,
+				url: nil,
 			},
 		},
 	}
@@ -95,10 +113,10 @@ func TestInMemoryURLRepository_FindURLByKey(t *testing.T) {
 				urls: tt.existedURLs,
 			}
 
-			url, exist := repository.FindURLByKey(tt.key)
+			newURL, err := repository.FindURLByKey(tt.key)
 
-			assert.Equal(t, tt.want.exist, exist)
-			assert.Equal(t, tt.want.url, url)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.want.url, newURL)
 		})
 	}
 }
