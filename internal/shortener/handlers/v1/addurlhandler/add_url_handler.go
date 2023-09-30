@@ -1,7 +1,8 @@
 package addurlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/config"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/util"
 	"io"
 	"net/http"
@@ -9,12 +10,16 @@ import (
 )
 
 type AddHandler struct {
-	urlRepository storage.URLStorageInterface
+	urlRepository repository.URLRepositoryInterface
 	keyGen        util.KeyGenInterface
 	baseURL       string
 }
 
-func NewAddHandler(urlRepository storage.URLStorageInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
+func InitializeAddHandler(cnf *config.Config, repository repository.URLRepositoryInterface) *AddHandler {
+	return NewAddHandler(repository, util.NewKeyGen(), cnf.BaseURL)
+}
+
+func NewAddHandler(urlRepository repository.URLRepositoryInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
 	return &AddHandler{
 		urlRepository: urlRepository,
 		keyGen:        keyGen,

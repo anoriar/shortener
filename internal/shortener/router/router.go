@@ -6,7 +6,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	addURLHandlerV2 "github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/middleware"
-	"github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
@@ -20,11 +20,11 @@ type Router struct {
 }
 
 func InitializeRouter(cnf *config.Config, logger *zap.Logger) *Router {
-	storage := storage.NewURLStorage()
+	urlRepository := repository.NewInMemoryURLRepository()
 	return NewRouter(
-		addurlhandler.InitializeAddHandler(cnf, storage),
-		geturlhandler.InitializeGetHandler(storage),
-		addURLHandlerV2.Initialize(cnf, storage),
+		addurlhandler.InitializeAddHandler(cnf, urlRepository),
+		geturlhandler.InitializeGetHandler(urlRepository),
+		addURLHandlerV2.Initialize(cnf, urlRepository),
 		middleware.NewLoggerMiddleware(logger),
 		middleware.NewCompressMiddleware(),
 	)

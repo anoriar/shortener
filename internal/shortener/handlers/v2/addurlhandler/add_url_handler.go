@@ -5,7 +5,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
-	"github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/util"
 	"github.com/asaskevich/govalidator"
 	"io"
@@ -13,7 +13,7 @@ import (
 )
 
 type AddHandler struct {
-	urlRepository storage.URLStorageInterface
+	urlRepository repository.URLRepositoryInterface
 	keyGen        util.KeyGenInterface
 	baseURL       string
 }
@@ -65,7 +65,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func NewAddHandler(urlRepository storage.URLStorageInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
+func NewAddHandler(urlRepository repository.URLRepositoryInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
 	return &AddHandler{
 		urlRepository: urlRepository,
 		keyGen:        keyGen,
@@ -73,6 +73,6 @@ func NewAddHandler(urlRepository storage.URLStorageInterface, keyGen util.KeyGen
 	}
 }
 
-func Initialize(cnf *config.Config, storage storage.URLStorageInterface) *AddHandler {
-	return NewAddHandler(storage, util.NewKeyGen(), cnf.BaseURL)
+func Initialize(cnf *config.Config, urlRepository repository.URLRepositoryInterface) *AddHandler {
+	return NewAddHandler(urlRepository, util.NewKeyGen(), cnf.BaseURL)
 }

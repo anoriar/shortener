@@ -1,11 +1,11 @@
-package storage
+package repository
 
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestURLStorage_AddURL(t *testing.T) {
+func TestInMemoryURLRepository_AddURL(t *testing.T) {
 	type args struct {
 		url string
 		key string
@@ -41,19 +41,19 @@ func TestURLStorage_AddURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			storage := &URLStorage{
+			repository := &InMemoryURLRepository{
 				urls: tt.existedURLs,
 			}
 
-			err := storage.AddURL(tt.args.url, tt.args.key)
+			err := repository.AddURL(tt.args.url, tt.args.key)
 
 			assert.Equal(t, tt.wantErr, err != nil)
-			assert.Contains(t, storage.urls, tt.args.key)
+			assert.Contains(t, repository.urls, tt.args.key)
 		})
 	}
 }
 
-func TestURLStorage_FindURLByKey(t *testing.T) {
+func TestInMemoryURLRepository_FindURLByKey(t *testing.T) {
 
 	type want struct {
 		url   string
@@ -91,11 +91,11 @@ func TestURLStorage_FindURLByKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			storage := &URLStorage{
+			repository := &InMemoryURLRepository{
 				urls: tt.existedURLs,
 			}
 
-			url, exist := storage.FindURLByKey(tt.key)
+			url, exist := repository.FindURLByKey(tt.key)
 
 			assert.Equal(t, tt.want.exist, exist)
 			assert.Equal(t, tt.want.url, url)

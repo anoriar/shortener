@@ -1,7 +1,7 @@
 package geturlhandler
 
 import (
-	storage2 "github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -22,7 +22,7 @@ func (mcr *mockGetHandlerURLStorageNotExists) FindURLByKey(key string) (string, 
 }
 
 func TestGetHandler_GetURL(t *testing.T) {
-	urlStorage := storage2.NewURLStorage()
+	urlStorage := repository.NewInMemoryURLRepository()
 	err := urlStorage.AddURL(successRedirectLocation, existedKey)
 	assert.NoError(t, err)
 
@@ -34,7 +34,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 	tests := []struct {
 		name       string
 		request    string
-		urlStorage storage2.URLStorageInterface
+		urlStorage repository.URLRepositoryInterface
 		want       want
 	}{
 		{

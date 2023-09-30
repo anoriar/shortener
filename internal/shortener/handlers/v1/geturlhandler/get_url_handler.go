@@ -1,16 +1,20 @@
 package geturlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"net/http"
 	"strings"
 )
 
 type GetHandler struct {
-	urlRepository storage.URLStorageInterface
+	urlRepository repository.URLRepositoryInterface
 }
 
-func NewGetHandler(urlRepository storage.URLStorageInterface) *GetHandler {
+func InitializeGetHandler(repository repository.URLRepositoryInterface) *GetHandler {
+	return NewGetHandler(repository)
+}
+
+func NewGetHandler(urlRepository repository.URLRepositoryInterface) *GetHandler {
 	return &GetHandler{
 		urlRepository: urlRepository,
 	}
