@@ -42,7 +42,7 @@ git fetch template && git checkout template/main .github
 
 ## Запуск e2e теста:
 
-1. В Goland Add Configuration -> go build
+1. В Goland Add Configuration -> go test
 2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/e2e```
 3. ENVIRONMENT скопировать из ```.env.e2e-example```
 

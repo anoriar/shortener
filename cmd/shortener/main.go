@@ -33,7 +33,7 @@ func run() {
 
 	err = http.ListenAndServe(conf.Host, r.Route())
 	if err != nil {
-		logger.Fatal("Server error", zap.String("error", err.Error()))
+		logger.Fatal("Server exception", zap.String("exception", err.Error()))
 		panic(err)
 	}
 }

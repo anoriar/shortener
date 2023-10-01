@@ -12,7 +12,7 @@ import (
 )
 
 const expectedShortKey = "etw73C"
-const successRequestBody = `{"url":"http://localhost:8080/etw73C"}`
+const successRequestBody = `{"url_gen":"http://localhost:8080/etw73C"}`
 const baseURL = "http://localhost:8080"
 const successExpectedBody = `{"result":"http://localhost:8080/etw73C"}`
 
@@ -26,10 +26,10 @@ func (mcr *mockAddHandlerURLRepositoryError) FindURLByShortURL(shortURL string) 
 	return nil, nil
 }
 
-type mockAddHandlerKeyGen struct{}
+type mockAddHandlerShortURLGen struct{}
 
-func (mock *mockAddHandlerKeyGen) Generate() string {
-	return expectedShortKey
+func (mock *mockAddHandlerShortURLGen) GenerateShortURL() (string, error) {
+	return expectedShortKey, nil
 }
 
 func TestAddURL(t *testing.T) {
@@ -56,7 +56,7 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:          "not valid url",
+			name:          "not valid url_gen",
 			requestBody:   "/dd",
 			urlRepository: repository.NewInMemoryURLRepository(),
 			want: want{
@@ -66,7 +66,7 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:          "repository error",
+			name:          "repository exception",
 			requestBody:   successRequestBody,
 			urlRepository: new(mockAddHandlerURLRepositoryError),
 			want: want{
@@ -82,9 +82,9 @@ func TestAddURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tt.requestBody))
 			w := httptest.NewRecorder()
 
-			keyGenMock := new(mockAddHandlerKeyGen)
+			urlGen := new(mockAddHandlerShortURLGen)
 
-			NewAddHandler(tt.urlRepository, keyGenMock, baseURL).AddURL(w, r)
+			NewAddHandler(tt.urlRepository, urlGen, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

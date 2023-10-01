@@ -7,7 +7,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
-	"github.com/anoriar/shortener/internal/shortener/util"
+	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/asaskevich/govalidator"
 	"github.com/google/uuid"
 	"io"
@@ -15,9 +15,21 @@ import (
 )
 
 type AddHandler struct {
-	urlRepository repository.URLRepositoryInterface
-	keyGen        util.KeyGenInterface
-	baseURL       string
+	urlRepository     repository.URLRepositoryInterface
+	shortURLGenerator urlgen.ShortURLGeneratorInterface
+	baseURL           string
+}
+
+func NewAddHandler(urlRepository repository.URLRepositoryInterface, shortURLGenerator urlgen.ShortURLGeneratorInterface, baseURL string) *AddHandler {
+	return &AddHandler{
+		urlRepository:     urlRepository,
+		shortURLGenerator: shortURLGenerator,
+		baseURL:           baseURL,
+	}
+}
+
+func Initialize(cnf *config.Config, urlRepository repository.URLRepositoryInterface) *AddHandler {
+	return NewAddHandler(urlRepository, urlgen.InitializeShortURLGenerator(urlRepository), cnf.BaseURL)
 }
 
 func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
@@ -40,8 +52,11 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	shortKey := handler.keyGen.Generate()
-	//TODO: доделать ы keygenerator генерацию в случае существюущего ключа (5 попыток)
+	shortKey, err := handler.shortURLGenerator.GenerateShortURL()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	_, err = handler.urlRepository.AddURL(&entity.URL{
 		UUID:        uuid.NewString(),
@@ -72,16 +87,4 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-}
-
-func NewAddHandler(urlRepository repository.URLRepositoryInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
-	return &AddHandler{
-		urlRepository: urlRepository,
-		keyGen:        keyGen,
-		baseURL:       baseURL,
-	}
-}
-
-func Initialize(cnf *config.Config, urlRepository repository.URLRepositoryInterface) *AddHandler {
-	return NewAddHandler(urlRepository, util.NewKeyGen(), cnf.BaseURL)
 }

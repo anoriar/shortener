@@ -4,7 +4,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
-	"github.com/anoriar/shortener/internal/shortener/util"
+	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -12,20 +12,20 @@ import (
 )
 
 type AddHandler struct {
-	urlRepository repository.URLRepositoryInterface
-	keyGen        util.KeyGenInterface
-	baseURL       string
+	urlRepository     repository.URLRepositoryInterface
+	shortURLGenerator urlgen.ShortURLGeneratorInterface
+	baseURL           string
 }
 
-func InitializeAddHandler(cnf *config.Config, repository repository.URLRepositoryInterface) *AddHandler {
-	return NewAddHandler(repository, util.NewKeyGen(), cnf.BaseURL)
+func InitializeAddHandler(cnf *config.Config, urlRepository repository.URLRepositoryInterface) *AddHandler {
+	return NewAddHandler(urlRepository, urlgen.InitializeShortURLGenerator(urlRepository), cnf.BaseURL)
 }
 
-func NewAddHandler(urlRepository repository.URLRepositoryInterface, keyGen util.KeyGenInterface, baseURL string) *AddHandler {
+func NewAddHandler(urlRepository repository.URLRepositoryInterface, shortURLGenerator urlgen.ShortURLGeneratorInterface, baseURL string) *AddHandler {
 	return &AddHandler{
-		urlRepository: urlRepository,
-		keyGen:        keyGen,
-		baseURL:       baseURL,
+		urlRepository:     urlRepository,
+		shortURLGenerator: shortURLGenerator,
+		baseURL:           baseURL,
 	}
 }
 
@@ -43,7 +43,12 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	shortKey := handler.keyGen.Generate()
+	shortKey, err := handler.shortURLGenerator.GenerateShortURL()
+	if err != nil {
+		http.Error(w, "Not valid URL", http.StatusBadRequest)
+		return
+	}
+
 	_, err = handler.urlRepository.AddURL(
 		&entity.URL{
 			UUID:        uuid.NewString(),

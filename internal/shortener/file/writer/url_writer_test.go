@@ -48,7 +48,7 @@ func TestUrlFileWriter_WriteURL(t *testing.T) {
 			assert.NoError(t, err)
 
 			if err := w.WriteURL(tt.args.url); (err != nil) != tt.wantErr {
-				t.Errorf("WriteURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("WriteURL() exception = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			readFile, err := os.ReadFile(tt.filename)

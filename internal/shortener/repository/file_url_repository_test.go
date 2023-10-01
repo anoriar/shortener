@@ -54,7 +54,7 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 			repository := NewFileURLRepository(filename)
 			got, err := repository.AddURL(tt.args.url)
 			if tt.wantErr != (err != nil) {
-				t.Errorf("AddURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("AddURL() exception = %v, wantErr %v", err, tt.wantErr)
 			}
 			assert.Equal(t, tt.want, got)
 		})
@@ -149,7 +149,7 @@ func TestFileURLRepository_FindURLByShortURL(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:     "syntax error file",
+			name:     "syntax exception file",
 			fileData: []byte{21, 32, 44},
 			fields: fields{
 				filename: filename,
@@ -178,7 +178,7 @@ func TestFileURLRepository_FindURLByShortURL(t *testing.T) {
 			repository := NewFileURLRepository(filename)
 			got, err := repository.FindURLByShortURL(tt.args.shortURL)
 			if tt.wantErr != (err != nil) {
-				t.Errorf("FindURLByShortURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("FindURLByShortURL() exception = %v, wantErr %v", err, tt.wantErr)
 			}
 			assert.Equalf(t, tt.want, got, "FindURLByShortURL(%v)", tt.args.shortURL)
 		})

@@ -56,7 +56,7 @@ func TestUrlFileReader_ReadUrl(t *testing.T) {
 		syntaxErrorFile.Close()
 		os.Remove(syntaxErrorFileName)
 	}()
-	_, err = syntaxErrorFile.Write([]byte("syntax error"))
+	_, err = syntaxErrorFile.Write([]byte("syntax exception"))
 	if err != nil {
 		t.Fatal("Error write file", err)
 	}
@@ -80,7 +80,7 @@ func TestUrlFileReader_ReadUrl(t *testing.T) {
 			wantErr:  true,
 		},
 		{
-			name:     "read syntax error",
+			name:     "read syntax exception",
 			filename: syntaxErrorFileName,
 			want:     nil,
 			wantErr:  true,
@@ -93,7 +93,7 @@ func TestUrlFileReader_ReadUrl(t *testing.T) {
 
 			got, err := c.ReadURL()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ReadURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ReadURL() exception = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 

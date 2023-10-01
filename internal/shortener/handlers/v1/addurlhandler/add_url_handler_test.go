@@ -26,10 +26,10 @@ func (mcr *mockAddHandlerURLRepositoryError) FindURLByShortURL(shortURL string) 
 	return nil, nil
 }
 
-type mockAddHandlerKeyGen struct{}
+type mockAddHandlerShortURLGen struct{}
 
-func (mock *mockAddHandlerKeyGen) Generate() string {
-	return expectedShortKey
+func (mock *mockAddHandlerShortURLGen) GenerateShortURL() (string, error) {
+	return expectedShortKey, nil
 }
 
 func TestAddURL(t *testing.T) {
@@ -56,7 +56,7 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:        "not valid url",
+			name:        "not valid url_gen",
 			requestBody: "/dd",
 			urlStorage:  repository.NewInMemoryURLRepository(),
 			want: want{
@@ -66,7 +66,7 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:        "repository error",
+			name:        "repository exception",
 			requestBody: successRequestBody,
 			urlStorage:  new(mockAddHandlerURLRepositoryError),
 			want: want{
@@ -82,7 +82,7 @@ func TestAddURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tt.requestBody))
 			w := httptest.NewRecorder()
 
-			keyGenMock := new(mockAddHandlerKeyGen)
+			keyGenMock := new(mockAddHandlerShortURLGen)
 
 			NewAddHandler(tt.urlStorage, keyGenMock, baseURL).AddURL(w, r)
 

@@ -74,7 +74,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 			},
 		},
 		{
-			name:          "error when fetching",
+			name:          "exception when fetching",
 			request:       "/" + notExistedKey,
 			urlRepository: new(mockGetHandlerURLRepositoryNotExists),
 			want: want{
