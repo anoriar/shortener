@@ -12,7 +12,7 @@ const fileName = "/tmp/success_file.json"
 
 func TestUrlFileWriter_WriteURL(t *testing.T) {
 	type args struct {
-		url *entity.Url
+		url *entity.URL
 	}
 	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -33,8 +33,8 @@ func TestUrlFileWriter_WriteURL(t *testing.T) {
 			name:     "success write",
 			filename: fileName,
 			args: args{
-				&entity.Url{
-					Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+				&entity.URL{
+					UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
 					ShortURL:    "sS9fk2",
 					OriginalURL: "https://practicum.yandex.ru/",
 				},
@@ -44,7 +44,7 @@ func TestUrlFileWriter_WriteURL(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w, err := NewUrlFileWriter(tt.filename)
+			w, err := NewURLFileWriter(tt.filename)
 			assert.NoError(t, err)
 
 			if err := w.WriteURL(tt.args.url); (err != nil) != tt.wantErr {
@@ -56,7 +56,7 @@ func TestUrlFileWriter_WriteURL(t *testing.T) {
 				return
 			}
 
-			urlFromFile := &entity.Url{}
+			urlFromFile := &entity.URL{}
 			err = json.Unmarshal(readFile, urlFromFile)
 			assert.NoError(t, err)
 

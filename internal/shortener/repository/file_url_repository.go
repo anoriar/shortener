@@ -17,9 +17,9 @@ func NewFileURLRepository(filename string) URLRepositoryInterface {
 	}
 }
 
-func (repository *FileURLRepository) AddURL(url *entity.Url) (*entity.Url, error) {
+func (repository *FileURLRepository) AddURL(url *entity.URL) (*entity.URL, error) {
 
-	fileWriter, err := writer.NewUrlFileWriter(repository.filename)
+	fileWriter, err := writer.NewURLFileWriter(repository.filename)
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +32,8 @@ func (repository *FileURLRepository) AddURL(url *entity.Url) (*entity.Url, error
 	return url, nil
 }
 
-func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity.Url, error) {
-	fileReader, err := reader.NewUrlFileReader(repository.filename)
+func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
+	fileReader, err := reader.NewURLFileReader(repository.filename)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 	defer fileReader.Close()
 
 	for {
-		url, err := fileReader.ReadUrl()
+		url, err := fileReader.ReadURL()
 		if err != nil {
 			if err == io.EOF {
 				return nil, nil

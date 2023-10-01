@@ -43,8 +43,8 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	shortKey := handler.keyGen.Generate()
 	//TODO: доделать ы keygenerator генерацию в случае существюущего ключа (5 попыток)
 
-	_, err = handler.urlRepository.AddURL(&entity.Url{
-		Uuid:        uuid.NewString(),
+	_, err = handler.urlRepository.AddURL(&entity.URL{
+		UUID:        uuid.NewString(),
 		ShortURL:    shortKey,
 		OriginalURL: addURLRequestDto.URL,
 	})

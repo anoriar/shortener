@@ -6,21 +6,21 @@ import (
 	"os"
 )
 
-type UrlFileReader struct {
+type URLFileReader struct {
 	file    *os.File
 	decoder *json.Decoder
 }
 
-func NewUrlFileReader(filename string) (*UrlFileReader, error) {
+func NewURLFileReader(filename string) (*URLFileReader, error) {
 	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
 	if err != nil {
 		return nil, err
 	}
-	return &UrlFileReader{file: file, decoder: json.NewDecoder(file)}, nil
+	return &URLFileReader{file: file, decoder: json.NewDecoder(file)}, nil
 }
 
-func (c *UrlFileReader) ReadUrl() (*entity.Url, error) {
-	event := &entity.Url{}
+func (c *URLFileReader) ReadURL() (*entity.URL, error) {
+	event := &entity.URL{}
 	//#MENTOR - есть ли смысл читать файл чанками? например по 20 строк и разом декодировать их? Или по производительности будет одинаково?
 	// Насколько я понимаю, чтобы прочитать файл чанками, все равно придется идти сканнером по строкам. Тут только вопрос к декодированию в джсон
 	// Процедура декодирования json массива строк быстрее чем по одной строке?
@@ -31,6 +31,6 @@ func (c *UrlFileReader) ReadUrl() (*entity.Url, error) {
 	return event, nil
 }
 
-func (c *UrlFileReader) Close() error {
+func (c *URLFileReader) Close() error {
 	return c.file.Close()
 }

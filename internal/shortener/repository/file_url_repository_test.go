@@ -20,13 +20,13 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 		filename string
 	}
 	type args struct {
-		url *entity.Url
+		url *entity.URL
 	}
 	tests := []struct {
 		name    string
 		fields  fields
 		args    args
-		want    *entity.Url
+		want    *entity.URL
 		wantErr bool
 	}{
 		{
@@ -35,14 +35,14 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 				filename: filename,
 			},
 			args: args{
-				&entity.Url{
-					Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+				&entity.URL{
+					UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
 					ShortURL:    "sS9fk2",
 					OriginalURL: "https://practicum.yandex.ru/",
 				},
 			},
-			want: &entity.Url{
-				Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+			want: &entity.URL{
+				UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
 				ShortURL:    "sS9fk2",
 				OriginalURL: "https://practicum.yandex.ru/",
 			},
@@ -64,19 +64,19 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 func TestFileURLRepository_FindURLByShortURL(t *testing.T) {
 	defer os.Remove(filename)
 
-	successExistedURLs := []*entity.Url{
-		&entity.Url{
-			Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+	successExistedURLs := []*entity.URL{
+		&entity.URL{
+			UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
 			ShortURL:    "sS9fk2",
 			OriginalURL: "https://practicum.yandex.ru/",
 		},
-		&entity.Url{
-			Uuid:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
+		&entity.URL{
+			UUID:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
 			ShortURL:    "ge9Yk2",
 			OriginalURL: "https://google.com",
 		},
-		&entity.Url{
-			Uuid:        "936f1338-c817-4ce4-924a-58bc34f1dd4f",
+		&entity.URL{
+			UUID:        "936f1338-c817-4ce4-924a-58bc34f1dd4f",
 			ShortURL:    "t8Fhd7",
 			OriginalURL: "https://yandex.ru/",
 		},
@@ -102,11 +102,11 @@ func TestFileURLRepository_FindURLByShortURL(t *testing.T) {
 	}
 	tests := []struct {
 		name        string
-		existedURLs []*entity.Url
+		existedURLs []*entity.URL
 		fileData    []byte
 		fields      fields
 		args        args
-		want        *entity.Url
+		want        *entity.URL
 		wantErr     bool
 	}{
 		{
@@ -118,8 +118,8 @@ func TestFileURLRepository_FindURLByShortURL(t *testing.T) {
 			args: args{
 				shortURL: "ge9Yk2",
 			},
-			want: &entity.Url{
-				Uuid:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
+			want: &entity.URL{
+				UUID:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
 				ShortURL:    "ge9Yk2",
 				OriginalURL: "https://google.com",
 			},

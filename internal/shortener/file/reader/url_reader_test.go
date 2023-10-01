@@ -16,8 +16,8 @@ const (
 )
 
 func TestUrlFileReader_ReadUrl(t *testing.T) {
-	testURL := &entity.Url{
-		Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+	testURL := &entity.URL{
+		UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
 		ShortURL:    "sS9fk2",
 		OriginalURL: "https://practicum.yandex.ru/",
 	}
@@ -64,7 +64,7 @@ func TestUrlFileReader_ReadUrl(t *testing.T) {
 	tests := []struct {
 		name     string
 		filename string
-		want     *entity.Url
+		want     *entity.URL
 		wantErr  bool
 	}{
 		{
@@ -88,18 +88,18 @@ func TestUrlFileReader_ReadUrl(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c, err := NewUrlFileReader(tt.filename)
+			c, err := NewURLFileReader(tt.filename)
 			assert.NoError(t, err)
 
-			got, err := c.ReadUrl()
+			got, err := c.ReadURL()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ReadUrl() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("ReadURL() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			//#MENTOR: есть ли различие между reflect.DeepEqual и просто сравнением объектов через assert.equal(got, tt.want)?
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ReadUrl() got = %v, want %v", got, tt.want)
+				t.Errorf("ReadURL() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

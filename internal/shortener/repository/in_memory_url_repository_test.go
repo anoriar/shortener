@@ -8,26 +8,26 @@ import (
 
 func TestInMemoryURLRepository_AddURL(t *testing.T) {
 	type args struct {
-		url *entity.Url
+		url *entity.URL
 	}
 	tests := []struct {
 		name        string
-		existedURLs map[string]*entity.Url
+		existedURLs map[string]*entity.URL
 		args        args
 		wantErr     bool
 	}{
 		{
 			name: "add item simple",
-			existedURLs: map[string]*entity.Url{
-				"KZXdDY": &entity.Url{
-					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+			existedURLs: map[string]*entity.URL{
+				"KZXdDY": &entity.URL{
+					UUID:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
 					ShortURL:    "KZXdDY",
 					OriginalURL: "https://github.com",
 				},
 			},
 			args: args{
-				&entity.Url{
-					Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+				&entity.URL{
+					UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
 					ShortURL:    "sS9fk2",
 					OriginalURL: "https://practicum.yandex.ru/",
 				},
@@ -52,28 +52,28 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 func TestInMemoryURLRepository_FindURLByKey(t *testing.T) {
 
 	type want struct {
-		url *entity.Url
+		url *entity.URL
 	}
 
 	tests := []struct {
 		name        string
-		existedURLs map[string]*entity.Url
+		existedURLs map[string]*entity.URL
 		key         string
 		want        want
 	}{
 		{
 			name: "item exists",
-			existedURLs: map[string]*entity.Url{
-				"KZXdDY": &entity.Url{
-					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+			existedURLs: map[string]*entity.URL{
+				"KZXdDY": &entity.URL{
+					UUID:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
 					ShortURL:    "KZXdDY",
 					OriginalURL: "https://github.com",
 				},
 			},
 			key: "KZXdDY",
 			want: want{
-				url: &entity.Url{
-					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+				url: &entity.URL{
+					UUID:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
 					ShortURL:    "KZXdDY",
 					OriginalURL: "https://github.com",
 				},
@@ -81,9 +81,9 @@ func TestInMemoryURLRepository_FindURLByKey(t *testing.T) {
 		},
 		{
 			name: "item not exists",
-			existedURLs: map[string]*entity.Url{
-				"KZXdDY": &entity.Url{
-					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
+			existedURLs: map[string]*entity.URL{
+				"KZXdDY": &entity.URL{
+					UUID:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
 					ShortURL:    "KZXdDY",
 					OriginalURL: "https://github.com",
 				},

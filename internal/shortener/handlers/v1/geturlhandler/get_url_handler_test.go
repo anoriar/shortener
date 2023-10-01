@@ -15,18 +15,18 @@ const notExistedKey = "sdJ2f3"
 
 type mockGetHandlerURLRepositoryNotExists struct{}
 
-func (mcr *mockGetHandlerURLRepositoryNotExists) AddURL(url *entity.Url) (*entity.Url, error) {
+func (mcr *mockGetHandlerURLRepositoryNotExists) AddURL(url *entity.URL) (*entity.URL, error) {
 	return nil, nil
 }
 
-func (mcr *mockGetHandlerURLRepositoryNotExists) FindURLByShortURL(shortURL string) (*entity.Url, error) {
+func (mcr *mockGetHandlerURLRepositoryNotExists) FindURLByShortURL(shortURL string) (*entity.URL, error) {
 	return nil, nil
 }
 
 func TestGetHandler_GetURL(t *testing.T) {
 	urlRepository := repository.NewInMemoryURLRepository()
-	_, err := urlRepository.AddURL(&entity.Url{
-		Uuid:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
+	_, err := urlRepository.AddURL(&entity.URL{
+		UUID:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
 		ShortURL:    existedKey,
 		OriginalURL: successRedirectLocation,
 	})

@@ -6,21 +6,21 @@ import (
 	"os"
 )
 
-type UrlFileWriter struct {
+type URLFileWriter struct {
 	file    *os.File
 	encoder *json.Encoder
 }
 
-func NewUrlFileWriter(filename string) (*UrlFileWriter, error) {
+func NewURLFileWriter(filename string) (*URLFileWriter, error) {
 	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		return nil, err
 	}
 
-	return &UrlFileWriter{file: file, encoder: json.NewEncoder(file)}, nil
+	return &URLFileWriter{file: file, encoder: json.NewEncoder(file)}, nil
 }
 
-func (w *UrlFileWriter) WriteURL(url *entity.Url) error {
+func (w *URLFileWriter) WriteURL(url *entity.URL) error {
 	err := w.encoder.Encode(url)
 	if err != nil {
 		return err
@@ -28,6 +28,6 @@ func (w *UrlFileWriter) WriteURL(url *entity.Url) error {
 	return nil
 }
 
-func (w *UrlFileWriter) Close() error {
+func (w *URLFileWriter) Close() error {
 	return w.file.Close()
 }

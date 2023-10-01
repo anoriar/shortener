@@ -18,11 +18,11 @@ const successExpectedBody = `{"result":"http://localhost:8080/etw73C"}`
 
 type mockAddHandlerURLRepositoryError struct{}
 
-func (mcr *mockAddHandlerURLRepositoryError) AddURL(url *entity.Url) (*entity.Url, error) {
+func (mcr *mockAddHandlerURLRepositoryError) AddURL(url *entity.URL) (*entity.URL, error) {
 	return nil, errors.New("test")
 }
 
-func (mcr *mockAddHandlerURLRepositoryError) FindURLByShortURL(shortURL string) (*entity.Url, error) {
+func (mcr *mockAddHandlerURLRepositoryError) FindURLByShortURL(shortURL string) (*entity.URL, error) {
 	return nil, nil
 }
 
