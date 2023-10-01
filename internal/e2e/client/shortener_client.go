@@ -24,6 +24,17 @@ func NewShortenerClient(httpClient *http.Client, baseURL string) *ShortenerClien
 		baseURL:    baseURL,
 	}
 }
+func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface {
+	return &ShortenerClient{
+		httpClient: &http.Client{
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				// Disable automatic redirects
+				return http.ErrUseLastResponse
+			},
+		},
+		baseURL: cnf.BaseURL,
+	}
+}
 
 func (client *ShortenerClient) AddURL(url string) (*dtoResponsePkg.AddResponseDto, error) {
 	request, err := http.NewRequest(http.MethodPost, client.baseURL, bytes.NewReader([]byte(url)))
@@ -83,6 +94,54 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	}
 
 	request.Header.Add("Content-Type", "application/json")
+	resp, err := client.httpClient.Do(request)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	reader := resp.Body
+
+	body, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		return nil, errors.New(string(body))
+	}
+
+	if resp.Header.Get("Content-Type") != "application/json" {
+		return nil, errors.New("not expected content type in response")
+	}
+
+	var addURLResponseDto dtoResponsePkg.AddURLResponseDTO
+	err = json.Unmarshal(body, &addURLResponseDto)
+	if err != nil {
+		return nil, err
+	}
+
+	return dtoResponsePkg.NewAddResponseV2Dto(
+		resp.StatusCode,
+		resp.Header.Get("Content-Type"),
+		addURLResponseDto,
+	), nil
+}
+
+func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType string) (*dtoResponsePkg.AddResponseV2EncodingDto, error) {
+	requestDto := dtoRequestPkg.AddURLRequestDto{URL: url}
+	requestJSON, err := json.Marshal(requestDto)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten", bytes.NewReader(requestJSON))
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", contentType)
 	request.Header.Add("Accept-Encoding", "gzip")
 	resp, err := client.httpClient.Do(request)
 
@@ -120,22 +179,10 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 		return nil, err
 	}
 
-	return dtoResponsePkg.NewAddResponseV2Dto(
+	return dtoResponsePkg.NewAddResponseV2EncodingDto(
 		resp.StatusCode,
 		resp.Header.Get("Content-Type"),
 		resp.Header.Get("Content-Encoding"),
 		addURLResponseDto,
 	), nil
-}
-
-func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface {
-	return &ShortenerClient{
-		httpClient: &http.Client{
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				// Disable automatic redirects
-				return http.ErrUseLastResponse
-			},
-		},
-		baseURL: cnf.BaseURL,
-	}
 }

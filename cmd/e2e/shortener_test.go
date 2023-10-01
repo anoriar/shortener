@@ -54,6 +54,33 @@ func Test_ShortenerV2(t *testing.T) {
 
 	assert.Equal(t, http.StatusCreated, addResponse.StatusCode)
 	assert.Equal(t, "application/json", addResponse.ContentType)
+	assert.True(t, strings.HasPrefix(addResponse.Body.Result, cnf.BaseURL))
+
+	splittedURL := strings.Split(addResponse.Body.Result, "/")
+	key := splittedURL[len(splittedURL)-1]
+
+	getResponse, err := shortenerClient.GetURL(key)
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusTemporaryRedirect, getResponse.StatusCode)
+	assert.Equal(t, testURL, getResponse.Location)
+}
+
+func Test_ShortenerV2WithCompress(t *testing.T) {
+	cnf := config.NewTestConfig()
+	err := env.Parse(cnf)
+	assert.NoError(t, err)
+
+	if cnf.BaseURL == "" {
+		t.Skip()
+	}
+
+	shortenerClient := client.InitializeShortenerClient(cnf)
+	addResponse, err := shortenerClient.AddURLv2WithCompress(testURL, "application/json")
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusCreated, addResponse.StatusCode)
+	assert.Equal(t, "application/json", addResponse.ContentType)
 	assert.Equal(t, "gzip", addResponse.ContentEncoding)
 	assert.True(t, strings.HasPrefix(addResponse.Body.Result, cnf.BaseURL))
 
