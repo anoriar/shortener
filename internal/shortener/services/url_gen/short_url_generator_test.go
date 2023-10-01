@@ -11,7 +11,7 @@ import (
 
 const expectedShortKey = "s7Fh4G"
 
-var runtimeException = errors.New("exception")
+var errRuntime = errors.New("exception")
 
 type mockKeyGen struct{}
 
@@ -22,7 +22,7 @@ func (mock *mockKeyGen) Generate() string {
 type mockURLRepositorySuccess struct{}
 
 func (mcr *mockURLRepositorySuccess) AddURL(url *entity.URL) (*entity.URL, error) {
-	return nil, runtimeException
+	return nil, errRuntime
 }
 
 func (mcr *mockURLRepositorySuccess) FindURLByShortURL(shortURL string) (*entity.URL, error) {
@@ -84,7 +84,7 @@ func TestShortURLGenerator_generateShortURL(t *testing.T) {
 				keyGen:        new(mockKeyGen),
 			},
 			want:    "",
-			wantErr: runtimeException,
+			wantErr: errRuntime,
 		},
 		{
 			name: "attempts exceeded",
@@ -93,7 +93,7 @@ func TestShortURLGenerator_generateShortURL(t *testing.T) {
 				keyGen:        new(mockKeyGen),
 			},
 			want:    "",
-			wantErr: ShortKeyGenerationAttemptsExceededError,
+			wantErr: ErrShortKeyGenerationAttemptsExceeded,
 		},
 	}
 	for _, tt := range tests {

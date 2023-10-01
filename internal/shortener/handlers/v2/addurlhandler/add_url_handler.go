@@ -65,7 +65,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	})
 
 	if err != nil {
-		//TODO: middleware на обработку ошибок
+		//#MENTOR: Возможно ли выходить из хендлера в одну строку? Без return. Например, возвращать ошибку? Часто натыкался на случаи, где забываю поставить return
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

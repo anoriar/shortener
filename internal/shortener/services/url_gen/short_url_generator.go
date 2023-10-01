@@ -1,7 +1,6 @@
 package urlgen
 
 import (
-	"errors"
 	"fmt"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/util"
@@ -10,7 +9,7 @@ import (
 const maxAttempts = 5
 
 // #MENTOR: Как лучше оформлять кастомные ошибки? Делать отдельным типом или глобальной переменной?
-var ShortKeyGenerationAttemptsExceededError = errors.New(fmt.Sprintf("max number of attempts for short url generation has been exhausted: %v", maxAttempts))
+var ErrShortKeyGenerationAttemptsExceeded = fmt.Errorf("max number of attempts for short url generation has been exhausted: %v", maxAttempts)
 
 type ShortURLGenerator struct {
 	urlRepository repository.URLRepositoryInterface
@@ -25,6 +24,8 @@ func NewShortURLGenerator(urlRepository repository.URLRepositoryInterface, keyGe
 	return &ShortURLGenerator{urlRepository: urlRepository, keyGen: keyGen}
 }
 
+// #MENTOR какой алгоритм лучше использовать, чтобы генерировать разные шортулр без повторений?
+// Понимаю, что невозможно бесконечное количество комбинаций обычных урлов нельзя свести к ограниченному количеству комбинаций из 6 символов
 func (sug *ShortURLGenerator) GenerateShortURL() (string, error) {
 	attempt := 0
 	for attempt < maxAttempts {
@@ -38,5 +39,5 @@ func (sug *ShortURLGenerator) GenerateShortURL() (string, error) {
 		}
 		attempt++
 	}
-	return "", ShortKeyGenerationAttemptsExceededError
+	return "", ErrShortKeyGenerationAttemptsExceeded
 }

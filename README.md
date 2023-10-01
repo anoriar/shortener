@@ -74,3 +74,10 @@ Script text = ./shortenertestbeta -test.v -test.run=^TestIteration1$ -binary-pat
 Script брать из .github/workflows/shortenertest.yaml и менять для каждой итерации
 Пример с переменной окружения SERVER_PORT
 SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^TestIteration5$ -binary-path=cmd/shortener/shortener -server-port=$SERVER_PORT
+
+## Как пользоваться линтером Яндекс
+1. Скачать бинарник statictest для вашей операционной системы (если у вас apple silicon, дополнительно выполните эту инструкцию)
+Ссылка  на скачивание бинарника https://github.com/Yandex-Practicum/go-autotests/releases/tag/v0.9.16
+Для ubuntu - statictest
+2. Поместить в корень проекта. Дать права 777
+3. go vet -vettool=/home/loginarea/GolangProjects/shortener/statictest ./...
