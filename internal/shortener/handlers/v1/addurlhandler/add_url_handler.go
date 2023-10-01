@@ -2,8 +2,10 @@ package addurlhandler
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/config"
+	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/util"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 	neturl "net/url"
@@ -42,7 +44,12 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	}
 
 	shortKey := handler.keyGen.Generate()
-	_, err = handler.urlRepository.AddURL(string(url), shortKey)
+	_, err = handler.urlRepository.AddURL(
+		&entity.Url{
+			Uuid:        uuid.NewString(),
+			ShortURL:    shortKey,
+			OriginalURL: string(url),
+		})
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

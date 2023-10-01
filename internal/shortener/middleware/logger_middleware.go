@@ -27,7 +27,6 @@ func (lm *LoggerMiddleware) Log(h http.Handler) http.Handler {
 
 		responseData := lw.ResponseData()
 
-		//#MENTOR: Целесообразно ли использовать Sugarize? Он удобнее, но напрягает то, что его можно дешугоризовывать динамически.
 		lm.logger.Info("Request",
 			zap.String("uri", request.URL.String()),
 			zap.String("method", request.Method),

@@ -8,8 +8,7 @@ import (
 
 func TestInMemoryURLRepository_AddURL(t *testing.T) {
 	type args struct {
-		url string
-		key string
+		url *entity.Url
 	}
 	tests := []struct {
 		name        string
@@ -27,25 +26,13 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 				},
 			},
 			args: args{
-				url: "https://google.com",
-				key: "aTgd1u",
-			},
-			wantErr: false,
-		},
-		{
-			name: "item exists",
-			existedURLs: map[string]*entity.Url{
-				"KZXdDY": &entity.Url{
-					Uuid:        "46b8f9d2-b123-4f8e-aabb-f77dd764a00b",
-					ShortURL:    "KZXdDY",
-					OriginalURL: "https://github.com",
+				&entity.Url{
+					Uuid:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
+					ShortURL:    "sS9fk2",
+					OriginalURL: "https://practicum.yandex.ru/",
 				},
 			},
-			args: args{
-				url: "https://google.com",
-				key: "KZXdDY",
-			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -54,10 +41,10 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 				urls: tt.existedURLs,
 			}
 
-			_, err := repository.AddURL(tt.args.url, tt.args.key)
+			_, err := repository.AddURL(tt.args.url)
 
 			assert.Equal(t, tt.wantErr, err != nil)
-			assert.Contains(t, repository.urls, tt.args.key)
+			assert.Contains(t, repository.urls, tt.args.url.ShortURL)
 		})
 	}
 }
@@ -113,7 +100,7 @@ func TestInMemoryURLRepository_FindURLByKey(t *testing.T) {
 				urls: tt.existedURLs,
 			}
 
-			newURL, err := repository.FindURLByKey(tt.key)
+			newURL, err := repository.FindURLByShortURL(tt.key)
 
 			assert.NoError(t, err)
 			assert.Equal(t, tt.want.url, newURL)

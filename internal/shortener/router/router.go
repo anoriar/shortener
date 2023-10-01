@@ -21,6 +21,10 @@ type Router struct {
 
 func InitializeRouter(cnf *config.Config, logger *zap.Logger) *Router {
 	urlRepository := repository.NewInMemoryURLRepository()
+	if cnf.FileStoragePath != "" {
+		urlRepository = repository.NewFileURLRepository(cnf.FileStoragePath)
+	}
+
 	return NewRouter(
 		addurlhandler.InitializeAddHandler(cnf, urlRepository),
 		geturlhandler.InitializeGetHandler(urlRepository),

@@ -5,9 +5,11 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
+	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/util"
 	"github.com/asaskevich/govalidator"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
 )
@@ -39,9 +41,16 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	}
 
 	shortKey := handler.keyGen.Generate()
-	_, err = handler.urlRepository.AddURL(addURLRequestDto.URL, shortKey)
+	//TODO: доделать ы keygenerator генерацию в случае существюущего ключа (5 попыток)
+
+	_, err = handler.urlRepository.AddURL(&entity.Url{
+		Uuid:        uuid.NewString(),
+		ShortURL:    shortKey,
+		OriginalURL: addURLRequestDto.URL,
+	})
 
 	if err != nil {
+		//TODO: middleware на обработку ошибок
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

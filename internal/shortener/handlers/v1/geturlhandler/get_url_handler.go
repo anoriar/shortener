@@ -29,7 +29,7 @@ func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	url, err := handler.urlRepository.FindURLByKey(shortKey)
+	url, err := handler.urlRepository.FindURLByShortURL(shortKey)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
