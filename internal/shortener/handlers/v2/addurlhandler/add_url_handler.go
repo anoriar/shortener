@@ -8,10 +8,10 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
-	"github.com/asaskevich/govalidator"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
+	neturl "net/url"
 )
 
 type AddHandler struct {
@@ -47,8 +47,9 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if _, err = govalidator.ValidateStruct(&addURLRequestDto); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	parsedURL, err := neturl.Parse(addURLRequestDto.URL)
+	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
+		http.Error(w, "Not valid URL", http.StatusBadRequest)
 		return
 	}
 
@@ -65,7 +66,6 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	})
 
 	if err != nil {
-		//#MENTOR: Возможно ли выходить из хендлера в одну строку? Без return. Например, возвращать ошибку? Часто натыкался на случаи, где забываю поставить return
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

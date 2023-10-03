@@ -13,7 +13,7 @@ func NewKeyGen() *KeyGen {
 }
 
 const Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-const KeyLength = 6
+const KeyLength = 10
 
 func (k *KeyGen) Generate() string {
 

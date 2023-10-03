@@ -1,7 +1,7 @@
-package middleware
+package logger
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/shared/response"
+	"github.com/anoriar/shortener/internal/shortener/middleware/logger/internal/responsewriter"
 	"go.uber.org/zap"
 	"net/http"
 	"time"
@@ -19,7 +19,7 @@ func (lm *LoggerMiddleware) Log(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		timeStart := time.Now()
 
-		lw := response.NewLoggingResponseWriter(w)
+		lw := responsewriter.NewLoggingResponseWriter(w)
 
 		h.ServeHTTP(lw, request)
 

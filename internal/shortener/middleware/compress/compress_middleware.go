@@ -1,7 +1,8 @@
-package middleware
+package compress
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/shared/compress"
+	compress2 "github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/reader"
+	"github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/responsewriter"
 	"net/http"
 	"strings"
 )
@@ -28,7 +29,7 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 			acceptEncoding := r.Header.Get("Accept-Encoding")
 			supportsGzip := strings.Contains(acceptEncoding, "gzip")
 			if supportsGzip {
-				cw := compress.NewCompressWriter(w)
+				cw := responsewriter.NewCompressWriter(w)
 				ow = cw
 				defer cw.Close()
 			}
@@ -38,7 +39,7 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 		contentEncoding := r.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
 		if sendsGzip {
-			cr, err := compress.NewCompressReader(r.Body)
+			cr, err := compress2.NewCompressReader(r.Body)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return

@@ -113,7 +113,7 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	}
 
 	if resp.Header.Get("Content-Type") != "application/json" {
-		return nil, errors.New("not expected content type in response")
+		return nil, errors.New("not expected content type in responsewriter")
 	}
 
 	var addURLResponseDto dtoResponsePkg.AddURLResponseDTO
@@ -170,7 +170,7 @@ func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType stri
 	}
 
 	if resp.Header.Get("Content-Type") != "application/json" {
-		return nil, errors.New("not expected content type in response")
+		return nil, errors.New("not expected content type in responsewriter")
 	}
 
 	var addURLResponseDto dtoResponsePkg.AddURLResponseDTO

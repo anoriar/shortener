@@ -1,9 +1,10 @@
-package repository
+package file
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/file/reader"
-	"github.com/anoriar/shortener/internal/shortener/file/writer"
+	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
+	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/writer"
 	"io"
 )
 
@@ -11,7 +12,7 @@ type FileURLRepository struct {
 	filename string
 }
 
-func NewFileURLRepository(filename string) URLRepositoryInterface {
+func NewFileURLRepository(filename string) repository.URLRepositoryInterface {
 	return &FileURLRepository{
 		filename: filename,
 	}

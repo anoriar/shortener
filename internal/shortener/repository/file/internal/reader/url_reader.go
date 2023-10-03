@@ -21,9 +21,6 @@ func NewURLFileReader(filename string) (*URLFileReader, error) {
 
 func (c *URLFileReader) ReadURL() (*entity.URL, error) {
 	event := &entity.URL{}
-	//#MENTOR - есть ли смысл читать файл чанками? например по 20 строк и разом декодировать их? Или по производительности будет одинаково?
-	// Насколько я понимаю, чтобы прочитать файл чанками, все равно придется идти сканнером по строкам. Тут только вопрос к декодированию в джсон
-	// Процедура декодирования json массива строк быстрее чем по одной строке?
 	err := c.decoder.Decode(event)
 	if err != nil {
 		return nil, err

@@ -5,8 +5,10 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	addURLHandlerV2 "github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlhandler"
-	"github.com/anoriar/shortener/internal/shortener/middleware"
+	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
+	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/file"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
@@ -15,22 +17,22 @@ type Router struct {
 	addHandler         *addurlhandler.AddHandler
 	getHandler         *geturlhandler.GetHandler
 	addHandlerV2       *addURLHandlerV2.AddHandler
-	loggerMiddleware   *middleware.LoggerMiddleware
-	compressMiddleware *middleware.CompressMiddleware
+	loggerMiddleware   *loggerMiddlewarePkg.LoggerMiddleware
+	compressMiddleware *compress.CompressMiddleware
 }
 
 func InitializeRouter(cnf *config.Config, logger *zap.Logger) *Router {
 	urlRepository := repository.NewInMemoryURLRepository()
 	if cnf.FileStoragePath != "" {
-		urlRepository = repository.NewFileURLRepository(cnf.FileStoragePath)
+		urlRepository = file.NewFileURLRepository(cnf.FileStoragePath)
 	}
 
 	return NewRouter(
 		addurlhandler.InitializeAddHandler(cnf, urlRepository),
 		geturlhandler.InitializeGetHandler(urlRepository),
 		addURLHandlerV2.Initialize(cnf, urlRepository),
-		middleware.NewLoggerMiddleware(logger),
-		middleware.NewCompressMiddleware(),
+		loggerMiddlewarePkg.NewLoggerMiddleware(logger),
+		compress.NewCompressMiddleware(),
 	)
 }
 
@@ -38,8 +40,8 @@ func NewRouter(
 	addHandler *addurlhandler.AddHandler,
 	getHandler *geturlhandler.GetHandler,
 	addHandlerV2 *addURLHandlerV2.AddHandler,
-	loggerMiddleware *middleware.LoggerMiddleware,
-	compressMiddleware *middleware.CompressMiddleware,
+	loggerMiddleware *loggerMiddlewarePkg.LoggerMiddleware,
+	compressMiddleware *compress.CompressMiddleware,
 ) *Router {
 	return &Router{
 		addHandler:         addHandler,

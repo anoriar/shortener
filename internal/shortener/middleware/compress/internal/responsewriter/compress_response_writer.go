@@ -1,31 +1,31 @@
-package compress
+package responsewriter
 
 import (
 	"compress/gzip"
 	"net/http"
 )
 
-type compressWriter struct {
+type compressResponseWriter struct {
 	w  http.ResponseWriter
 	zw *gzip.Writer
 }
 
-func NewCompressWriter(w http.ResponseWriter) *compressWriter {
-	return &compressWriter{
+func NewCompressWriter(w http.ResponseWriter) *compressResponseWriter {
+	return &compressResponseWriter{
 		w:  w,
 		zw: gzip.NewWriter(w),
 	}
 }
 
-func (c *compressWriter) Header() http.Header {
+func (c *compressResponseWriter) Header() http.Header {
 	return c.w.Header()
 }
 
-func (c *compressWriter) Write(p []byte) (int, error) {
+func (c *compressResponseWriter) Write(p []byte) (int, error) {
 	return c.zw.Write(p)
 }
 
-func (c *compressWriter) WriteHeader(statusCode int) {
+func (c *compressResponseWriter) WriteHeader(statusCode int) {
 	if statusCode < 300 {
 		c.w.Header().Set("Content-Encoding", "gzip")
 	}
@@ -33,6 +33,6 @@ func (c *compressWriter) WriteHeader(statusCode int) {
 }
 
 // Close закрывает compress.Writer и досылает все данные из буфера.
-func (c *compressWriter) Close() error {
+func (c *compressResponseWriter) Close() error {
 	return c.zw.Close()
 }

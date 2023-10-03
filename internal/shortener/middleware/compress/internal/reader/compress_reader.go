@@ -1,4 +1,4 @@
-package compress
+package reader
 
 import (
 	"compress/gzip"
