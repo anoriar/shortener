@@ -12,7 +12,7 @@ import (
 )
 
 const expectedShortKey = "etw73C"
-const successRequestBody = `{"url_gen":"http://localhost:8080/etw73C"}`
+const successRequestBody = `{"url":"http://localhost:8080/etw73C"}`
 const baseURL = "http://localhost:8080"
 const successExpectedBody = `{"result":"http://localhost:8080/etw73C"}`
 

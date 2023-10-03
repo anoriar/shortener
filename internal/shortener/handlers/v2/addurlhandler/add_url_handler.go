@@ -40,9 +40,9 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	addURLRequestDto := request.AddURLRequestDto{}
+	addURLRequestDto := &request.AddURLRequestDto{}
 
-	if err = json.Unmarshal(requestBody, &addURLRequestDto); err != nil {
+	if err = json.Unmarshal(requestBody, addURLRequestDto); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
