@@ -2,7 +2,8 @@ package addurlhandler
 
 import (
 	"errors"
-	storage2 "github.com/anoriar/shortener/internal/shortener/storage"
+	"github.com/anoriar/shortener/internal/shortener/entity"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
@@ -15,20 +16,20 @@ const successRequestBody = "https://github.com"
 const baseURL = "http://localhost:8080"
 const successExpectedBody = baseURL + "/" + expectedShortKey
 
-type mockAddHandlerURLStorageError struct{}
+type mockAddHandlerURLRepositoryError struct{}
 
-func (mcr *mockAddHandlerURLStorageError) AddURL(url string, key string) error {
-	return errors.New("test")
+func (mcr *mockAddHandlerURLRepositoryError) AddURL(url *entity.URL) (*entity.URL, error) {
+	return nil, errors.New("test")
 }
 
-func (mcr *mockAddHandlerURLStorageError) FindURLByKey(key string) (string, bool) {
-	return "https://github.com", true
+func (mcr *mockAddHandlerURLRepositoryError) FindURLByShortURL(shortURL string) (*entity.URL, error) {
+	return nil, nil
 }
 
-type mockAddHandlerKeyGen struct{}
+type mockAddHandlerShortURLGen struct{}
 
-func (mock *mockAddHandlerKeyGen) Generate() string {
-	return expectedShortKey
+func (mock *mockAddHandlerShortURLGen) GenerateShortURL() (string, error) {
+	return expectedShortKey, nil
 }
 
 func TestAddURL(t *testing.T) {
@@ -41,13 +42,13 @@ func TestAddURL(t *testing.T) {
 	tests := []struct {
 		name        string
 		requestBody string
-		urlStorage  storage2.URLStorageInterface
+		urlStorage  repository.URLRepositoryInterface
 		want        want
 	}{
 		{
 			name:        "success",
 			requestBody: successRequestBody,
-			urlStorage:  storage2.NewURLStorage(),
+			urlStorage:  repository.NewInMemoryURLRepository(),
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -55,9 +56,9 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:        "not valid url",
+			name:        "not valid url_gen",
 			requestBody: "/dd",
-			urlStorage:  storage2.NewURLStorage(),
+			urlStorage:  repository.NewInMemoryURLRepository(),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -65,9 +66,9 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:        "storage error",
+			name:        "repository exception",
 			requestBody: successRequestBody,
-			urlStorage:  new(mockAddHandlerURLStorageError),
+			urlStorage:  new(mockAddHandlerURLRepositoryError),
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -81,7 +82,7 @@ func TestAddURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(tt.requestBody))
 			w := httptest.NewRecorder()
 
-			keyGenMock := new(mockAddHandlerKeyGen)
+			keyGenMock := new(mockAddHandlerShortURLGen)
 
 			NewAddHandler(tt.urlStorage, keyGenMock, baseURL).AddURL(w, r)
 
