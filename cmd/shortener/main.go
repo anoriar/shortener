@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/config"
+	database "github.com/anoriar/shortener/internal/shortener/db"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/router"
 	"github.com/caarlos0/env/v6"
@@ -29,7 +30,13 @@ func run() {
 
 	defer logger.Sync()
 
-	r := router.InitializeRouter(conf, logger)
+	db, err := database.InitializeDatabase(conf.DatabaseDSN)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	r := router.InitializeRouter(conf, logger, db)
 
 	err = http.ListenAndServe(conf.Host, r.Route())
 	if err != nil {

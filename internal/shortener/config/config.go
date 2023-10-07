@@ -5,6 +5,7 @@ type Config struct {
 	BaseURL         string `env:"BASE_URL"`
 	LogLevel        string `env:"LOG_LEVEL"`
 	FileStoragePath string `env:"FILE_STORAGE_PATH"`
+	DatabaseDSN     string `env:"DATABASE_DSN"`
 }
 
 func NewConfig() *Config {
