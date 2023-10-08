@@ -187,16 +187,16 @@ func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType stri
 	), nil
 }
 
-func (client *ShortenerClient) Ping() (*dtoResponsePkg.PingResponseDto, error) {
+func (client *ShortenerClient) Ping() (dtoResponsePkg.PingResponseDto, error) {
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ping", client.baseURL), nil)
 	if err != nil {
-		return nil, err
+		return dtoResponsePkg.PingResponseDto{}, err
 	}
 
 	request.Header.Add("Content-Type", "text/plain")
 	response, err := client.httpClient.Do(request)
 	if err != nil {
-		return nil, err
+		return dtoResponsePkg.PingResponseDto{}, err
 	}
 	defer response.Body.Close()
 

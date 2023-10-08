@@ -9,5 +9,5 @@ type ShortenerClientInterface interface {
 	AddURLv2(url string) (*response.AddResponseV2Dto, error)
 	AddURLv2WithCompress(url string, contentType string) (*response.AddResponseV2EncodingDto, error)
 	GetURL(key string) (*response.GetResponseDto, error)
-	Ping() (*response.PingResponseDto, error)
+	Ping() (response.PingResponseDto, error)
 }
