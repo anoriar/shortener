@@ -186,3 +186,21 @@ func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType stri
 		addURLResponseDto,
 	), nil
 }
+
+func (client *ShortenerClient) Ping() (*dtoResponsePkg.PingResponseDto, error) {
+	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ping", client.baseURL), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "text/plain")
+	response, err := client.httpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	return dtoResponsePkg.NewPingResponseDto(
+		response.StatusCode,
+	), nil
+}

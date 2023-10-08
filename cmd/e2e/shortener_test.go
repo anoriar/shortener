@@ -93,3 +93,19 @@ func Test_ShortenerV2WithCompress(t *testing.T) {
 	assert.Equal(t, http.StatusTemporaryRedirect, getResponse.StatusCode)
 	assert.Equal(t, testURL, getResponse.Location)
 }
+
+func Test_ShortenerPing(t *testing.T) {
+	cnf := config.NewTestConfig()
+	err := env.Parse(cnf)
+	assert.NoError(t, err)
+
+	if cnf.BaseURL == "" {
+		t.Skip()
+	}
+
+	shortenerClient := client.InitializeShortenerClient(cnf)
+	pingResponse, err := shortenerClient.Ping()
+	assert.NoError(t, err)
+
+	assert.Equal(t, http.StatusOK, pingResponse.StatusCode)
+}
