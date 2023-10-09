@@ -10,7 +10,10 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	dbURLRepository "github.com/anoriar/shortener/internal/shortener/repository/db"
 	"github.com/anoriar/shortener/internal/shortener/repository/file"
+	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
+	"github.com/anoriar/shortener/internal/shortener/util"
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
@@ -26,14 +29,18 @@ type Router struct {
 
 func InitializeRouter(cnf *config.Config, logger *zap.Logger, db *sql.DB) *Router {
 	urlRepository := repository.NewInMemoryURLRepository()
-	if cnf.FileStoragePath != "" {
+
+	switch {
+	case cnf.DatabaseDSN != "" && db != nil:
+		urlRepository = dbURLRepository.NewDBURLRepository(db, logger)
+	case cnf.FileStoragePath != "":
 		urlRepository = file.NewFileURLRepository(cnf.FileStoragePath)
 	}
 
 	return NewRouter(
-		addurlhandler.InitializeAddHandler(cnf, urlRepository),
-		geturlhandler.InitializeGetHandler(urlRepository),
-		addURLHandlerV2.Initialize(cnf, urlRepository),
+		addurlhandler.NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), logger, cnf.BaseURL),
+		geturlhandler.NewGetHandler(urlRepository, logger),
+		addURLHandlerV2.NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), logger, cnf.BaseURL),
 		ping.NewPingHandler(db, logger),
 		loggerMiddlewarePkg.NewLoggerMiddleware(logger),
 		compress.NewCompressMiddleware(),

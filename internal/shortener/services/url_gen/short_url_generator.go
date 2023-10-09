@@ -15,10 +15,6 @@ type ShortURLGenerator struct {
 	keyGen        util.KeyGenInterface
 }
 
-func InitializeShortURLGenerator(urlRepository repository.URLRepositoryInterface) ShortURLGeneratorInterface {
-	return NewShortURLGenerator(urlRepository, util.NewKeyGen())
-}
-
 func NewShortURLGenerator(urlRepository repository.URLRepositoryInterface, keyGen util.KeyGenInterface) *ShortURLGenerator {
 	return &ShortURLGenerator{urlRepository: urlRepository, keyGen: keyGen}
 }

@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"github.com/anoriar/shortener/internal/shortener/db/migrations"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"time"
 )
@@ -19,6 +20,13 @@ func InitializeDatabase(dsn string) (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	err = PingDatabase(db)
+	if err != nil {
+		return nil, err
+	}
+
+	migrations.Up(db)
 
 	return db, nil
 }

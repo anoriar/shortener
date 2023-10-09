@@ -2,8 +2,10 @@ package geturlhandler
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/entity"
+	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,7 +32,10 @@ func TestGetHandler_GetURL(t *testing.T) {
 		ShortURL:    existedKey,
 		OriginalURL: successRedirectLocation,
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
+
+	logger, err := logger.Initialize("info")
+	require.NoError(t, err)
 
 	type want struct {
 		status      int
@@ -90,7 +95,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 
-			NewGetHandler(tt.urlRepository).GetURL(w, r)
+			NewGetHandler(tt.urlRepository, logger).GetURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

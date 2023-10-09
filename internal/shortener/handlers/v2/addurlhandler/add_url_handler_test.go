@@ -3,8 +3,10 @@ package addurlhandler
 import (
 	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
+	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -33,6 +35,8 @@ func (mock *mockAddHandlerShortURLGen) GenerateShortURL() (string, error) {
 }
 
 func TestAddURL(t *testing.T) {
+	logger, err := logger.Initialize("info")
+	require.NoError(t, err)
 
 	type want struct {
 		status      int
@@ -84,7 +88,7 @@ func TestAddURL(t *testing.T) {
 
 			urlGen := new(mockAddHandlerShortURLGen)
 
-			NewAddHandler(tt.urlRepository, urlGen, baseURL).AddURL(w, r)
+			NewAddHandler(tt.urlRepository, urlGen, logger, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

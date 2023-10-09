@@ -2,13 +2,13 @@ package addurlhandler
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	neturl "net/url"
@@ -17,25 +17,29 @@ import (
 type AddHandler struct {
 	urlRepository     repository.URLRepositoryInterface
 	shortURLGenerator urlgen.ShortURLGeneratorInterface
+	logger            *zap.Logger
 	baseURL           string
 }
 
-func NewAddHandler(urlRepository repository.URLRepositoryInterface, shortURLGenerator urlgen.ShortURLGeneratorInterface, baseURL string) *AddHandler {
+func NewAddHandler(
+	urlRepository repository.URLRepositoryInterface,
+	shortURLGenerator urlgen.ShortURLGeneratorInterface,
+	logger *zap.Logger,
+	baseURL string,
+) *AddHandler {
 	return &AddHandler{
 		urlRepository:     urlRepository,
 		shortURLGenerator: shortURLGenerator,
+		logger:            logger,
 		baseURL:           baseURL,
 	}
-}
-
-func Initialize(cnf *config.Config, urlRepository repository.URLRepositoryInterface) *AddHandler {
-	return NewAddHandler(urlRepository, urlgen.InitializeShortURLGenerator(urlRepository), cnf.BaseURL)
 }
 
 func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
+		handler.logger.Error("re error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -55,6 +59,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
 	shortKey, err := handler.shortURLGenerator.GenerateShortURL()
 	if err != nil {
+		handler.logger.Error("short URL generation error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -66,6 +71,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	})
 
 	if err != nil {
+		handler.logger.Error("add URL error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -79,11 +85,14 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
 	jsonResult, err := json.Marshal(responseDTO)
 	if err != nil {
+		handler.logger.Error("marshal error", zap.String("error", err.Error()))
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	_, err = w.Write(jsonResult)
 	if err != nil {
+		handler.logger.Error("write response error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
