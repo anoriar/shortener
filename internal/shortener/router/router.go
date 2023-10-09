@@ -2,7 +2,9 @@ package router
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/anoriar/shortener/internal/shortener/config"
+	database "github.com/anoriar/shortener/internal/shortener/db"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/ping"
@@ -27,11 +29,15 @@ type Router struct {
 	compressMiddleware *compress.CompressMiddleware
 }
 
-func InitializeRouter(cnf *config.Config, logger *zap.Logger, db *sql.DB) *Router {
+func InitializeRouter(cnf *config.Config, logger *zap.Logger, db *sql.DB) (*Router, error) {
 	urlRepository := repository.NewInMemoryURLRepository()
 
 	switch {
 	case cnf.DatabaseDSN != "" && db != nil:
+		err := database.PrepareDatabase(db)
+		if err != nil {
+			return nil, fmt.Errorf("database preparing error %s", err)
+		}
 		urlRepository = dbURLRepository.NewDBURLRepository(db, logger)
 	case cnf.FileStoragePath != "":
 		urlRepository = file.NewFileURLRepository(cnf.FileStoragePath)
@@ -44,7 +50,7 @@ func InitializeRouter(cnf *config.Config, logger *zap.Logger, db *sql.DB) *Route
 		ping.NewPingHandler(db, logger),
 		loggerMiddlewarePkg.NewLoggerMiddleware(logger),
 		compress.NewCompressMiddleware(),
-	)
+	), nil
 }
 
 func NewRouter(

@@ -36,7 +36,12 @@ func run() {
 	}
 	defer db.Close()
 
-	r := router.InitializeRouter(conf, logger, db)
+	r, err := router.InitializeRouter(conf, logger, db)
+
+	if err != nil {
+		logger.Fatal("init error", zap.String("error", err.Error()))
+		panic(err)
+	}
 
 	err = http.ListenAndServe(conf.Host, r.Route())
 	if err != nil {

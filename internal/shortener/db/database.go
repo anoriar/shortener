@@ -21,14 +21,21 @@ func InitializeDatabase(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 
-	err = PingDatabase(db)
+	return db, nil
+}
+
+func PrepareDatabase(db *sql.DB) error {
+	err := PingDatabase(db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	migrations.Up(db)
+	err = migrations.Up(db)
+	if err != nil {
+		return err
+	}
 
-	return db, nil
+	return nil
 }
 
 func PingDatabase(db *sql.DB) error {
