@@ -19,19 +19,19 @@ func NewFileURLRepository(filename string) repository.URLRepositoryInterface {
 	}
 }
 
-func (repository *FileURLRepository) AddURL(url *entity.URL) (*entity.URL, error) {
+func (repository *FileURLRepository) AddURL(url *entity.URL) error {
 
 	fileWriter, err := writer.NewURLFileWriter(repository.filename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer fileWriter.Close()
 
 	err = fileWriter.WriteURL(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return url, nil
+	return nil
 }
 
 func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
@@ -59,7 +59,7 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 
 func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
 	for _, url := range urls {
-		_, err := repository.AddURL(&url)
+		err := repository.AddURL(&url)
 		if err != nil {
 			return err
 		}

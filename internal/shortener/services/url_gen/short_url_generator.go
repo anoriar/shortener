@@ -32,5 +32,6 @@ func (sug *ShortURLGenerator) GenerateShortURL() (string, error) {
 		}
 		attempt++
 	}
+
 	return "", ErrShortKeyGenerationAttemptsExceeded
 }

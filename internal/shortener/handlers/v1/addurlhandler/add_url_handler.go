@@ -54,7 +54,7 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err = handler.urlRepository.AddURL(
+	err = handler.urlRepository.AddURL(
 		&entity.URL{
 			UUID:        uuid.NewString(),
 			ShortURL:    shortKey,

@@ -20,13 +20,13 @@ func NewDBURLRepository(db *sql.DB, logger *zap.Logger) *DatabaseURLRepository {
 // С точки зрения DDD - плохая практика, а также замусоривает  параметры функции
 // #MENTOR: Вопрос 2: Может ли сервер потерять связь с базой данных? Например, стоит консьюмер, который работает 20 дней.
 // Нужно ли проверять коннект к бд и реконнектить в случае неуспешного пинга? Как отличить: потерялся коннект к бд или ошибка запроса?
-func (repository *DatabaseURLRepository) AddURL(url *entity.URL) (*entity.URL, error) {
+func (repository *DatabaseURLRepository) AddURL(url *entity.URL) error {
 	_, err := repository.db.Exec("INSERT INTO urls (uuid, short_url, original_url) VALUES ($1, $2, $3);", url.UUID, url.ShortURL, url.OriginalURL)
 	if err != nil {
 		repository.logger.Error(err.Error())
-		return nil, err
+		return err
 	}
-	return url, err
+	return nil
 }
 
 func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {

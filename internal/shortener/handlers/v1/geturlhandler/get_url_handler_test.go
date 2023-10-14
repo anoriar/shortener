@@ -1,9 +1,12 @@
 package geturlhandler
 
 import (
+	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/mock"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -26,13 +29,23 @@ func (mcr *mockGetHandlerURLRepositoryNotExists) FindURLByShortURL(shortURL stri
 }
 
 func TestGetHandler_GetURL(t *testing.T) {
-	urlRepository := repository.NewInMemoryURLRepository()
-	_, err := urlRepository.AddURL(&entity.URL{
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	urlRepoSuccessMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoSuccessMock.EXPECT().FindURLByShortURL(gomock.Any()).Return(&entity.URL{
 		UUID:        "b9d1113f-da5f-40d2-b9ef-15a3daf23668",
 		ShortURL:    existedKey,
 		OriginalURL: successRedirectLocation,
-	})
-	require.NoError(t, err)
+	}, nil)
+
+	urlRepoNotExistedURLMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoNotExistedURLMock.EXPECT().FindURLByShortURL(gomock.Any()).Return(nil, nil)
+
+	urlRepoNotCallsMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoNotCallsMock.EXPECT().FindURLByShortURL(gomock.Any()).Times(0)
+
+	urlRepoErrorMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoErrorMock.EXPECT().FindURLByShortURL(gomock.Any()).Return(nil, errors.New("exception")).Times(1)
 
 	logger, err := logger.Initialize("info")
 	require.NoError(t, err)
@@ -51,7 +64,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:          "success",
 			request:       "/" + existedKey,
-			urlRepository: urlRepository,
+			urlRepository: urlRepoSuccessMock,
 			want: want{
 				status:      http.StatusTemporaryRedirect,
 				contentType: "text/plain",
@@ -61,7 +74,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:          "empty short key",
 			request:       "/",
-			urlRepository: urlRepository,
+			urlRepository: urlRepoNotCallsMock,
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -71,7 +84,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:          "not existed short key",
 			request:       "/" + notExistedKey,
-			urlRepository: urlRepository,
+			urlRepository: urlRepoNotExistedURLMock,
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",
@@ -81,7 +94,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		{
 			name:          "exception when fetching",
 			request:       "/" + notExistedKey,
-			urlRepository: new(mockGetHandlerURLRepositoryNotExists),
+			urlRepository: urlRepoErrorMock,
 			want: want{
 				status:      http.StatusBadRequest,
 				contentType: "text/plain; charset=utf-8",

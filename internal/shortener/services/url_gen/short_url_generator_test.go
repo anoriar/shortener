@@ -4,7 +4,10 @@ import (
 	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/mock"
 	"github.com/anoriar/shortener/internal/shortener/util"
+	utilMock "github.com/anoriar/shortener/internal/shortener/util/mock"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -13,51 +16,26 @@ const expectedShortKey = "s7Fh4G"
 
 var errRuntime = errors.New("exception")
 
-type mockKeyGen struct{}
-
-func (mock *mockKeyGen) Generate() string {
-	return expectedShortKey
-}
-
-type mockURLRepositorySuccess struct{}
-
-func (mcr *mockURLRepositorySuccess) AddURL(url *entity.URL) (*entity.URL, error) {
-	return nil, errRuntime
-}
-
-func (mcr *mockURLRepositorySuccess) FindURLByShortURL(shortURL string) (*entity.URL, error) {
-	return nil, nil
-}
-
-type mockURLRepositoryError struct{}
-
-func (mcr *mockURLRepositoryError) AddURL(url *entity.URL) (*entity.URL, error) {
-	return nil, errors.New("exception")
-}
-
-func (mcr *mockURLRepositoryError) FindURLByShortURL(shortURL string) (*entity.URL, error) {
-	return nil, errors.New("exception")
-}
-
-type mockURLRepositoryEveryoneExisted struct{}
-
-func (mcr *mockURLRepositoryEveryoneExisted) AddURL(url *entity.URL) (*entity.URL, error) {
-	return &entity.URL{
-		UUID:        "111",
-		ShortURL:    "222",
-		OriginalURL: "333",
-	}, nil
-}
-
-func (mcr *mockURLRepositoryEveryoneExisted) FindURLByShortURL(shortURL string) (*entity.URL, error) {
-	return &entity.URL{
-		UUID:        "111",
-		ShortURL:    "222",
-		OriginalURL: "333",
-	}, nil
-}
-
 func TestShortURLGenerator_generateShortURL(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	urlRepoSuccessMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoSuccessMock.EXPECT().FindURLByShortURL(gomock.Any()).Return(nil, nil).MaxTimes(1).MinTimes(1)
+
+	urlRepoErrorMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoErrorMock.EXPECT().FindURLByShortURL(gomock.Any()).Return(nil, errors.New("exception")).MaxTimes(1).MinTimes(1)
+
+	urlRepoEveryoneExistedMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlRepoEveryoneExistedMock.EXPECT().FindURLByShortURL(gomock.Any()).Return(&entity.URL{
+		UUID:        "111",
+		ShortURL:    "222",
+		OriginalURL: "333",
+	}, nil).MaxTimes(maxAttempts).MinTimes(maxAttempts)
+
+	keyGenMock := utilMock.NewMockKeyGenInterface(ctrl)
+	keyGenMock.EXPECT().Generate().Return(expectedShortKey).AnyTimes()
+
 	type fields struct {
 		urlRepository repository.URLRepositoryInterface
 		keyGen        util.KeyGenInterface
@@ -71,8 +49,8 @@ func TestShortURLGenerator_generateShortURL(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				urlRepository: new(mockURLRepositorySuccess),
-				keyGen:        new(mockKeyGen),
+				urlRepository: urlRepoSuccessMock,
+				keyGen:        keyGenMock,
 			},
 			want:    expectedShortKey,
 			wantErr: nil,
@@ -80,8 +58,8 @@ func TestShortURLGenerator_generateShortURL(t *testing.T) {
 		{
 			name: "exception repository",
 			fields: fields{
-				urlRepository: new(mockURLRepositoryError),
-				keyGen:        new(mockKeyGen),
+				urlRepository: urlRepoErrorMock,
+				keyGen:        keyGenMock,
 			},
 			want:    "",
 			wantErr: errRuntime,
@@ -89,8 +67,8 @@ func TestShortURLGenerator_generateShortURL(t *testing.T) {
 		{
 			name: "attempts exceeded",
 			fields: fields{
-				urlRepository: new(mockURLRepositoryEveryoneExisted),
-				keyGen:        new(mockKeyGen),
+				urlRepository: urlRepoEveryoneExistedMock,
+				keyGen:        keyGenMock,
 			},
 			want:    "",
 			wantErr: ErrShortKeyGenerationAttemptsExceeded,
