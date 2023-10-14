@@ -7,7 +7,6 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/logger"
-	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/repository/mock"
 	urlGenMock "github.com/anoriar/shortener/internal/shortener/services/url_gen/mock"
 	"github.com/golang/mock/gomock"
@@ -48,14 +47,8 @@ func TestAddURL(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	urlRepoSuccessMock := mock.NewMockURLRepositoryInterface(ctrl)
-	urlRepoSuccessMock.EXPECT().AddURL(gomock.Any()).Return(nil)
-
-	urlRepoNotCallsMock := mock.NewMockURLRepositoryInterface(ctrl)
-	urlRepoNotCallsMock.EXPECT().AddURL(gomock.Any()).Return(nil).MaxTimes(0)
-
-	urlRepoErrorMock := mock.NewMockURLRepositoryInterface(ctrl)
-	urlRepoErrorMock.EXPECT().AddURL(gomock.Any()).Return(errors.New("exception")).MinTimes(1)
+	urlRepositoryMock := mock.NewMockURLRepositoryInterface(ctrl)
+	urlGeneratorMock := urlGenMock.NewMockShortURLGeneratorInterface(ctrl)
 
 	logger, err := logger.Initialize("info")
 	require.NoError(t, err)
@@ -68,13 +61,16 @@ func TestAddURL(t *testing.T) {
 	tests := []struct {
 		name          string
 		requestBody   []byte
-		urlRepository repository.URLRepositoryInterface
+		mockBehaviour func()
 		want          want
 	}{
 		{
-			name:          "success",
-			requestBody:   successRequestBody,
-			urlRepository: urlRepoSuccessMock,
+			name:        "success",
+			requestBody: successRequestBody,
+			mockBehaviour: func() {
+				urlGeneratorMock.EXPECT().GenerateShortURL().Return(expectedShortKey, nil).Times(1)
+				urlRepositoryMock.EXPECT().AddURL(gomock.Any()).Return(nil).Times(1)
+			},
 			want: want{
 				status:      http.StatusCreated,
 				body:        successExpectedBody,
@@ -82,9 +78,12 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:          "not valid url_gen",
-			requestBody:   []byte("sss"),
-			urlRepository: urlRepoNotCallsMock,
+			name:        "not valid url body",
+			requestBody: []byte("sss"),
+			mockBehaviour: func() {
+				urlGeneratorMock.EXPECT().GenerateShortURL().Times(0)
+				urlRepositoryMock.EXPECT().AddURL(gomock.Any()).Times(0)
+			},
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -92,9 +91,12 @@ func TestAddURL(t *testing.T) {
 			},
 		},
 		{
-			name:          "repository exception",
-			requestBody:   successRequestBody,
-			urlRepository: urlRepoErrorMock,
+			name:        "repository exception",
+			requestBody: successRequestBody,
+			mockBehaviour: func() {
+				urlGeneratorMock.EXPECT().GenerateShortURL().Return(expectedShortKey, nil)
+				urlRepositoryMock.EXPECT().AddURL(gomock.Any()).Return(errors.New("exception")).Times(1)
+			},
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -105,13 +107,12 @@ func TestAddURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
+			tt.mockBehaviour()
+
 			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(tt.requestBody))
 			w := httptest.NewRecorder()
 
-			urlGen := urlGenMock.NewMockShortURLGeneratorInterface(ctrl)
-			urlGen.EXPECT().GenerateShortURL().Return(expectedShortKey, nil).AnyTimes()
-
-			NewAddHandler(tt.urlRepository, urlGen, logger, baseURL).AddURL(w, r)
+			NewAddHandler(urlRepositoryMock, urlGeneratorMock, logger, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))
