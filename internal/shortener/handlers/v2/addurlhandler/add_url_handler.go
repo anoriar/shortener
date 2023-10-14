@@ -39,7 +39,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
-		handler.logger.Error("re error", zap.String("error", err.Error()))
+		handler.logger.Error("read request error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -47,6 +47,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	addURLRequestDto := &request.AddURLRequestDto{}
 
 	if err = json.Unmarshal(requestBody, addURLRequestDto); err != nil {
+		handler.logger.Error("request unmarshal error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

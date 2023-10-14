@@ -1,6 +1,7 @@
 package file
 
 import (
+	"context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
@@ -54,4 +55,14 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 			return url, nil
 		}
 	}
+}
+
+func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
+	for _, url := range urls {
+		_, err := repository.AddURL(&url)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

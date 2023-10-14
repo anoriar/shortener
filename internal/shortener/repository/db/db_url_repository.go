@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"go.uber.org/zap"
@@ -56,4 +57,36 @@ func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*en
 	}
 
 	return &url, err
+}
+
+func (repository *DatabaseURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
+	tx, err := repository.db.BeginTx(ctx, nil)
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare("INSERT INTO urls (uuid, short_url, original_url) VALUES ($1,$2,$3)")
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+	defer stmt.Close()
+
+	for _, url := range urls {
+		_, err := stmt.ExecContext(ctx, url.UUID, url.ShortURL, url.OriginalURL)
+		if err != nil {
+			repository.logger.Error(err.Error())
+			return err
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+
+	return nil
 }

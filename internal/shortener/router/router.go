@@ -8,6 +8,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/ping"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander"
 	addURLHandlerV2 "github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
@@ -24,6 +25,7 @@ type Router struct {
 	addHandler         *addurlhandler.AddHandler
 	getHandler         *geturlhandler.GetHandler
 	addHandlerV2       *addURLHandlerV2.AddHandler
+	addURLBatchHandler *addurlbatchhander.AddURLBatchHandler
 	pingHandler        *ping.PingHandler
 	loggerMiddleware   *loggerMiddlewarePkg.LoggerMiddleware
 	compressMiddleware *compress.CompressMiddleware
@@ -47,6 +49,7 @@ func InitializeRouter(cnf *config.Config, logger *zap.Logger, db *sql.DB) (*Rout
 		addurlhandler.NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), logger, cnf.BaseURL),
 		geturlhandler.NewGetHandler(urlRepository, logger),
 		addURLHandlerV2.NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), logger, cnf.BaseURL),
+		addurlbatchhander.InitializeAddURLBatchHandler(urlRepository, util.NewKeyGen(), logger, cnf.BaseURL),
 		ping.NewPingHandler(db, logger),
 		loggerMiddlewarePkg.NewLoggerMiddleware(logger),
 		compress.NewCompressMiddleware(),
@@ -57,6 +60,7 @@ func NewRouter(
 	addHandler *addurlhandler.AddHandler,
 	getHandler *geturlhandler.GetHandler,
 	addHandlerV2 *addURLHandlerV2.AddHandler,
+	addURLBatchHandler *addurlbatchhander.AddURLBatchHandler,
 	pingHandler *ping.PingHandler,
 	loggerMiddleware *loggerMiddlewarePkg.LoggerMiddleware,
 	compressMiddleware *compress.CompressMiddleware,
@@ -65,6 +69,7 @@ func NewRouter(
 		addHandler:         addHandler,
 		getHandler:         getHandler,
 		addHandlerV2:       addHandlerV2,
+		addURLBatchHandler: addURLBatchHandler,
 		pingHandler:        pingHandler,
 		loggerMiddleware:   loggerMiddleware,
 		compressMiddleware: compressMiddleware,
@@ -81,6 +86,7 @@ func (r *Router) Route() chi.Router {
 	router.Post("/", r.addHandler.AddURL)
 	router.Get("/{id}", r.getHandler.GetURL)
 	router.Post("/api/shorten", r.addHandlerV2.AddURL)
+	router.Post("/api/shorten/batch", r.addURLBatchHandler.AddURLBatch)
 
 	return router
 }

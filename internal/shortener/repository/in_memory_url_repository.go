@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
@@ -25,4 +26,14 @@ func (repository *InMemoryURLRepository) FindURLByShortURL(key string) (*entity.
 		return nil, nil
 	}
 	return url, nil
+}
+
+func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
+	for _, url := range urls {
+		_, err := repository.AddURL(&url)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
