@@ -19,6 +19,20 @@ func (repository *InMemoryURLRepository) AddURL(url *entity.URL) error {
 
 	return nil
 }
+func (repository *InMemoryURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
+	return repository.findOneByCondition(func(url entity.URL) bool {
+		return url.OriginalURL == originalURL
+	})
+}
+
+func (repository *InMemoryURLRepository) findOneByCondition(condition func(url entity.URL) bool) (*entity.URL, error) {
+	for _, url := range repository.urls {
+		if condition(*url) {
+			return url, nil
+		}
+	}
+	return nil, nil
+}
 
 func (repository *InMemoryURLRepository) FindURLByShortURL(key string) (*entity.URL, error) {
 	url, exists := repository.urls[key]

@@ -30,7 +30,12 @@ func PrepareDatabase(db *sql.DB) error {
 		return err
 	}
 
-	err = migrations.Up(db)
+	err = migrations.Version231009Up(db)
+	if err != nil {
+		return err
+	}
+
+	err = migrations.Version231015Up(db)
 	if err != nil {
 		return err
 	}

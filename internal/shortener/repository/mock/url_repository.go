@@ -63,6 +63,21 @@ func (mr *MockURLRepositoryInterfaceMockRecorder) AddURLBatch(ctx, urls interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddURLBatch", reflect.TypeOf((*MockURLRepositoryInterface)(nil).AddURLBatch), ctx, urls)
 }
 
+// FindURLByOriginalURL mocks base method.
+func (m *MockURLRepositoryInterface) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindURLByOriginalURL", ctx, originalURL)
+	ret0, _ := ret[0].(*entity.URL)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindURLByOriginalURL indicates an expected call of FindURLByOriginalURL.
+func (mr *MockURLRepositoryInterfaceMockRecorder) FindURLByOriginalURL(ctx, originalURL interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindURLByOriginalURL", reflect.TypeOf((*MockURLRepositoryInterface)(nil).FindURLByOriginalURL), ctx, originalURL)
+}
+
 // FindURLByShortURL mocks base method.
 func (m *MockURLRepositoryInterface) FindURLByShortURL(shortURL string) (*entity.URL, error) {
 	m.ctrl.T.Helper()

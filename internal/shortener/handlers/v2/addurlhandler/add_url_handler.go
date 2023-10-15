@@ -2,10 +2,12 @@ package addurlhandler
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -37,6 +39,7 @@ func NewAddHandler(
 
 func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
+	status := http.StatusCreated
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
 		handler.logger.Error("read request error", zap.String("error", err.Error()))
@@ -72,17 +75,27 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	})
 
 	if err != nil {
-		handler.logger.Error("add URL error", zap.String("error", err.Error()))
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		if errors.Is(err, repositoryerror.ErrConflict) {
+			existedURL, err := handler.urlRepository.FindURLByOriginalURL(req.Context(), addURLRequestDto.URL)
+			if err != nil {
+				handler.logger.Error("find existed URL error", zap.String("error", err.Error()))
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			shortKey = existedURL.ShortURL
+			status = http.StatusConflict
+		} else {
+			handler.logger.Error("add URL error", zap.String("error", err.Error()))
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
-
 	responseDTO := response.AddURLResponseDto{
 		Result: handler.baseURL + "/" + shortKey,
 	}
 
 	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(status)
 
 	jsonResult, err := json.Marshal(responseDTO)
 	if err != nil {

@@ -1,8 +1,10 @@
 package addurlhandler
 
 import (
+	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -33,7 +35,7 @@ func NewAddHandler(
 }
 
 func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
-	w.Header().Set("content-type", "text/plain")
+	status := http.StatusCreated
 
 	url, err := io.ReadAll(req.Body)
 	if err != nil {
@@ -62,12 +64,24 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		})
 
 	if err != nil {
-		handler.logger.Error("add URL error", zap.String("error", err.Error()))
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		if errors.Is(err, repositoryerror.ErrConflict) {
+			existedURL, err := handler.urlRepository.FindURLByOriginalURL(req.Context(), string(url))
+			if err != nil {
+				handler.logger.Error("find existed URL error", zap.String("error", err.Error()))
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			shortKey = existedURL.ShortURL
+			status = http.StatusConflict
+		} else {
+			handler.logger.Error("add URL error", zap.String("error", err.Error()))
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(status)
+	w.Header().Set("content-type", "text/plain")
 
 	_, err = w.Write([]byte(handler.baseURL + "/" + shortKey))
 	if err != nil {

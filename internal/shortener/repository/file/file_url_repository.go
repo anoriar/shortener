@@ -57,6 +57,35 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 	}
 }
 
+func (repository *FileURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
+	return repository.findOneByCondition(func(url entity.URL) bool {
+		return url.OriginalURL == originalURL
+	})
+}
+
+func (repository *FileURLRepository) findOneByCondition(condition func(url entity.URL) bool) (*entity.URL, error) {
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fileReader.Close()
+
+	for {
+		url, err := fileReader.ReadURL()
+		if err != nil {
+			if err == io.EOF {
+				return nil, nil
+			}
+			return nil, err
+		}
+
+		if condition(*url) {
+			return url, nil
+		}
+	}
+}
+
 func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
 	for _, url := range urls {
 		err := repository.AddURL(&url)

@@ -9,5 +9,6 @@ import (
 type URLRepositoryInterface interface {
 	AddURL(url *entity.URL) error
 	FindURLByShortURL(shortURL string) (*entity.URL, error)
+	FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error)
 	AddURLBatch(ctx context.Context, urls []entity.URL) error
 }
