@@ -1,0 +1,2 @@
+CREATE TABLE IF NOT EXISTS urls (uuid VARCHAR(36) NOT NULL, short_url VARCHAR(255) NOT NULL, original_url VARCHAR(255) NOT NULL, PRIMARY KEY (uuid));
+CREATE INDEX IF NOT EXISTS short_url_idx ON urls (short_url);

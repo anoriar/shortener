@@ -11,10 +11,5 @@ func InitializeDBURLRepository(dsn string, logger *zap.Logger) (*DatabaseURLRepo
 		return nil, err
 	}
 
-	err = internal.PrepareDatabase(db)
-	if err != nil {
-		return nil, err
-	}
-
 	return NewDBURLRepository(db, logger), nil
 }

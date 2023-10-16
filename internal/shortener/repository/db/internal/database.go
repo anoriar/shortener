@@ -2,7 +2,10 @@ package internal
 
 import (
 	"database/sql"
-	migrations2 "github.com/anoriar/shortener/internal/shortener/repository/db/internal/migrations"
+	"errors"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
@@ -12,19 +15,18 @@ func InitializeDatabase(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 
+	m, err := migrate.New(
+		"file://migrations",
+		dsn,
+	)
+	if err != nil {
+		return nil, err
+	}
+	err = m.Up()
+	if err != nil {
+		if !errors.Is(err, migrate.ErrNoChange) {
+			return nil, err
+		}
+	}
 	return db, nil
-}
-
-func PrepareDatabase(db *sql.DB) error {
-	err := migrations2.Version231009Up(db)
-	if err != nil {
-		return err
-	}
-
-	err = migrations2.Version231015Up(db)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
