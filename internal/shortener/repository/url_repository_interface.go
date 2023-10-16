@@ -11,4 +11,6 @@ type URLRepositoryInterface interface {
 	FindURLByShortURL(shortURL string) (*entity.URL, error)
 	FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error)
 	AddURLBatch(ctx context.Context, urls []entity.URL) error
+	Ping(ctx context.Context) error
+	Close() error
 }

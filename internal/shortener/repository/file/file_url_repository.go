@@ -3,7 +3,6 @@ package file
 import (
 	"context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/writer"
 	"io"
@@ -13,10 +12,14 @@ type FileURLRepository struct {
 	filename string
 }
 
-func NewFileURLRepository(filename string) repository.URLRepositoryInterface {
+func NewFileURLRepository(filename string) *FileURLRepository {
 	return &FileURLRepository{
 		filename: filename,
 	}
+}
+
+func (repository *FileURLRepository) Ping(ctx context.Context) error {
+	return nil
 }
 
 func (repository *FileURLRepository) AddURL(url *entity.URL) error {
@@ -93,5 +96,9 @@ func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []ent
 			return err
 		}
 	}
+	return nil
+}
+
+func (repository *FileURLRepository) Close() error {
 	return nil
 }

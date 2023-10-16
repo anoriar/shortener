@@ -1,25 +1,24 @@
 package ping
 
 import (
-	"database/sql"
-	"github.com/anoriar/shortener/internal/shortener/db"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"go.uber.org/zap"
 	"net/http"
 )
 
 type PingHandler struct {
-	db     *sql.DB
-	logger *zap.Logger
+	urlRepository repository.URLRepositoryInterface
+	logger        *zap.Logger
 }
 
-func NewPingHandler(db *sql.DB, logger *zap.Logger) *PingHandler {
-	return &PingHandler{db: db, logger: logger}
+func NewPingHandler(urlRepository repository.URLRepositoryInterface, logger *zap.Logger) *PingHandler {
+	return &PingHandler{urlRepository: urlRepository, logger: logger}
 }
 
 func (p *PingHandler) Ping(w http.ResponseWriter, req *http.Request) {
-	err := db.PingDatabase(p.db)
+	err := p.urlRepository.Ping(req.Context())
 	if err != nil {
-		p.logger.Error("Database error", zap.String("error", err.Error()))
+		p.logger.Error("Storage error", zap.String("error", err.Error()))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}

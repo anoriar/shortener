@@ -9,8 +9,12 @@ type InMemoryURLRepository struct {
 	urls map[string]*entity.URL
 }
 
-func NewInMemoryURLRepository() URLRepositoryInterface {
+func NewInMemoryURLRepository() *InMemoryURLRepository {
 	return &InMemoryURLRepository{urls: make(map[string]*entity.URL)}
+}
+
+func (repository *InMemoryURLRepository) Ping(ctx context.Context) error {
+	return nil
 }
 
 func (repository *InMemoryURLRepository) AddURL(url *entity.URL) error {
@@ -49,5 +53,9 @@ func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls [
 			return err
 		}
 	}
+	return nil
+}
+
+func (repository *InMemoryURLRepository) Close() error {
 	return nil
 }

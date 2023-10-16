@@ -63,6 +63,20 @@ func (mr *MockURLRepositoryInterfaceMockRecorder) AddURLBatch(ctx, urls interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddURLBatch", reflect.TypeOf((*MockURLRepositoryInterface)(nil).AddURLBatch), ctx, urls)
 }
 
+// Close mocks base method.
+func (m *MockURLRepositoryInterface) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockURLRepositoryInterfaceMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockURLRepositoryInterface)(nil).Close))
+}
+
 // FindURLByOriginalURL mocks base method.
 func (m *MockURLRepositoryInterface) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	m.ctrl.T.Helper()
@@ -91,4 +105,18 @@ func (m *MockURLRepositoryInterface) FindURLByShortURL(shortURL string) (*entity
 func (mr *MockURLRepositoryInterfaceMockRecorder) FindURLByShortURL(shortURL interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindURLByShortURL", reflect.TypeOf((*MockURLRepositoryInterface)(nil).FindURLByShortURL), shortURL)
+}
+
+// Ping mocks base method.
+func (m *MockURLRepositoryInterface) Ping(ctx context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping", ctx)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockURLRepositoryInterfaceMockRecorder) Ping(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockURLRepositoryInterface)(nil).Ping), ctx)
 }

@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/config"
-	database "github.com/anoriar/shortener/internal/shortener/db"
 	"github.com/anoriar/shortener/internal/shortener/logger"
+	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/router"
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
@@ -30,13 +30,13 @@ func run() {
 
 	defer logger.Sync()
 
-	db, err := database.InitializeDatabase(conf.DatabaseDSN)
+	urlRepository, err := repository.InitializeURLRepository(conf, logger)
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
+	defer urlRepository.Close()
 
-	r, err := router.InitializeRouter(conf, logger, db)
+	r, err := router.InitializeRouter(conf, urlRepository, logger)
 
 	if err != nil {
 		logger.Fatal("init error", zap.String("error", err.Error()))
