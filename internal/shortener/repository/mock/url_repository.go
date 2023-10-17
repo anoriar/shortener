@@ -77,6 +77,20 @@ func (mr *MockURLRepositoryInterfaceMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockURLRepositoryInterface)(nil).Close))
 }
 
+// DeleteURLBatch mocks base method.
+func (m *MockURLRepositoryInterface) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteURLBatch", ctx, shortURLs)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteURLBatch indicates an expected call of DeleteURLBatch.
+func (mr *MockURLRepositoryInterfaceMockRecorder) DeleteURLBatch(ctx, shortURLs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteURLBatch", reflect.TypeOf((*MockURLRepositoryInterface)(nil).DeleteURLBatch), ctx, shortURLs)
+}
+
 // FindURLByOriginalURL mocks base method.
 func (m *MockURLRepositoryInterface) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	m.ctrl.T.Helper()

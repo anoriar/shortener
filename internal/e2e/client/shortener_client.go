@@ -204,3 +204,73 @@ func (client *ShortenerClient) Ping() (dtoResponsePkg.PingResponseDto, error) {
 		response.StatusCode,
 	), nil
 }
+
+func (client *ShortenerClient) DeleteURLBatch(shortURLs []string) (*dtoResponsePkg.DeleteURLBatchResponseDto, error) {
+	requestJSON, err := json.Marshal(shortURLs)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(http.MethodDelete, client.baseURL+"/api/shorten/batch", bytes.NewReader(requestJSON))
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "application/json")
+	resp, err := client.httpClient.Do(request)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return dtoResponsePkg.NewDeleteURLBatchResponseDto(
+		resp.StatusCode,
+		resp.Header.Get("Content-Type"),
+	), nil
+}
+
+func (client *ShortenerClient) AddURLBatch(items []dtoRequestPkg.AddURLBatchItemDTO) (*dtoResponsePkg.AddURLBatchResponseDto, error) {
+	requestJSON, err := json.Marshal(items)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten/batch", bytes.NewReader(requestJSON))
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "application/json")
+	resp, err := client.httpClient.Do(request)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusCreated {
+		return nil, errors.New(string(body))
+	}
+
+	if resp.Header.Get("Content-Type") != "application/json" {
+		return nil, errors.New("not expected content type in responsewriter")
+	}
+
+	var batchItems []dtoResponsePkg.AddURLBatchItemDTO
+	err = json.Unmarshal(body, &batchItems)
+	if err != nil {
+		return nil, err
+	}
+
+	return dtoResponsePkg.NewAddURLBatchResponseDto(
+		resp.StatusCode,
+		resp.Header.Get("Content-Type"),
+		batchItems,
+	), nil
+}

@@ -1,6 +1,7 @@
 package client
 
 import (
+	"github.com/anoriar/shortener/internal/e2e/client/dto/request"
 	"github.com/anoriar/shortener/internal/e2e/client/dto/response"
 )
 
@@ -10,4 +11,6 @@ type ShortenerClientInterface interface {
 	AddURLv2WithCompress(url string, contentType string) (*response.AddResponseV2EncodingDto, error)
 	GetURL(key string) (*response.GetResponseDto, error)
 	Ping() (response.PingResponseDto, error)
+	DeleteURLBatch(shortURLs []string) (*response.DeleteURLBatchResponseDto, error)
+	AddURLBatch(items []request.AddURLBatchItemDTO) (*response.AddURLBatchResponseDto, error)
 }

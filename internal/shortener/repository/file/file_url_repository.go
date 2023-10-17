@@ -2,6 +2,7 @@ package file
 
 import (
 	"context"
+	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/writer"
@@ -48,7 +49,7 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 	for {
 		url, err := fileReader.ReadURL()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil, nil
 			}
 			return nil, err
@@ -90,12 +91,61 @@ func (repository *FileURLRepository) findOneByCondition(condition func(url entit
 }
 
 func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
+	fileWriter, err := writer.NewURLFileWriter(repository.filename)
+	if err != nil {
+		return err
+	}
+	defer fileWriter.Close()
+
 	for _, url := range urls {
-		err := repository.AddURL(&url)
+		err = fileWriter.WriteURL(&url)
 		if err != nil {
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (repository *FileURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return nil
+	}
+	fileURLs := make(map[string]*entity.URL)
+
+	defer fileReader.Close()
+
+	//Считываем все данные с файла
+	for {
+		url, err := fileReader.ReadURL()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+		fileURLs[url.ShortURL] = url
+	}
+
+	//Удаляем лишние
+	for _, shortURL := range shortURLs {
+		delete(fileURLs, shortURL)
+	}
+	//Перезаписываем файл заново
+	fileWriter, err := writer.NewURLFileEmptyWriter(repository.filename)
+	if err != nil {
+		return err
+	}
+	defer fileWriter.Close()
+
+	for _, url := range fileURLs {
+		err = fileWriter.WriteURL(url)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

@@ -56,6 +56,13 @@ func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls [
 	return nil
 }
 
+func (repository *InMemoryURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
+	for _, shortURL := range shortURLs {
+		delete(repository.urls, shortURL)
+	}
+	return nil
+}
+
 func (repository *InMemoryURLRepository) Close() error {
 	return nil
 }

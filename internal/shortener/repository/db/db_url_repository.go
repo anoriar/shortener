@@ -112,6 +112,38 @@ func (repository *DatabaseURLRepository) AddURLBatch(ctx context.Context, urls [
 	return nil
 }
 
+func (repository *DatabaseURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
+	tx, err := repository.db.BeginTx(ctx, nil)
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+
+	defer tx.Rollback()
+
+	stmt, err := tx.Prepare("DELETE FROM urls WHERE short_url=$1")
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+	defer stmt.Close()
+
+	for _, shortURL := range shortURLs {
+		_, err := stmt.ExecContext(ctx, shortURL)
+		if err != nil {
+			repository.logger.Error(err.Error())
+			return err
+		}
+	}
+	err = tx.Commit()
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func (repository *DatabaseURLRepository) Close() error {
 	err := repository.db.Close()
 	if err != nil {

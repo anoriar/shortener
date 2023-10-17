@@ -13,4 +13,5 @@ type URLRepositoryInterface interface {
 	AddURLBatch(ctx context.Context, urls []entity.URL) error
 	Ping(ctx context.Context) error
 	Close() error
+	DeleteURLBatch(ctx context.Context, shortURLs []string) error
 }

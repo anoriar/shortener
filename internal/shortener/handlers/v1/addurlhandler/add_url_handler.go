@@ -43,6 +43,7 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
 	parsedURL, err := neturl.Parse(string(url))
 	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
 		http.Error(w, "Not valid URL", http.StatusBadRequest)
@@ -79,11 +80,11 @@ func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
-
-	w.WriteHeader(status)
 	w.Header().Set("content-type", "text/plain")
+	w.WriteHeader(status)
 
 	_, err = w.Write([]byte(handler.baseURL + "/" + shortKey))
+
 	if err != nil {
 		handler.logger.Error("write response error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
