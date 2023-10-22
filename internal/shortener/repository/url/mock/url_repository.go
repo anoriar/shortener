@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	repository "github.com/anoriar/shortener/internal/shortener/dto/repository"
 	entity "github.com/anoriar/shortener/internal/shortener/entity"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -77,20 +78,6 @@ func (mr *MockURLRepositoryInterfaceMockRecorder) Close() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockURLRepositoryInterface)(nil).Close))
 }
 
-// DeleteURLBatch mocks base method.
-func (m *MockURLRepositoryInterface) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteURLBatch", ctx, shortURLs)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// DeleteURLBatch indicates an expected call of DeleteURLBatch.
-func (mr *MockURLRepositoryInterfaceMockRecorder) DeleteURLBatch(ctx, shortURLs interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteURLBatch", reflect.TypeOf((*MockURLRepositoryInterface)(nil).DeleteURLBatch), ctx, shortURLs)
-}
-
 // FindURLByOriginalURL mocks base method.
 func (m *MockURLRepositoryInterface) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	m.ctrl.T.Helper()
@@ -119,6 +106,21 @@ func (m *MockURLRepositoryInterface) FindURLByShortURL(shortURL string) (*entity
 func (mr *MockURLRepositoryInterfaceMockRecorder) FindURLByShortURL(shortURL interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindURLByShortURL", reflect.TypeOf((*MockURLRepositoryInterface)(nil).FindURLByShortURL), shortURL)
+}
+
+// GetURLsByQuery mocks base method.
+func (m *MockURLRepositoryInterface) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetURLsByQuery", ctx, urlQuery)
+	ret0, _ := ret[0].([]entity.URL)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetURLsByQuery indicates an expected call of GetURLsByQuery.
+func (mr *MockURLRepositoryInterfaceMockRecorder) GetURLsByQuery(ctx, urlQuery interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetURLsByQuery", reflect.TypeOf((*MockURLRepositoryInterface)(nil).GetURLsByQuery), ctx, urlQuery)
 }
 
 // Ping mocks base method.

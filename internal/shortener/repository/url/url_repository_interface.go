@@ -2,6 +2,7 @@ package url
 
 import (
 	"context"
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
@@ -14,4 +15,5 @@ type URLRepositoryInterface interface {
 	Ping(ctx context.Context) error
 	Close() error
 	DeleteURLBatch(ctx context.Context, shortURLs []string) error
+	GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error)
 }

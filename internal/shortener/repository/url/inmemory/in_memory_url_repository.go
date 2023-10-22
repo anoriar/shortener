@@ -2,6 +2,7 @@ package inmemory
 
 import (
 	"context"
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
@@ -44,6 +45,31 @@ func (repository *InMemoryURLRepository) FindURLByShortURL(key string) (*entity.
 		return nil, nil
 	}
 	return url, nil
+}
+
+func (repository *InMemoryURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	var resultURLs []entity.URL
+
+	for _, url := range repository.urls {
+		if len(urlQuery.OriginalURLs) > 0 {
+			for _, originalURL := range urlQuery.OriginalURLs {
+				if url.OriginalURL == originalURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+
+		if len(urlQuery.ShortURLs) > 0 {
+			for _, shortURL := range urlQuery.ShortURLs {
+				if url.ShortURL == shortURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+	}
+	return resultURLs, nil
 }
 
 func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {

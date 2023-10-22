@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/anoriar/shortener/internal/shortener/auth/dto"
-	v1 "github.com/anoriar/shortener/internal/shortener/auth/v1"
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
+	"github.com/anoriar/shortener/internal/shortener/dto/auth"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/user"
+	v1 "github.com/anoriar/shortener/internal/shortener/services/auth"
 	"github.com/google/uuid"
 	"net/http"
 )
@@ -45,7 +45,7 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 				return
 			}
 			if am.signService.Verify(decodedToken, signature) {
-				tokenPayload := &dto.TokenPayload{}
+				tokenPayload := &auth.TokenPayload{}
 				err = json.Unmarshal(decodedToken, tokenPayload)
 				if err != nil {
 					http.Error(w, "unmarshal token error", http.StatusInternalServerError)
@@ -60,7 +60,7 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 		}
 
 		if shouldCreateNewToken {
-			tokenPayload := dto.TokenPayload{UserID: uuid.NewString()}
+			tokenPayload := auth.TokenPayload{UserID: uuid.NewString()}
 			token, err := am.createNewToken(tokenPayload)
 			if err != nil {
 				http.Error(w, "create token error", http.StatusInternalServerError)
@@ -89,7 +89,7 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 
 }
 
-func (am *AuthMiddleware) createNewToken(payload dto.TokenPayload) (string, error) {
+func (am *AuthMiddleware) createNewToken(payload auth.TokenPayload) (string, error) {
 
 	jsonTokenPayload, err := json.Marshal(payload)
 	if err != nil {

@@ -3,6 +3,7 @@ package file
 import (
 	"context"
 	"errors"
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/reader"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/writer"
@@ -59,6 +60,45 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 			return url, nil
 		}
 	}
+}
+
+func (repository *FileURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	var resultURLs []entity.URL
+
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return nil, err
+	}
+	defer fileReader.Close()
+
+	for {
+		url, err := fileReader.ReadURL()
+		if err != nil {
+			if errors.Is(io.EOF, err) {
+				break
+			}
+			return nil, err
+		}
+
+		if len(urlQuery.OriginalURLs) > 0 {
+			for _, originalURL := range urlQuery.OriginalURLs {
+				if url.OriginalURL == originalURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+
+		if len(urlQuery.ShortURLs) > 0 {
+			for _, shortURL := range urlQuery.ShortURLs {
+				if url.ShortURL == shortURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+	}
+	return resultURLs, nil
 }
 
 func (repository *FileURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
