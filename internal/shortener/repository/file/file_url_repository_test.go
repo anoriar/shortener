@@ -26,7 +26,6 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 		name    string
 		fields  fields
 		args    args
-		want    *entity.URL
 		wantErr bool
 	}{
 		{
@@ -41,22 +40,16 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 					OriginalURL: "https://practicum.yandex.ru/",
 				},
 			},
-			want: &entity.URL{
-				UUID:        "4e473abf-9ded-4b16-8d20-f0964c88a7b9",
-				ShortURL:    "sS9fk2",
-				OriginalURL: "https://practicum.yandex.ru/",
-			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repository := NewFileURLRepository(filename)
-			got, err := repository.AddURL(tt.args.url)
+			err := repository.AddURL(tt.args.url)
 			if tt.wantErr != (err != nil) {
 				t.Errorf("AddURL() exception = %v, wantErr %v", err, tt.wantErr)
 			}
-			assert.Equal(t, tt.want, got)
 		})
 	}
 }

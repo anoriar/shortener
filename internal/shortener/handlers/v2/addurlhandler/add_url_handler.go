@@ -2,13 +2,15 @@ package addurlhandler
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/config"
+	"errors"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	neturl "net/url"
@@ -17,25 +19,30 @@ import (
 type AddHandler struct {
 	urlRepository     repository.URLRepositoryInterface
 	shortURLGenerator urlgen.ShortURLGeneratorInterface
+	logger            *zap.Logger
 	baseURL           string
 }
 
-func NewAddHandler(urlRepository repository.URLRepositoryInterface, shortURLGenerator urlgen.ShortURLGeneratorInterface, baseURL string) *AddHandler {
+func NewAddHandler(
+	urlRepository repository.URLRepositoryInterface,
+	shortURLGenerator urlgen.ShortURLGeneratorInterface,
+	logger *zap.Logger,
+	baseURL string,
+) *AddHandler {
 	return &AddHandler{
 		urlRepository:     urlRepository,
 		shortURLGenerator: shortURLGenerator,
+		logger:            logger,
 		baseURL:           baseURL,
 	}
 }
 
-func Initialize(cnf *config.Config, urlRepository repository.URLRepositoryInterface) *AddHandler {
-	return NewAddHandler(urlRepository, urlgen.InitializeShortURLGenerator(urlRepository), cnf.BaseURL)
-}
-
 func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
+	status := http.StatusCreated
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
+		handler.logger.Error("read request error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -43,6 +50,7 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	addURLRequestDto := &request.AddURLRequestDto{}
 
 	if err = json.Unmarshal(requestBody, addURLRequestDto); err != nil {
+		handler.logger.Error("request unmarshal error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -55,35 +63,50 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 
 	shortKey, err := handler.shortURLGenerator.GenerateShortURL()
 	if err != nil {
+		handler.logger.Error("short URL generation error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	_, err = handler.urlRepository.AddURL(&entity.URL{
+	err = handler.urlRepository.AddURL(&entity.URL{
 		UUID:        uuid.NewString(),
 		ShortURL:    shortKey,
 		OriginalURL: addURLRequestDto.URL,
 	})
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		if errors.Is(err, repositoryerror.ErrConflict) {
+			existedURL, err := handler.urlRepository.FindURLByOriginalURL(req.Context(), addURLRequestDto.URL)
+			if err != nil {
+				handler.logger.Error("find existed URL error", zap.String("error", err.Error()))
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			shortKey = existedURL.ShortURL
+			status = http.StatusConflict
+		} else {
+			handler.logger.Error("add URL error", zap.String("error", err.Error()))
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 	}
-
 	responseDTO := response.AddURLResponseDto{
 		Result: handler.baseURL + "/" + shortKey,
 	}
 
 	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(status)
 
 	jsonResult, err := json.Marshal(responseDTO)
 	if err != nil {
+		handler.logger.Error("marshal error", zap.String("error", err.Error()))
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	_, err = w.Write(jsonResult)
 	if err != nil {
+		handler.logger.Error("write response error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

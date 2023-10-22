@@ -20,6 +20,15 @@ func NewURLFileWriter(filename string) (*URLFileWriter, error) {
 	return &URLFileWriter{file: file, encoder: json.NewEncoder(file)}, nil
 }
 
+func NewURLFileEmptyWriter(filename string) (*URLFileWriter, error) {
+	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+	if err != nil {
+		return nil, err
+	}
+
+	return &URLFileWriter{file: file, encoder: json.NewEncoder(file)}, nil
+}
+
 func (w *URLFileWriter) WriteURL(url *entity.URL) error {
 	err := w.encoder.Encode(url)
 	if err != nil {

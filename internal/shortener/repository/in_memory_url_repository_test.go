@@ -41,7 +41,7 @@ func TestInMemoryURLRepository_AddURL(t *testing.T) {
 				urls: tt.existedURLs,
 			}
 
-			_, err := repository.AddURL(tt.args.url)
+			err := repository.AddURL(tt.args.url)
 
 			assert.Equal(t, tt.wantErr, err != nil)
 			assert.Contains(t, repository.urls, tt.args.url.ShortURL)

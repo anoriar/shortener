@@ -1,8 +1,9 @@
 package file
 
 import (
+	"context"
+	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
 	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/writer"
 	"io"
@@ -12,28 +13,61 @@ type FileURLRepository struct {
 	filename string
 }
 
-func NewFileURLRepository(filename string) repository.URLRepositoryInterface {
+func NewFileURLRepository(filename string) *FileURLRepository {
 	return &FileURLRepository{
 		filename: filename,
 	}
 }
 
-func (repository *FileURLRepository) AddURL(url *entity.URL) (*entity.URL, error) {
+func (repository *FileURLRepository) Ping(ctx context.Context) error {
+	return nil
+}
+
+func (repository *FileURLRepository) AddURL(url *entity.URL) error {
 
 	fileWriter, err := writer.NewURLFileWriter(repository.filename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer fileWriter.Close()
 
 	err = fileWriter.WriteURL(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return url, nil
+	return nil
 }
 
 func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return nil, err
+	}
+
+	defer fileReader.Close()
+
+	for {
+		url, err := fileReader.ReadURL()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return nil, nil
+			}
+			return nil, err
+		}
+
+		if url.ShortURL == shortURL {
+			return url, nil
+		}
+	}
+}
+
+func (repository *FileURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
+	return repository.findOneByCondition(func(url entity.URL) bool {
+		return url.OriginalURL == originalURL
+	})
+}
+
+func (repository *FileURLRepository) findOneByCondition(condition func(url entity.URL) bool) (*entity.URL, error) {
 	fileReader, err := reader.NewURLFileReader(repository.filename)
 	if err != nil {
 		return nil, err
@@ -50,8 +84,71 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 			return nil, err
 		}
 
-		if url.ShortURL == shortURL {
+		if condition(*url) {
 			return url, nil
 		}
 	}
+}
+
+func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
+	fileWriter, err := writer.NewURLFileWriter(repository.filename)
+	if err != nil {
+		return err
+	}
+	defer fileWriter.Close()
+
+	for _, url := range urls {
+		err = fileWriter.WriteURL(&url)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (repository *FileURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return nil
+	}
+	fileURLs := make(map[string]*entity.URL)
+
+	defer fileReader.Close()
+
+	//Считываем все данные с файла
+	for {
+		url, err := fileReader.ReadURL()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return err
+		}
+		fileURLs[url.ShortURL] = url
+	}
+
+	//Удаляем лишние
+	for _, shortURL := range shortURLs {
+		delete(fileURLs, shortURL)
+	}
+	//Перезаписываем файл заново
+	fileWriter, err := writer.NewURLFileEmptyWriter(repository.filename)
+	if err != nil {
+		return err
+	}
+	defer fileWriter.Close()
+
+	for _, url := range fileURLs {
+		err = fileWriter.WriteURL(url)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (repository *FileURLRepository) Close() error {
+	return nil
 }

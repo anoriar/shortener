@@ -2,21 +2,20 @@ package geturlhandler
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/repository"
+	"go.uber.org/zap"
 	"net/http"
 	"strings"
 )
 
 type GetHandler struct {
 	urlRepository repository.URLRepositoryInterface
+	logger        *zap.Logger
 }
 
-func InitializeGetHandler(repository repository.URLRepositoryInterface) *GetHandler {
-	return NewGetHandler(repository)
-}
-
-func NewGetHandler(urlRepository repository.URLRepositoryInterface) *GetHandler {
+func NewGetHandler(urlRepository repository.URLRepositoryInterface, logger *zap.Logger) *GetHandler {
 	return &GetHandler{
 		urlRepository: urlRepository,
+		logger:        logger,
 	}
 }
 
@@ -31,6 +30,7 @@ func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 
 	url, err := handler.urlRepository.FindURLByShortURL(shortKey)
 	if err != nil {
+		handler.logger.Error("get url error", zap.String("error", err.Error()))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
