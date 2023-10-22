@@ -1,17 +1,17 @@
 package ping
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"go.uber.org/zap"
 	"net/http"
 )
 
 type PingHandler struct {
-	urlRepository repository.URLRepositoryInterface
+	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
 }
 
-func NewPingHandler(urlRepository repository.URLRepositoryInterface, logger *zap.Logger) *PingHandler {
+func NewPingHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *PingHandler {
 	return &PingHandler{urlRepository: urlRepository, logger: logger}
 }
 

@@ -1,4 +1,4 @@
-package repository
+package inmemory
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/entity"

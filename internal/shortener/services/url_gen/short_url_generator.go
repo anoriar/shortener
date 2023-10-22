@@ -2,7 +2,7 @@ package urlgen
 
 import (
 	"fmt"
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
@@ -11,11 +11,11 @@ const maxAttempts = 5
 var ErrShortKeyGenerationAttemptsExceeded = fmt.Errorf("max number of attempts for short url generation has been exhausted: %v", maxAttempts)
 
 type ShortURLGenerator struct {
-	urlRepository repository.URLRepositoryInterface
+	urlRepository url.URLRepositoryInterface
 	keyGen        util.KeyGenInterface
 }
 
-func NewShortURLGenerator(urlRepository repository.URLRepositoryInterface, keyGen util.KeyGenInterface) *ShortURLGenerator {
+func NewShortURLGenerator(urlRepository url.URLRepositoryInterface, keyGen util.KeyGenInterface) *ShortURLGenerator {
 	return &ShortURLGenerator{urlRepository: urlRepository, keyGen: keyGen}
 }
 

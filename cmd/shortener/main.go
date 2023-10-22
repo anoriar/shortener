@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/logger"
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/router"
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
@@ -30,7 +30,7 @@ func run() {
 
 	defer logger.Sync()
 
-	urlRepository, err := repository.InitializeURLRepository(conf, logger)
+	urlRepository, err := url.InitializeURLRepository(conf, logger)
 	if err != nil {
 		panic(err)
 	}

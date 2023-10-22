@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository/db/internal"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/db/internal"
 	"go.uber.org/zap"
 )
 

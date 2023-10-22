@@ -2,18 +2,18 @@ package deleteurlbatchhandler
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
 type DeleteURLBatchHandler struct {
-	urlRepository repository.URLRepositoryInterface
+	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
 }
 
-func NewDeleteURLBatchHandler(urlRepository repository.URLRepositoryInterface, logger *zap.Logger) *DeleteURLBatchHandler {
+func NewDeleteURLBatchHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *DeleteURLBatchHandler {
 	return &DeleteURLBatchHandler{urlRepository: urlRepository, logger: logger}
 }
 

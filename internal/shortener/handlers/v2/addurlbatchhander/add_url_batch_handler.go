@@ -2,29 +2,52 @@ package addurlbatchhander
 
 import (
 	"encoding/json"
+	"github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/factory"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/validator"
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
+	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
 type AddURLBatchHandler struct {
-	urlRepository              repository.URLRepositoryInterface
+	urlRepository              url.URLRepositoryInterface
+	userService                *user.UserService
 	addURLBatchFactory         *factory.AddURLEntityFactory
 	addURLBatchResponseFactory *factory.AddURLBatchResponseFactory
 	logger                     *zap.Logger
 	validator                  *validator.AddURLBatchValidator
 }
 
-func NewAddURLBatchHandler(urlRepository repository.URLRepositoryInterface, addURLBatchFactory *factory.AddURLEntityFactory, addURLBatchResponseFactory *factory.AddURLBatchResponseFactory, logger *zap.Logger, validator *validator.AddURLBatchValidator) *AddURLBatchHandler {
-	return &AddURLBatchHandler{urlRepository: urlRepository, addURLBatchFactory: addURLBatchFactory, addURLBatchResponseFactory: addURLBatchResponseFactory, logger: logger, validator: validator}
+func NewAddURLBatchHandler(
+	urlRepository url.URLRepositoryInterface,
+	userService *user.UserService,
+	addURLBatchFactory *factory.AddURLEntityFactory,
+	addURLBatchResponseFactory *factory.AddURLBatchResponseFactory,
+	logger *zap.Logger,
+	validator *validator.AddURLBatchValidator,
+) *AddURLBatchHandler {
+	return &AddURLBatchHandler{
+		urlRepository:              urlRepository,
+		userService:                userService,
+		addURLBatchFactory:         addURLBatchFactory,
+		addURLBatchResponseFactory: addURLBatchResponseFactory,
+		logger:                     logger,
+		validator:                  validator,
+	}
 }
 
 func (handler *AddURLBatchHandler) AddURLBatch(w http.ResponseWriter, req *http.Request) {
+	userID := ""
+	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
+	if userIDCtxParam != nil {
+		userID = userIDCtxParam.(string)
+	}
+
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
 		handler.logger.Error("read request error", zap.String("error", err.Error()))
@@ -56,6 +79,20 @@ func (handler *AddURLBatchHandler) AddURLBatch(w http.ResponseWriter, req *http.
 		handler.logger.Error("batch add error", zap.String("error", err.Error()))
 		http.Error(w, "batch add error", http.StatusBadRequest)
 		return
+	} else {
+		if userID != "" {
+			var shortKeys []string
+			for _, val := range urlsMap {
+				shortKeys = append(shortKeys, val.ShortURL)
+			}
+
+			err = handler.userService.AddShortURLsToUser(userID, shortKeys)
+			if err != nil {
+				handler.logger.Error("add short url to user error", zap.String("error", err.Error()))
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+		}
 	}
 
 	response := handler.addURLBatchResponseFactory.CreateResponse(urlsMap, requestItems)

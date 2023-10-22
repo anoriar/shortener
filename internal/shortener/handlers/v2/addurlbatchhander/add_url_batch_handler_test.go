@@ -9,7 +9,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/factory"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/validator"
 	"github.com/anoriar/shortener/internal/shortener/logger"
-	"github.com/anoriar/shortener/internal/shortener/repository/mock"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
 	utilMock "github.com/anoriar/shortener/internal/shortener/util/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

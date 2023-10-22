@@ -1,9 +1,10 @@
-package repository
+package url
 
 import (
 	"github.com/anoriar/shortener/internal/shortener/config"
-	dbURLRepository "github.com/anoriar/shortener/internal/shortener/repository/db"
-	"github.com/anoriar/shortener/internal/shortener/repository/file"
+	dbURLRepository "github.com/anoriar/shortener/internal/shortener/repository/url/db"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/file"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
 	"go.uber.org/zap"
 )
 
@@ -18,6 +19,6 @@ func InitializeURLRepository(cnf *config.Config, logger *zap.Logger) (URLReposit
 	case cnf.FileStoragePath != "":
 		return file.NewFileURLRepository(cnf.FileStoragePath), nil
 	default:
-		return NewInMemoryURLRepository(), nil
+		return inmemory.NewInMemoryURLRepository(), nil
 	}
 }

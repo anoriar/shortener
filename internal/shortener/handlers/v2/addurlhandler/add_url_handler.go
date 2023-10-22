@@ -3,12 +3,14 @@ package addurlhandler
 import (
 	"encoding/json"
 	"errors"
+	"github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository"
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
+	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"io"
@@ -17,27 +19,35 @@ import (
 )
 
 type AddHandler struct {
-	urlRepository     repository.URLRepositoryInterface
+	urlRepository     url.URLRepositoryInterface
 	shortURLGenerator urlgen.ShortURLGeneratorInterface
+	userService       *user.UserService
 	logger            *zap.Logger
 	baseURL           string
 }
 
 func NewAddHandler(
-	urlRepository repository.URLRepositoryInterface,
+	urlRepository url.URLRepositoryInterface,
 	shortURLGenerator urlgen.ShortURLGeneratorInterface,
+	userService *user.UserService,
 	logger *zap.Logger,
 	baseURL string,
 ) *AddHandler {
 	return &AddHandler{
 		urlRepository:     urlRepository,
 		shortURLGenerator: shortURLGenerator,
+		userService:       userService,
 		logger:            logger,
 		baseURL:           baseURL,
 	}
 }
 
 func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
+	userID := ""
+	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
+	if userIDCtxParam != nil {
+		userID = userIDCtxParam.(string)
+	}
 
 	status := http.StatusCreated
 	requestBody, err := io.ReadAll(req.Body)
@@ -88,6 +98,15 @@ func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 			handler.logger.Error("add URL error", zap.String("error", err.Error()))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
+		}
+	} else {
+		if userID != "" {
+			err = handler.userService.AddShortURLsToUser(userID, []string{shortKey})
+			if err != nil {
+				handler.logger.Error("add short url to user error", zap.String("error", err.Error()))
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 		}
 	}
 	responseDTO := response.AddURLResponseDto{

@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
-	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/writer"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/reader"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/writer"
 	"io"
 )
 
