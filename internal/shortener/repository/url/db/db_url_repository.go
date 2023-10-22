@@ -88,16 +88,25 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 
 	paramCounter := 1
 	var filters []string
-	var filterParams []interface{}
+	var filterParams []string
 	if len(urlQuery.OriginalURLs) > 0 {
-		filters = append(filters, fmt.Sprintf("original_url IN ($%d)", paramCounter))
-		filterParams = append(filterParams, strings.Join(urlQuery.OriginalURLs, ", "))
-		paramCounter++
+		placeholders := make([]string, len(urlQuery.OriginalURLs))
+		for i := range urlQuery.OriginalURLs {
+			placeholders[i] = fmt.Sprintf("$%d", paramCounter)
+			paramCounter++
+		}
+
+		filters = append(filters, fmt.Sprintf("original_url IN (%s)", strings.Join(placeholders, ", ")))
+		filterParams = append(filterParams, urlQuery.OriginalURLs...)
 	}
 	if len(urlQuery.ShortURLs) > 0 {
-		filters = append(filters, fmt.Sprintf("short_url IN ($%d)", paramCounter))
-		filterParams = append(filterParams, strings.Join(urlQuery.ShortURLs, ", "))
-		paramCounter++
+		placeholders := make([]string, len(urlQuery.ShortURLs))
+		for i := range urlQuery.ShortURLs {
+			placeholders[i] = fmt.Sprintf("$%d", paramCounter)
+			paramCounter++
+		}
+		filters = append(filters, fmt.Sprintf("short_url IN (%s)", strings.Join(placeholders, ", ")))
+		filterParams = append(filterParams, urlQuery.ShortURLs...)
 	}
 
 	filterString := strings.Join(filters, " AND ")
@@ -113,7 +122,12 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.QueryContext(ctx, filterParams...)
+	args := make([]string, len(filterParams))
+	for i, v := range filterParams {
+		args[i] = v
+	}
+
+	rows, err := stmt.QueryContext(ctx, args)
 	if err != nil {
 		repository.logger.Error(err.Error())
 		return nil, err
