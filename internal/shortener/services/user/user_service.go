@@ -18,7 +18,7 @@ func (us *UserService) AddShortURLsToUser(userID string, shortURLs []string) err
 		return err
 	}
 	if exists {
-		user.SavedUrlIDs = append(user.SavedUrlIDs, shortURLs...)
+		user.SavedURLIDs = append(user.SavedURLIDs, shortURLs...)
 		err := us.userRepository.UpdateUser(user)
 		if err != nil {
 			return err
@@ -33,7 +33,7 @@ func (us *UserService) GetUserShortURLs(userID string) ([]string, error) {
 		return nil, err
 	}
 	if exists {
-		return user.SavedUrlIDs, nil
+		return user.SavedURLIDs, nil
 	}
 	return []string{}, nil
 }

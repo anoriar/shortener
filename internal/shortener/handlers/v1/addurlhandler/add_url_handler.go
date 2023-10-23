@@ -17,7 +17,7 @@ import (
 
 type AddHandler struct {
 	urlRepository     url.URLRepositoryInterface
-	userService       *user.UserService
+	userService       user.UserServiceInterface
 	shortURLGenerator urlgen.ShortURLGeneratorInterface
 	logger            *zap.Logger
 	baseURL           string
@@ -25,7 +25,7 @@ type AddHandler struct {
 
 func NewAddHandler(
 	urlRepository url.URLRepositoryInterface,
-	userService *user.UserService,
+	userService user.UserServiceInterface,
 	shortURLGenerator urlgen.ShortURLGeneratorInterface,
 	zapLogger *zap.Logger,
 	baseURL string,

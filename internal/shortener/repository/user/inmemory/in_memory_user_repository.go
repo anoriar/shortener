@@ -24,7 +24,7 @@ func (repository InMemoryUserRepository) AddUser(user entity.User) error {
 
 func (repository InMemoryUserRepository) UpdateUser(user entity.User) error {
 	if _, exists := repository.users[user.UUID]; !exists {
-		return repositoryerror.NotFound
+		return repositoryerror.ErrNotFound
 	}
 	repository.users[user.UUID] = user
 

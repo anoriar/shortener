@@ -13,14 +13,14 @@ import (
 
 type GetUserURLsHandler struct {
 	urlRepository   url.URLRepositoryInterface
-	userService     *user.UserService
+	userService     user.UserServiceInterface
 	responseFactory *factory.GetUSerURLsResponseFactory
 	logger          *zap.Logger
 }
 
 func NewGetUserURLsHandler(
 	urlRepository url.URLRepositoryInterface,
-	userService *user.UserService,
+	userService user.UserServiceInterface,
 	responseFactory *factory.GetUSerURLsResponseFactory,
 	logger *zap.Logger,
 ) *GetUserURLsHandler {
@@ -63,8 +63,8 @@ func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.
 		OriginalURLs: nil,
 	})
 	if err2 != nil {
-		handler.logger.Error("get URLs error", zap.String("error", err.Error()))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		handler.logger.Error("get URLs error", zap.String("error", err2.Error()))
+		http.Error(w, err2.Error(), http.StatusBadRequest)
 		return
 	}
 

@@ -32,7 +32,7 @@ func TestInMemoryURLRepository_AddUser(t *testing.T) {
 			existedUsers: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
@@ -40,7 +40,7 @@ func TestInMemoryURLRepository_AddUser(t *testing.T) {
 			args: args{
 				entity.User{
 					UUID: userID2,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 						userURL2,
 					},
@@ -49,13 +49,13 @@ func TestInMemoryURLRepository_AddUser(t *testing.T) {
 			want: map[string]entity.User{
 				userID1: {
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
 				userID2: {
 					UUID: userID2,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 						userURL2,
 					},
@@ -69,7 +69,7 @@ func TestInMemoryURLRepository_AddUser(t *testing.T) {
 			existedUsers: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
@@ -77,7 +77,7 @@ func TestInMemoryURLRepository_AddUser(t *testing.T) {
 			args: args{
 				entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 						userURL2,
 					},
@@ -86,7 +86,7 @@ func TestInMemoryURLRepository_AddUser(t *testing.T) {
 			want: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
@@ -135,7 +135,7 @@ func TestInMemoryURLRepository_UpdateUser(t *testing.T) {
 			existedUsers: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
@@ -143,7 +143,7 @@ func TestInMemoryURLRepository_UpdateUser(t *testing.T) {
 			args: args{
 				entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 						userURL2,
 					},
@@ -152,7 +152,7 @@ func TestInMemoryURLRepository_UpdateUser(t *testing.T) {
 			want: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 						userURL2,
 					},
@@ -166,7 +166,7 @@ func TestInMemoryURLRepository_UpdateUser(t *testing.T) {
 			existedUsers: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
@@ -174,7 +174,7 @@ func TestInMemoryURLRepository_UpdateUser(t *testing.T) {
 			args: args{
 				entity.User{
 					UUID: "31312",
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 						userURL2,
 					},
@@ -183,13 +183,13 @@ func TestInMemoryURLRepository_UpdateUser(t *testing.T) {
 			want: map[string]entity.User{
 				userID1: entity.User{
 					UUID: userID1,
-					SavedUrlIDs: []string{
+					SavedURLIDs: []string{
 						userURL1,
 					},
 				},
 			},
 			wantErr: true,
-			errorIs: repositoryerror.NotFound,
+			errorIs: repositoryerror.ErrNotFound,
 		},
 	}
 	for _, tt := range tests {

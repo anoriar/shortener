@@ -10,6 +10,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/validator"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
+	mock2 "github.com/anoriar/shortener/internal/shortener/services/user/mock"
 	utilMock "github.com/anoriar/shortener/internal/shortener/util/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -96,6 +97,7 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 	require.NoError(t, err)
 
 	urlRepositoryMock := mock.NewMockURLRepositoryInterface(ctrl)
+	userServiceMock := mock2.NewMockUserServiceInterface(ctrl)
 
 	type args struct {
 		requestBody []byte
@@ -195,6 +197,7 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 
 			handler := &AddURLBatchHandler{
 				urlRepository:              urlRepositoryMock,
+				userService:                userServiceMock,
 				addURLBatchFactory:         addURLEntityFactory,
 				addURLBatchResponseFactory: addURLBatchResponseFactory,
 				logger:                     logger,

@@ -95,9 +95,6 @@ func (repository *DatabaseURLRepository) INQuery(ctx context.Context, urls []str
 	if err != nil {
 		return nil, err
 	}
-	if err != nil {
-		return nil, err
-	}
 	defer rows.Close()
 
 	for rows.Next() {

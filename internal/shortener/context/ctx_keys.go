@@ -1,3 +1,5 @@
 package context
 
-const UserIDContextKey = "userID"
+const UserIDContextKey = UserIDContextType("userID")
+
+type UserIDContextType string

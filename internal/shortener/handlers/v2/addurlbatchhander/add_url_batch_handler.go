@@ -16,7 +16,7 @@ import (
 
 type AddURLBatchHandler struct {
 	urlRepository              url.URLRepositoryInterface
-	userService                *user.UserService
+	userService                user.UserServiceInterface
 	addURLBatchFactory         *factory.AddURLEntityFactory
 	addURLBatchResponseFactory *factory.AddURLBatchResponseFactory
 	logger                     *zap.Logger
@@ -25,7 +25,7 @@ type AddURLBatchHandler struct {
 
 func NewAddURLBatchHandler(
 	urlRepository url.URLRepositoryInterface,
-	userService *user.UserService,
+	userService user.UserServiceInterface,
 	addURLBatchFactory *factory.AddURLEntityFactory,
 	addURLBatchResponseFactory *factory.AddURLBatchResponseFactory,
 	logger *zap.Logger,

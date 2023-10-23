@@ -10,6 +10,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
 	urlGenMock "github.com/anoriar/shortener/internal/shortener/services/url_gen/mock"
+	mock2 "github.com/anoriar/shortener/internal/shortener/services/user/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -34,6 +35,7 @@ func TestAddURL(t *testing.T) {
 
 	urlRepositoryMock := mock.NewMockURLRepositoryInterface(ctrl)
 	urlGeneratorMock := urlGenMock.NewMockShortURLGeneratorInterface(ctrl)
+	userServiceMock := mock2.NewMockUserServiceInterface(ctrl)
 
 	logger, err := logger.Initialize("info")
 	require.NoError(t, err)
@@ -129,7 +131,7 @@ func TestAddURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, "/", bytes.NewReader(tt.requestBody))
 			w := httptest.NewRecorder()
 
-			NewAddHandler(urlRepositoryMock, urlGeneratorMock, logger, baseURL).AddURL(w, r)
+			NewAddHandler(urlRepositoryMock, urlGeneratorMock, userServiceMock, logger, baseURL).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))
