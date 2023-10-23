@@ -83,6 +83,40 @@ func (repository *DatabaseURLRepository) FindURLByOriginalURL(ctx context.Contex
 	return &url, nil
 }
 
+func (repository *DatabaseURLRepository) INQuery(ctx context.Context, urls []string) ([]entity.URL, error) {
+	var resultUrls []entity.URL
+	values := make([]interface{}, len(urls))
+	for i, id := range urls {
+		values[i] = id
+	}
+	query := "SELECT * FROM urls WHERE short_url IN ($1, $2, $3)"
+
+	rows, err := repository.db.Query(query, values...)
+	if err != nil {
+		return nil, err
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var url entity.URL
+		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
+		if err != nil {
+			repository.logger.Error(err.Error())
+			return nil, err
+		}
+		resultUrls = append(resultUrls, url)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return resultUrls, nil
+}
+
 func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
 	var resultUrls []entity.URL
 
@@ -115,19 +149,13 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 		queryString += " WHERE " + filterString
 	}
 
-	stmt, err := repository.db.PrepareContext(ctx, queryString)
-	if err != nil {
-		repository.logger.Error(err.Error())
-		return nil, err
-	}
-	defer stmt.Close()
-
-	args := make([]string, len(filterParams))
-	for i, v := range filterParams {
-		args[i] = v
+	//#MENTOR: вот эта штука супернеочевидная. нужно именно тип interface, string не подходит
+	params := make([]interface{}, len(filterParams))
+	for i, filterParam := range filterParams {
+		params[i] = filterParam
 	}
 
-	rows, err := stmt.QueryContext(ctx, args)
+	rows, err := repository.db.QueryContext(ctx, queryString, params...)
 	if err != nil {
 		repository.logger.Error(err.Error())
 		return nil, err
