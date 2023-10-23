@@ -2,8 +2,10 @@ package addurlbatchhander
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/factory"
@@ -31,6 +33,7 @@ const (
 	correlationID2 = "ngfdsf3"
 	originalURL3   = "https://practicum3.yandex.ru"
 	correlationID3 = "by4564trg"
+	userID         = "6daaf660-a160-4a5c-b99d-faca42c01ef6"
 )
 
 func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
@@ -99,6 +102,8 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 	urlRepositoryMock := mock.NewMockURLRepositoryInterface(ctrl)
 	userServiceMock := mock2.NewMockUserServiceInterface(ctrl)
 
+	ctxWithUser := context.WithValue(context.Background(), context2.UserIDContextKey, userID)
+
 	type args struct {
 		requestBody []byte
 	}
@@ -111,6 +116,7 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 		name          string
 		mockBehaviour func()
 		args          args
+		ctx           context.Context
 		want          want
 	}{
 		{
@@ -120,10 +126,12 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 				keyGenMock.EXPECT().Generate().Return(shortKey1).Times(1)
 				keyGenMock.EXPECT().Generate().Return(shortKey2).Times(1)
 				keyGenMock.EXPECT().Generate().Return(shortKey3).Times(1)
+				userServiceMock.EXPECT().AddShortURLsToUser(userID, gomock.Any()).Return(nil).Times(1)
 			},
 			args: args{
 				requestBody: successRequestBody,
 			},
+			ctx: ctxWithUser,
 			want: want{
 				status:      http.StatusCreated,
 				body:        string(successResponseBody),
@@ -134,10 +142,12 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 			name: "not valid body",
 			mockBehaviour: func() {
 				urlRepositoryMock.EXPECT().AddURLBatch(gomock.Any(), gomock.Any()).Times(0)
+				userServiceMock.EXPECT().AddShortURLsToUser(userID, gomock.Any()).Return(nil).Times(0)
 			},
 			args: args{
 				requestBody: []byte("sss"),
 			},
+			ctx: ctxWithUser,
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -148,10 +158,12 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 			name: "not valid url",
 			mockBehaviour: func() {
 				urlRepositoryMock.EXPECT().AddURLBatch(gomock.Any(), gomock.Any()).Times(0)
+				userServiceMock.EXPECT().AddShortURLsToUser(userID, gomock.Any()).Return(nil).Times(0)
 			},
 			args: args{
 				requestBody: notValidURLRequestBody,
 			},
+			ctx: ctxWithUser,
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -162,10 +174,12 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 			name: "has duplicates",
 			mockBehaviour: func() {
 				urlRepositoryMock.EXPECT().AddURLBatch(gomock.Any(), gomock.Any()).Times(0)
+				userServiceMock.EXPECT().AddShortURLsToUser(userID, gomock.Any()).Return(nil).Times(0)
 			},
 			args: args{
 				requestBody: reqBodyWithDuplicates,
 			},
+			ctx: ctxWithUser,
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -177,10 +191,50 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 			mockBehaviour: func() {
 				keyGenMock.EXPECT().Generate().Return(shortKey1).Times(3)
 				urlRepositoryMock.EXPECT().AddURLBatch(gomock.Any(), gomock.Any()).Return(errors.New("exception")).Times(1)
+				userServiceMock.EXPECT().AddShortURLsToUser(userID, gomock.Any()).Return(nil).Times(0)
 			},
 			args: args{
 				requestBody: successRequestBody,
 			},
+			ctx: ctxWithUser,
+			want: want{
+				status:      http.StatusBadRequest,
+				body:        "",
+				contentType: "text/plain; charset=utf-8",
+			},
+		},
+		{
+			name: "success and empty user context",
+			mockBehaviour: func() {
+				urlRepositoryMock.EXPECT().AddURLBatch(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+				keyGenMock.EXPECT().Generate().Return(shortKey1).Times(1)
+				keyGenMock.EXPECT().Generate().Return(shortKey2).Times(1)
+				keyGenMock.EXPECT().Generate().Return(shortKey3).Times(1)
+				userServiceMock.EXPECT().AddShortURLsToUser(gomock.Any(), gomock.Any()).Return(nil).Times(0)
+			},
+			args: args{
+				requestBody: successRequestBody,
+			},
+			ctx: context.WithValue(context.Background(), context2.UserIDContextKey, ""),
+			want: want{
+				status:      http.StatusCreated,
+				body:        string(successResponseBody),
+				contentType: "application/json",
+			},
+		},
+		{
+			name: "add short url to user error",
+			mockBehaviour: func() {
+				urlRepositoryMock.EXPECT().AddURLBatch(gomock.Any(), gomock.Any()).Return(nil).Times(1)
+				keyGenMock.EXPECT().Generate().Return(shortKey1).Times(1)
+				keyGenMock.EXPECT().Generate().Return(shortKey2).Times(1)
+				keyGenMock.EXPECT().Generate().Return(shortKey3).Times(1)
+				userServiceMock.EXPECT().AddShortURLsToUser(userID, gomock.Any()).Return(errors.New("error")).Times(1)
+			},
+			args: args{
+				requestBody: successRequestBody,
+			},
+			ctx: ctxWithUser,
 			want: want{
 				status:      http.StatusBadRequest,
 				body:        "",
@@ -191,6 +245,7 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := httptest.NewRequest(http.MethodPost, "/api/shorten/batch", bytes.NewReader(tt.args.requestBody))
+			r = r.WithContext(tt.ctx)
 			w := httptest.NewRecorder()
 
 			tt.mockBehaviour()
