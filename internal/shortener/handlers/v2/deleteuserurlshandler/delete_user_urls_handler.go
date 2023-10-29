@@ -3,21 +3,20 @@ package deleteuserurlshandler
 import (
 	"encoding/json"
 	"github.com/anoriar/shortener/internal/shortener/context"
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
-	"github.com/anoriar/shortener/internal/shortener/repository/user"
+	deleteurlsprocessor "github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor"
+	"github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor/message"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
 type DeleteUserURLsHandler struct {
-	urlRepository  url.URLRepositoryInterface
-	userRepository user.UserRepositoryInterface
-	logger         *zap.Logger
+	deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor
+	logger                  *zap.Logger
 }
 
-func NewDeleteUserURLsHandler(urlRepository url.URLRepositoryInterface, userRepository user.UserRepositoryInterface, logger *zap.Logger) *DeleteUserURLsHandler {
-	return &DeleteUserURLsHandler{urlRepository: urlRepository, userRepository: userRepository, logger: logger}
+func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor, logger *zap.Logger) *DeleteUserURLsHandler {
+	return &DeleteUserURLsHandler{deleteUserURLsProcessor: deleteUserURLsProcessor, logger: logger}
 }
 
 func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req *http.Request) {
@@ -41,27 +40,16 @@ func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req 
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	user, exist, err := handler.userRepository.FindUserByID(userID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if exist && len(user.SavedURLIDs) > 0 {
-		var shortURLsForDelete []string
-
-		for _, requestShortURL := range shortURLs {
-			if _, exists := user.SavedURLIDs.FindShortURL(requestShortURL); exists {
-				shortURLsForDelete = append(shortURLsForDelete, requestShortURL)
-			}
-		}
-		if len(shortURLsForDelete) > 0 {
-			err = handler.urlRepository.UpdateIsDeletedBatch(req.Context(), shortURLsForDelete, true)
-			if err != nil {
-				handler.logger.Error("batch delete error", zap.String("error", err.Error()))
-				http.Error(w, "batch delete error", http.StatusBadRequest)
-				return
-			}
-		}
+	if userID != "" && len(shortURLs) > 0 {
+		//#MENTOR: Не понял в задании
+		// "Для максимального наполнения буфера объектов обновления используйте паттерн fanIn"
+		// С точки зрения обще проектировки: сервер создает горутины - (fan-out)
+		// Здесь засовываем все сообщения в один канал - а обрабатывается он асинхронно
+		// Может в задании что-то другое подразумевалось?
+		handler.deleteUserURLsProcessor.AddMessage(message.DeleteUserURLsMessage{
+			UserID:    userID,
+			ShortURLs: shortURLs,
+		})
 	}
 
 	w.Header().Set("content-type", "text/plain")

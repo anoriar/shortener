@@ -13,9 +13,11 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/middleware/auth"
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
+	deleteurlsprocessor "github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/repository/user/inmemory"
 	v1 "github.com/anoriar/shortener/internal/shortener/services/auth"
+	"github.com/anoriar/shortener/internal/shortener/services/deleteuserurls"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
@@ -33,7 +35,10 @@ func InitializeRouter(cnf *config.Config, urlRepository url.URLRepositoryInterfa
 		getuserurlshandler.InitializeGetUserURLsHandler(urlRepository, userService, logger, cnf.BaseURL),
 		ping.NewPingHandler(urlRepository, logger),
 		deleteurlbatchhandler.NewDeleteURLBatchHandler(urlRepository, logger),
-		deleteuserurlshandler.NewDeleteUserURLsHandler(urlRepository, userRepository, logger),
+		deleteuserurlshandler.NewDeleteUserURLsHandler(
+			deleteurlsprocessor.NewDeleteUserURLsProcessor(
+				deleteuserurls.NewDeleteUserURLsService(urlRepository, userRepository), logger),
+			logger),
 		loggerMiddlewarePkg.NewLoggerMiddleware(logger),
 		compress.NewCompressMiddleware(),
 		auth.NewAuthMiddleware(v1.NewSignService(cnf.AuthSecretKey), userRepository),
