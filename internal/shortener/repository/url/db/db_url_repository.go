@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+var ErrSliceCanNotBeEmpty = errors.New("slice can not be empty")
+
 type DatabaseURLRepository struct {
 	db     *sql.DB
 	logger *zap.Logger
@@ -42,7 +44,7 @@ func (repository *DatabaseURLRepository) AddURL(url *entity.URL) error {
 }
 
 func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
-	rows, err := repository.db.Query("SELECT uuid, short_url, original_url FROM urls WHERE short_url = $1 LIMIT 1", shortURL)
+	rows, err := repository.db.Query("SELECT uuid, short_url, original_url, is_deleted FROM urls WHERE short_url = $1 LIMIT 1", shortURL)
 	if err != nil {
 		repository.logger.Error(err.Error())
 		return nil, err
@@ -52,7 +54,7 @@ func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*en
 	var url entity.URL
 
 	for rows.Next() {
-		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
+		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL, &url.IsDeleted)
 		if err != nil {
 			repository.logger.Error(err.Error())
 			return nil, err
@@ -72,46 +74,15 @@ func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*en
 }
 
 func (repository *DatabaseURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT uuid, short_url, original_url FROM urls WHERE original_url = $1 LIMIT 1", originalURL)
+	row := repository.db.QueryRowContext(ctx, "SELECT uuid, short_url, original_url, is_deleted FROM urls WHERE original_url = $1 LIMIT 1", originalURL)
 	var url entity.URL
-	err := row.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
+	err := row.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL, &url.IsDeleted)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
 	return &url, nil
-}
-
-func (repository *DatabaseURLRepository) INQuery(ctx context.Context, urls []string) ([]entity.URL, error) {
-	var resultUrls []entity.URL
-	values := make([]interface{}, len(urls))
-	for i, id := range urls {
-		values[i] = id
-	}
-	query := "SELECT * FROM urls WHERE short_url IN ($1, $2, $3)"
-
-	rows, err := repository.db.Query(query, values...)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var url entity.URL
-		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
-		if err != nil {
-			repository.logger.Error(err.Error())
-			return nil, err
-		}
-		resultUrls = append(resultUrls, url)
-	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
-
-	return resultUrls, nil
 }
 
 func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
@@ -141,7 +112,7 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 	}
 
 	filterString := strings.Join(filters, " AND ")
-	queryString := "SELECT uuid, short_url, original_url FROM urls"
+	queryString := "SELECT uuid, short_url, original_url, is_deleted FROM urls"
 	if filterString != "" && len(filterParams) != 0 {
 		queryString += " WHERE " + filterString
 	}
@@ -161,7 +132,7 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 
 	for rows.Next() {
 		var url entity.URL
-		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
+		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL, &url.IsDeleted)
 		if err != nil {
 			repository.logger.Error(err.Error())
 			return nil, err
@@ -232,6 +203,31 @@ func (repository *DatabaseURLRepository) DeleteURLBatch(ctx context.Context, sho
 		}
 	}
 	err = tx.Commit()
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (repository *DatabaseURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	if len(shortURLs) == 0 {
+		return ErrSliceCanNotBeEmpty
+	}
+
+	var args []any
+	args = append(args, isDeleted)
+	var strParams []string
+
+	paramCounter := 2
+	for _, shortURL := range shortURLs {
+		args = append(args, shortURL)
+		strParams = append(strParams, fmt.Sprintf("$%d", paramCounter))
+		paramCounter++
+	}
+
+	_, err := repository.db.ExecContext(ctx, fmt.Sprintf("UPDATE urls SET is_deleted = $1 WHERE short_url IN (%s)", strings.Join(strParams, ", ")), args...)
 	if err != nil {
 		repository.logger.Error(err.Error())
 		return err

@@ -51,9 +51,20 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 					http.Error(w, "unmarshal token error", http.StatusInternalServerError)
 					return
 				}
-				//#MENTOR: Лучше не передавать переменные через контекст, но тут пришлось
-				// Есть ли более хорошее решение, как можно передать userID в хендлеры?
-				ctx = context.WithValue(request.Context(), context2.UserIDContextKey, tokenPayload.UserID)
+
+				_, exists, err := am.userRepository.FindUserByID(tokenPayload.UserID)
+				if err != nil {
+					http.Error(w, "find user error", http.StatusInternalServerError)
+					return
+				}
+				if exists {
+					//#MENTOR: Лучше не передавать переменные через контекст, но тут пришлось
+					// Есть ли более хорошее решение, как можно передать userID в хендлеры?
+					ctx = context.WithValue(request.Context(), context2.UserIDContextKey, tokenPayload.UserID)
+				} else {
+					shouldCreateNewToken = true
+				}
+
 			} else {
 				shouldCreateNewToken = true
 			}

@@ -16,4 +16,5 @@ type URLRepositoryInterface interface {
 	Close() error
 	DeleteURLBatch(ctx context.Context, shortURLs []string) error
 	GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error)
+	UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error
 }

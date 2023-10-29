@@ -8,6 +8,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander"
 	addURLHandlerV2 "github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/deleteurlbatchhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v2/deleteuserurlshandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/getuserurlshandler"
 	"github.com/anoriar/shortener/internal/shortener/middleware/auth"
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
@@ -32,6 +33,7 @@ func InitializeRouter(cnf *config.Config, urlRepository url.URLRepositoryInterfa
 		getuserurlshandler.InitializeGetUserURLsHandler(urlRepository, userService, logger, cnf.BaseURL),
 		ping.NewPingHandler(urlRepository, logger),
 		deleteurlbatchhandler.NewDeleteURLBatchHandler(urlRepository, logger),
+		deleteuserurlshandler.NewDeleteUserURLsHandler(urlRepository, userRepository, logger),
 		loggerMiddlewarePkg.NewLoggerMiddleware(logger),
 		compress.NewCompressMiddleware(),
 		auth.NewAuthMiddleware(v1.NewSignService(cnf.AuthSecretKey), userRepository),

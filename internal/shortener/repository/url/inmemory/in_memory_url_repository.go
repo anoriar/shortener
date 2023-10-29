@@ -89,6 +89,15 @@ func (repository *InMemoryURLRepository) DeleteURLBatch(ctx context.Context, sho
 	return nil
 }
 
+func (repository *InMemoryURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	for _, shortURL := range shortURLs {
+		if item, ok := repository.urls[shortURL]; ok {
+			item.IsDeleted = isDeleted
+		}
+	}
+	return nil
+}
+
 func (repository *InMemoryURLRepository) Close() error {
 	return nil
 }

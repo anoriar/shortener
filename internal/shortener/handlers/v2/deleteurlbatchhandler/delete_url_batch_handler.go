@@ -35,8 +35,8 @@ func (handler *DeleteURLBatchHandler) DeleteURLBatch(w http.ResponseWriter, req 
 
 	err = handler.urlRepository.DeleteURLBatch(req.Context(), shortURLs)
 	if err != nil {
-		handler.logger.Error("batch add error", zap.String("error", err.Error()))
-		http.Error(w, "batch add error", http.StatusBadRequest)
+		handler.logger.Error("batch delete error", zap.String("error", err.Error()))
+		http.Error(w, "batch delete error", http.StatusBadRequest)
 		return
 	}
 

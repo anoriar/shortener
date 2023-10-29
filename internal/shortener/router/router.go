@@ -7,6 +7,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander"
 	addURLHandlerV2 "github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/deleteurlbatchhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v2/deleteuserurlshandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/getuserurlshandler"
 	"github.com/anoriar/shortener/internal/shortener/middleware/auth"
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
@@ -22,6 +23,7 @@ type Router struct {
 	getUserURLsHandler    *getuserurlshandler.GetUserURLsHandler
 	pingHandler           *ping.PingHandler
 	deleteURLBatchHandler *deleteurlbatchhandler.DeleteURLBatchHandler
+	deleteUserURLsHandler *deleteuserurlshandler.DeleteUserURLsHandler
 	loggerMiddleware      *loggerMiddlewarePkg.LoggerMiddleware
 	compressMiddleware    *compress.CompressMiddleware
 	authMiddleware        *auth.AuthMiddleware
@@ -35,6 +37,7 @@ func NewRouter(
 	getUserURLsHandler *getuserurlshandler.GetUserURLsHandler,
 	pingHandler *ping.PingHandler,
 	deleteURLBatchHandler *deleteurlbatchhandler.DeleteURLBatchHandler,
+	deleteUserURLsHandler *deleteuserurlshandler.DeleteUserURLsHandler,
 	loggerMiddleware *loggerMiddlewarePkg.LoggerMiddleware,
 	compressMiddleware *compress.CompressMiddleware,
 	authMiddleware *auth.AuthMiddleware,
@@ -47,6 +50,7 @@ func NewRouter(
 		getUserURLsHandler:    getUserURLsHandler,
 		pingHandler:           pingHandler,
 		deleteURLBatchHandler: deleteURLBatchHandler,
+		deleteUserURLsHandler: deleteUserURLsHandler,
 		loggerMiddleware:      loggerMiddleware,
 		compressMiddleware:    compressMiddleware,
 		authMiddleware:        authMiddleware,
@@ -66,6 +70,7 @@ func (r *Router) Route() chi.Router {
 	router.With(r.authMiddleware.Auth).Post("/api/shorten/batch", r.addURLBatchHandler.AddURLBatch)
 	router.With(r.authMiddleware.Auth).Delete("/api/shorten/batch", r.deleteURLBatchHandler.DeleteURLBatch)
 	router.With(r.authMiddleware.Auth).Get("/api/user/urls", r.getUserURLsHandler.GetUserURLs)
+	router.With(r.authMiddleware.Auth).Delete("/api/user/urls", r.deleteUserURLsHandler.DeleteUserURLs)
 
 	return router
 }

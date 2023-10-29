@@ -150,3 +150,17 @@ func (mr *MockURLRepositoryInterfaceMockRecorder) Ping(ctx interface{}) *gomock.
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockURLRepositoryInterface)(nil).Ping), ctx)
 }
+
+// UpdateIsDeletedBatch mocks base method.
+func (m *MockURLRepositoryInterface) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateIsDeletedBatch", ctx, shortURLs, isDeleted)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateIsDeletedBatch indicates an expected call of UpdateIsDeletedBatch.
+func (mr *MockURLRepositoryInterfaceMockRecorder) UpdateIsDeletedBatch(ctx, shortURLs, isDeleted interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateIsDeletedBatch", reflect.TypeOf((*MockURLRepositoryInterface)(nil).UpdateIsDeletedBatch), ctx, shortURLs, isDeleted)
+}
