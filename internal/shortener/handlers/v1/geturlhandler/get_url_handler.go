@@ -38,7 +38,7 @@ func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "URL does not exists", http.StatusBadRequest)
 		return
 	}
-	if url.IsDeleted == true {
+	if url.IsDeleted {
 		http.Error(w, "URL deleted", http.StatusGone)
 		return
 	}
