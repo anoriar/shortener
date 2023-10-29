@@ -6,11 +6,13 @@ import (
 )
 
 type ShortenerClientInterface interface {
-	AddURL(url string) (*response.AddResponseDto, error)
-	AddURLv2(url string) (*response.AddResponseV2Dto, error)
-	AddURLv2WithCompress(url string, contentType string) (*response.AddResponseV2EncodingDto, error)
-	GetURL(key string) (*response.GetResponseDto, error)
+	AddURL(requestDto request.AddURLRequestDto) (*response.AddResponseDto, error)
+	AddURLv2(requestDto request.AddURLRequestDto) (*response.AddResponseV2Dto, error)
+	AddURLv2WithCompress(requestDto request.AddURLRequestDto, contentType string) (*response.AddResponseV2EncodingDto, error)
+	GetURL(requestDto request.GetURLRequestDto) (*response.GetResponseDto, error)
 	Ping() (response.PingResponseDto, error)
 	DeleteURLBatch(shortURLs []string) (*response.DeleteURLBatchResponseDto, error)
-	AddURLBatch(items []request.AddURLBatchItemDTO) (*response.AddURLBatchResponseDto, error)
+	AddURLBatch(requestDto request.AddURLBatchRequestDTO) (*response.AddURLBatchResponseDto, error)
+	GetUserURLs(requestDto request.AuthRequest) (*response.GetUserURLsResponseDto, error)
+	DeleteUserURLs(requestDto request.DeleteUserURLsRequestDto) (*response.DeleteUserURLsResponseDto, error)
 }

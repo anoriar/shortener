@@ -6,11 +6,14 @@ type AddURLBatchItemDTO struct {
 }
 
 type AddURLBatchResponseDto struct {
-	StatusCode  int
-	ContentType string
-	Body        []AddURLBatchItemDTO
+	BaseResponseDto
+	Body []AddURLBatchItemDTO
 }
 
-func NewAddURLBatchResponseDto(statusCode int, contentType string, body []AddURLBatchItemDTO) *AddURLBatchResponseDto {
-	return &AddURLBatchResponseDto{StatusCode: statusCode, ContentType: contentType, Body: body}
+func NewAddURLBatchResponseDto(statusCode int, contentType string, token string, body []AddURLBatchItemDTO) *AddURLBatchResponseDto {
+	return &AddURLBatchResponseDto{BaseResponseDto: BaseResponseDto{
+		StatusCode:  statusCode,
+		ContentType: contentType,
+		Token:       token,
+	}, Body: body}
 }

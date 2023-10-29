@@ -1,10 +1,13 @@
 package response
 
 type GetResponseDto struct {
-	StatusCode int
-	Location   string
+	BaseResponseDto
+	Location string
 }
 
-func NewGetResponseDto(statusCode int, location string) *GetResponseDto {
-	return &GetResponseDto{StatusCode: statusCode, Location: location}
+func NewGetResponseDto(statusCode int, contentType string, location string, token string) *GetResponseDto {
+	return &GetResponseDto{BaseResponseDto: BaseResponseDto{
+		StatusCode: statusCode,
+		Token:      token,
+	}, Location: location}
 }

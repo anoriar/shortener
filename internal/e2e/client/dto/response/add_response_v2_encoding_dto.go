@@ -5,13 +5,17 @@ type AddResponseV2EncodingDto struct {
 	ContentEncoding string
 }
 
-func NewAddResponseV2EncodingDto(statusCode int, contentType string, contentEncoding string, body AddURLResponseDTO) *AddResponseV2EncodingDto {
+func NewAddResponseV2EncodingDto(statusCode int, contentType string, token string, contentEncoding string, body AddURLResponseDTO) *AddResponseV2EncodingDto {
 	return &AddResponseV2EncodingDto{
 		AddResponseV2Dto: AddResponseV2Dto{
-			StatusCode:  statusCode,
-			ContentType: contentType,
-			Body:        body,
+			BaseResponseDto: BaseResponseDto{
+				StatusCode:  statusCode,
+				ContentType: contentType,
+				Token:       token,
+			},
+			Body: body,
 		},
+
 		ContentEncoding: contentEncoding,
 	}
 }

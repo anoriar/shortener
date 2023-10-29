@@ -1,10 +1,13 @@
 package response
 
 type DeleteURLBatchResponseDto struct {
-	StatusCode  int
-	ContentType string
+	BaseResponseDto
 }
 
-func NewDeleteURLBatchResponseDto(statusCode int, contentType string) *DeleteURLBatchResponseDto {
-	return &DeleteURLBatchResponseDto{StatusCode: statusCode, ContentType: contentType}
+func NewDeleteURLBatchResponseDto(statusCode int, contentType string, token string) *DeleteURLBatchResponseDto {
+	return &DeleteURLBatchResponseDto{BaseResponseDto{
+		StatusCode:  statusCode,
+		ContentType: contentType,
+		Token:       token,
+	}}
 }
