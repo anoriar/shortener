@@ -1,11 +1,14 @@
 package response
 
 type AddResponseDto struct {
-	StatusCode  int
-	ContentType string
-	Body        string
+	BaseResponseDto
+	Body string
 }
 
-func NewShortenerResponseDto(statusCode int, contentType string, body string) *AddResponseDto {
-	return &AddResponseDto{StatusCode: statusCode, ContentType: contentType, Body: body}
+func NewShortenerResponseDto(statusCode int, contentType string, token string, body string) *AddResponseDto {
+	return &AddResponseDto{BaseResponseDto: BaseResponseDto{
+		StatusCode:  statusCode,
+		ContentType: contentType,
+		Token:       token,
+	}, Body: body}
 }

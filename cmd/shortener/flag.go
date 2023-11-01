@@ -10,6 +10,7 @@ func parseFlags(config *config.Config) {
 	flag.StringVar(&config.BaseURL, "b", "http://localhost:8080", "Base url_gen")
 	flag.StringVar(&config.FileStoragePath, "f", "/tmp/short-url_gen-db.json", "File storage path")
 	flag.StringVar(&config.DatabaseDSN, "d", "", "Database DSN")
+	flag.StringVar(&config.AuthSecretKey, "ask", "secret-key", "Auth secret key")
 
 	flag.Parse()
 }

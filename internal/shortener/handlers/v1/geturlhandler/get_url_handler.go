@@ -1,18 +1,18 @@
 package geturlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"go.uber.org/zap"
 	"net/http"
 	"strings"
 )
 
 type GetHandler struct {
-	urlRepository repository.URLRepositoryInterface
+	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
 }
 
-func NewGetHandler(urlRepository repository.URLRepositoryInterface, logger *zap.Logger) *GetHandler {
+func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *GetHandler {
 	return &GetHandler{
 		urlRepository: urlRepository,
 		logger:        logger,
@@ -36,6 +36,10 @@ func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 	}
 	if url == nil {
 		http.Error(w, "URL does not exists", http.StatusBadRequest)
+		return
+	}
+	if url.IsDeleted {
+		http.Error(w, "URL deleted", http.StatusGone)
 		return
 	}
 

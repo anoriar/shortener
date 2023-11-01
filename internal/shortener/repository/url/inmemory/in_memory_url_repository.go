@@ -1,7 +1,8 @@
-package repository
+package inmemory
 
 import (
 	"context"
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
@@ -46,6 +47,31 @@ func (repository *InMemoryURLRepository) FindURLByShortURL(key string) (*entity.
 	return url, nil
 }
 
+func (repository *InMemoryURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	var resultURLs []entity.URL
+
+	for _, url := range repository.urls {
+		if len(urlQuery.OriginalURLs) > 0 {
+			for _, originalURL := range urlQuery.OriginalURLs {
+				if url.OriginalURL == originalURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+
+		if len(urlQuery.ShortURLs) > 0 {
+			for _, shortURL := range urlQuery.ShortURLs {
+				if url.ShortURL == shortURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+	}
+	return resultURLs, nil
+}
+
 func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
 	for _, url := range urls {
 		err := repository.AddURL(&url)
@@ -59,6 +85,15 @@ func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls [
 func (repository *InMemoryURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
 	for _, shortURL := range shortURLs {
 		delete(repository.urls, shortURL)
+	}
+	return nil
+}
+
+func (repository *InMemoryURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	for _, shortURL := range shortURLs {
+		if item, ok := repository.urls[shortURL]; ok {
+			item.IsDeleted = isDeleted
+		}
 	}
 	return nil
 }

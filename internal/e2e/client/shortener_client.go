@@ -24,6 +24,7 @@ func NewShortenerClient(httpClient *http.Client, baseURL string) *ShortenerClien
 		baseURL:    baseURL,
 	}
 }
+
 func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface {
 	return &ShortenerClient{
 		httpClient: &http.Client{
@@ -36,10 +37,26 @@ func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface 
 	}
 }
 
-func (client *ShortenerClient) AddURL(url string) (*dtoResponsePkg.AddResponseDto, error) {
-	request, err := http.NewRequest(http.MethodPost, client.baseURL, bytes.NewReader([]byte(url)))
+func (client *ShortenerClient) getTokenFromResponse(resp *http.Response) string {
+	cookies := resp.Cookies()
+	for _, cookie := range cookies {
+		if cookie.Name == "token" {
+			return cookie.Value
+		}
+	}
+	return ""
+}
+
+func (client *ShortenerClient) AddURL(requestDto dtoRequestPkg.AddURLRequestDto) (*dtoResponsePkg.AddResponseDto, error) {
+	request, err := http.NewRequest(http.MethodPost, client.baseURL, bytes.NewReader([]byte(requestDto.URL)))
 	if err != nil {
 		return nil, err
+	}
+	if requestDto.IsAuth {
+		request.AddCookie(&http.Cookie{
+			Name:  "token",
+			Value: requestDto.Token,
+		})
 	}
 
 	request.Header.Add("Content-Type", "text/plain")
@@ -58,12 +75,13 @@ func (client *ShortenerClient) AddURL(url string) (*dtoResponsePkg.AddResponseDt
 	return dtoResponsePkg.NewShortenerResponseDto(
 		response.StatusCode,
 		response.Header.Get("Content-Type"),
+		client.getTokenFromResponse(response),
 		string(body),
 	), nil
 }
 
-func (client *ShortenerClient) GetURL(key string) (*dtoResponsePkg.GetResponseDto, error) {
-	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, key), nil)
+func (client *ShortenerClient) GetURL(requestDto dtoRequestPkg.GetURLRequestDto) (*dtoResponsePkg.GetResponseDto, error) {
+	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, requestDto.ShortKey), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -77,13 +95,18 @@ func (client *ShortenerClient) GetURL(key string) (*dtoResponsePkg.GetResponseDt
 
 	return dtoResponsePkg.NewGetResponseDto(
 		response.StatusCode,
+		response.Header.Get("Content-Type"),
 		response.Header.Get("Location"),
+		client.getTokenFromResponse(response),
 	), nil
 }
 
-func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponseV2Dto, error) {
-	requestDto := dtoRequestPkg.AddURLRequestDto{URL: url}
-	requestJSON, err := json.Marshal(requestDto)
+func (client *ShortenerClient) AddURLv2(requestDto dtoRequestPkg.AddURLRequestDto) (*dtoResponsePkg.AddResponseV2Dto, error) {
+	requestJSON, err := json.Marshal(struct {
+		URL string `json:"url"`
+	}{
+		URL: requestDto.URL,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +114,12 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten", bytes.NewReader(requestJSON))
 	if err != nil {
 		return nil, err
+	}
+	if requestDto.IsAuth {
+		request.AddCookie(&http.Cookie{
+			Name:  "token",
+			Value: requestDto.Token,
+		})
 	}
 
 	request.Header.Add("Content-Type", "application/json")
@@ -125,13 +154,17 @@ func (client *ShortenerClient) AddURLv2(url string) (*dtoResponsePkg.AddResponse
 	return dtoResponsePkg.NewAddResponseV2Dto(
 		resp.StatusCode,
 		resp.Header.Get("Content-Type"),
+		client.getTokenFromResponse(resp),
 		addURLResponseDto,
 	), nil
 }
 
-func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType string) (*dtoResponsePkg.AddResponseV2EncodingDto, error) {
-	requestDto := dtoRequestPkg.AddURLRequestDto{URL: url}
-	requestJSON, err := json.Marshal(requestDto)
+func (client *ShortenerClient) AddURLv2WithCompress(requestDto dtoRequestPkg.AddURLRequestDto, contentType string) (*dtoResponsePkg.AddResponseV2EncodingDto, error) {
+	requestJSON, err := json.Marshal(struct {
+		URL string `json:"url"`
+	}{
+		URL: requestDto.URL,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +173,12 @@ func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType stri
 	if err != nil {
 		return nil, err
 	}
-
+	if requestDto.IsAuth {
+		request.AddCookie(&http.Cookie{
+			Name:  "token",
+			Value: requestDto.Token,
+		})
+	}
 	request.Header.Add("Content-Type", contentType)
 	request.Header.Add("Accept-Encoding", "gzip")
 	resp, err := client.httpClient.Do(request)
@@ -182,6 +220,7 @@ func (client *ShortenerClient) AddURLv2WithCompress(url string, contentType stri
 	return dtoResponsePkg.NewAddResponseV2EncodingDto(
 		resp.StatusCode,
 		resp.Header.Get("Content-Type"),
+		client.getTokenFromResponse(resp),
 		resp.Header.Get("Content-Encoding"),
 		addURLResponseDto,
 	), nil
@@ -227,11 +266,12 @@ func (client *ShortenerClient) DeleteURLBatch(shortURLs []string) (*dtoResponseP
 	return dtoResponsePkg.NewDeleteURLBatchResponseDto(
 		resp.StatusCode,
 		resp.Header.Get("Content-Type"),
+		client.getTokenFromResponse(resp),
 	), nil
 }
 
-func (client *ShortenerClient) AddURLBatch(items []dtoRequestPkg.AddURLBatchItemDTO) (*dtoResponsePkg.AddURLBatchResponseDto, error) {
-	requestJSON, err := json.Marshal(items)
+func (client *ShortenerClient) AddURLBatch(requestDto dtoRequestPkg.AddURLBatchRequestDTO) (*dtoResponsePkg.AddURLBatchResponseDto, error) {
+	requestJSON, err := json.Marshal(requestDto.Items)
 	if err != nil {
 		return nil, err
 	}
@@ -239,6 +279,12 @@ func (client *ShortenerClient) AddURLBatch(items []dtoRequestPkg.AddURLBatchItem
 	request, err := http.NewRequest(http.MethodPost, client.baseURL+"/api/shorten/batch", bytes.NewReader(requestJSON))
 	if err != nil {
 		return nil, err
+	}
+	if requestDto.IsAuth {
+		request.AddCookie(&http.Cookie{
+			Name:  "token",
+			Value: requestDto.Token,
+		})
 	}
 
 	request.Header.Add("Content-Type", "application/json")
@@ -271,6 +317,82 @@ func (client *ShortenerClient) AddURLBatch(items []dtoRequestPkg.AddURLBatchItem
 	return dtoResponsePkg.NewAddURLBatchResponseDto(
 		resp.StatusCode,
 		resp.Header.Get("Content-Type"),
+		client.getTokenFromResponse(resp),
 		batchItems,
+	), nil
+}
+
+func (client *ShortenerClient) GetUserURLs(requestDto dtoRequestPkg.AuthRequest) (*dtoResponsePkg.GetUserURLsResponseDto, error) {
+	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, "api/user/urls"), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "text/plain")
+
+	if requestDto.IsAuth {
+		request.AddCookie(&http.Cookie{
+			Name:  "token",
+			Value: requestDto.Token,
+		})
+	}
+
+	response, err := client.httpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Header.Get("Content-Type") != "application/json" {
+		return nil, errors.New("not expected content type in responsewriter")
+	}
+
+	var items []dtoResponsePkg.UserURLResponseItem
+	err = json.Unmarshal(body, &items)
+	if err != nil {
+		return nil, err
+	}
+
+	return dtoResponsePkg.NewGetUserURLsResponseDto(
+		response.StatusCode,
+		response.Header.Get("Content-Type"),
+		client.getTokenFromResponse(response),
+		items,
+	), nil
+}
+
+func (client *ShortenerClient) DeleteUserURLs(requestDto dtoRequestPkg.DeleteUserURLsRequestDto) (*dtoResponsePkg.DeleteUserURLsResponseDto, error) {
+	requestJSON, err := json.Marshal(requestDto.ShortURLs)
+	if err != nil {
+		return nil, err
+	}
+
+	request, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("%s/%s", client.baseURL, "api/user/urls"), bytes.NewReader(requestJSON))
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Content-Type", "text/plain")
+	if requestDto.IsAuth {
+		request.AddCookie(&http.Cookie{
+			Name:  "token",
+			Value: requestDto.Token,
+		})
+	}
+	response, err := client.httpClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	return dtoResponsePkg.NewDeleteUserURLsResponseDto(
+		response.StatusCode,
+		response.Header.Get("Content-Type"),
+		client.getTokenFromResponse(response),
 	), nil
 }

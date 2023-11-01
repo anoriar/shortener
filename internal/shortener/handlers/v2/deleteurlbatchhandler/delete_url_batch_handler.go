@@ -2,18 +2,18 @@ package deleteurlbatchhandler
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/repository"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
 )
 
 type DeleteURLBatchHandler struct {
-	urlRepository repository.URLRepositoryInterface
+	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
 }
 
-func NewDeleteURLBatchHandler(urlRepository repository.URLRepositoryInterface, logger *zap.Logger) *DeleteURLBatchHandler {
+func NewDeleteURLBatchHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *DeleteURLBatchHandler {
 	return &DeleteURLBatchHandler{urlRepository: urlRepository, logger: logger}
 }
 
@@ -35,8 +35,8 @@ func (handler *DeleteURLBatchHandler) DeleteURLBatch(w http.ResponseWriter, req 
 
 	err = handler.urlRepository.DeleteURLBatch(req.Context(), shortURLs)
 	if err != nil {
-		handler.logger.Error("batch add error", zap.String("error", err.Error()))
-		http.Error(w, "batch add error", http.StatusBadRequest)
+		handler.logger.Error("batch delete error", zap.String("error", err.Error()))
+		http.Error(w, "batch delete error", http.StatusBadRequest)
 		return
 	}
 

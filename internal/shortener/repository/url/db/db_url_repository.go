@@ -4,12 +4,17 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"go.uber.org/zap"
+	"strings"
 )
+
+var ErrSliceCanNotBeEmpty = errors.New("slice can not be empty")
 
 type DatabaseURLRepository struct {
 	db     *sql.DB
@@ -39,7 +44,7 @@ func (repository *DatabaseURLRepository) AddURL(url *entity.URL) error {
 }
 
 func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
-	rows, err := repository.db.Query("SELECT uuid, short_url, original_url FROM urls WHERE short_url = $1 LIMIT 1", shortURL)
+	rows, err := repository.db.Query("SELECT uuid, short_url, original_url, is_deleted FROM urls WHERE short_url = $1 LIMIT 1", shortURL)
 	if err != nil {
 		repository.logger.Error(err.Error())
 		return nil, err
@@ -49,7 +54,7 @@ func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*en
 	var url entity.URL
 
 	for rows.Next() {
-		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
+		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL, &url.IsDeleted)
 		if err != nil {
 			repository.logger.Error(err.Error())
 			return nil, err
@@ -69,15 +74,77 @@ func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*en
 }
 
 func (repository *DatabaseURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT uuid, short_url, original_url FROM urls WHERE original_url = $1 LIMIT 1", originalURL)
+	row := repository.db.QueryRowContext(ctx, "SELECT uuid, short_url, original_url, is_deleted FROM urls WHERE original_url = $1 LIMIT 1", originalURL)
 	var url entity.URL
-	err := row.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL)
+	err := row.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL, &url.IsDeleted)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
 	}
 	return &url, nil
+}
+
+func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	var resultUrls []entity.URL
+
+	paramCounter := 1
+	var filters []string
+	var filterParams []string
+	if len(urlQuery.OriginalURLs) > 0 {
+		placeholders := make([]string, len(urlQuery.OriginalURLs))
+		for i := range urlQuery.OriginalURLs {
+			placeholders[i] = fmt.Sprintf("$%d", paramCounter)
+			paramCounter++
+		}
+
+		filters = append(filters, fmt.Sprintf("original_url IN (%s)", strings.Join(placeholders, ", ")))
+		filterParams = append(filterParams, urlQuery.OriginalURLs...)
+	}
+	if len(urlQuery.ShortURLs) > 0 {
+		placeholders := make([]string, len(urlQuery.ShortURLs))
+		for i := range urlQuery.ShortURLs {
+			placeholders[i] = fmt.Sprintf("$%d", paramCounter)
+			paramCounter++
+		}
+		filters = append(filters, fmt.Sprintf("short_url IN (%s)", strings.Join(placeholders, ", ")))
+		filterParams = append(filterParams, urlQuery.ShortURLs...)
+	}
+
+	filterString := strings.Join(filters, " AND ")
+	queryString := "SELECT uuid, short_url, original_url, is_deleted FROM urls"
+	if filterString != "" && len(filterParams) != 0 {
+		queryString += " WHERE " + filterString
+	}
+
+	//#MENTOR: вот эта штука супернеочевидная. нужно именно тип interface, string не подходит
+	params := make([]interface{}, len(filterParams))
+	for i, filterParam := range filterParams {
+		params[i] = filterParam
+	}
+
+	rows, err := repository.db.QueryContext(ctx, queryString, params...)
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var url entity.URL
+		err := rows.Scan(&url.UUID, &url.ShortURL, &url.OriginalURL, &url.IsDeleted)
+		if err != nil {
+			repository.logger.Error(err.Error())
+			return nil, err
+		}
+		resultUrls = append(resultUrls, url)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
+	return resultUrls, nil
 }
 
 func (repository *DatabaseURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
@@ -136,6 +203,31 @@ func (repository *DatabaseURLRepository) DeleteURLBatch(ctx context.Context, sho
 		}
 	}
 	err = tx.Commit()
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func (repository *DatabaseURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	if len(shortURLs) == 0 {
+		return ErrSliceCanNotBeEmpty
+	}
+
+	var args []any
+	args = append(args, isDeleted)
+	var strParams []string
+
+	paramCounter := 2
+	for _, shortURL := range shortURLs {
+		args = append(args, shortURL)
+		strParams = append(strParams, fmt.Sprintf("$%d", paramCounter))
+		paramCounter++
+	}
+
+	_, err := repository.db.ExecContext(ctx, fmt.Sprintf("UPDATE urls SET is_deleted = $1 WHERE short_url IN (%s)", strings.Join(strParams, ", ")), args...)
 	if err != nil {
 		repository.logger.Error(err.Error())
 		return err

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/logger"
-	"github.com/anoriar/shortener/internal/shortener/repository"
-	"github.com/anoriar/shortener/internal/shortener/repository/mock"
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -46,7 +46,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 		name          string
 		request       string
 		mockBehaviour func()
-		urlRepository repository.URLRepositoryInterface
+		urlRepository url.URLRepositoryInterface
 		want          want
 	}{
 		{

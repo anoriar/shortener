@@ -5,11 +5,14 @@ type AddURLResponseDTO struct {
 }
 
 type AddResponseV2Dto struct {
-	StatusCode  int
-	ContentType string
-	Body        AddURLResponseDTO
+	BaseResponseDto
+	Body AddURLResponseDTO
 }
 
-func NewAddResponseV2Dto(statusCode int, contentType string, body AddURLResponseDTO) *AddResponseV2Dto {
-	return &AddResponseV2Dto{StatusCode: statusCode, ContentType: contentType, Body: body}
+func NewAddResponseV2Dto(statusCode int, contentType string, token string, body AddURLResponseDTO) *AddResponseV2Dto {
+	return &AddResponseV2Dto{BaseResponseDto: BaseResponseDto{
+		StatusCode:  statusCode,
+		ContentType: contentType,
+		Token:       token,
+	}, Body: body}
 }

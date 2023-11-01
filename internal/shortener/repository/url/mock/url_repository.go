@@ -8,6 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
+	repository "github.com/anoriar/shortener/internal/shortener/dto/repository"
 	entity "github.com/anoriar/shortener/internal/shortener/entity"
 	gomock "github.com/golang/mock/gomock"
 )
@@ -121,6 +122,21 @@ func (mr *MockURLRepositoryInterfaceMockRecorder) FindURLByShortURL(shortURL int
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindURLByShortURL", reflect.TypeOf((*MockURLRepositoryInterface)(nil).FindURLByShortURL), shortURL)
 }
 
+// GetURLsByQuery mocks base method.
+func (m *MockURLRepositoryInterface) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetURLsByQuery", ctx, urlQuery)
+	ret0, _ := ret[0].([]entity.URL)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetURLsByQuery indicates an expected call of GetURLsByQuery.
+func (mr *MockURLRepositoryInterfaceMockRecorder) GetURLsByQuery(ctx, urlQuery interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetURLsByQuery", reflect.TypeOf((*MockURLRepositoryInterface)(nil).GetURLsByQuery), ctx, urlQuery)
+}
+
 // Ping mocks base method.
 func (m *MockURLRepositoryInterface) Ping(ctx context.Context) error {
 	m.ctrl.T.Helper()
@@ -133,4 +149,18 @@ func (m *MockURLRepositoryInterface) Ping(ctx context.Context) error {
 func (mr *MockURLRepositoryInterfaceMockRecorder) Ping(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockURLRepositoryInterface)(nil).Ping), ctx)
+}
+
+// UpdateIsDeletedBatch mocks base method.
+func (m *MockURLRepositoryInterface) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateIsDeletedBatch", ctx, shortURLs, isDeleted)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateIsDeletedBatch indicates an expected call of UpdateIsDeletedBatch.
+func (mr *MockURLRepositoryInterfaceMockRecorder) UpdateIsDeletedBatch(ctx, shortURLs, isDeleted interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateIsDeletedBatch", reflect.TypeOf((*MockURLRepositoryInterface)(nil).UpdateIsDeletedBatch), ctx, shortURLs, isDeleted)
 }

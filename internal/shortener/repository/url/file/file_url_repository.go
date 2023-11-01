@@ -3,9 +3,10 @@ package file
 import (
 	"context"
 	"errors"
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/reader"
-	"github.com/anoriar/shortener/internal/shortener/repository/file/internal/writer"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/reader"
+	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/writer"
 	"io"
 )
 
@@ -61,6 +62,45 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 	}
 }
 
+func (repository *FileURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
+	var resultURLs []entity.URL
+
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return nil, err
+	}
+	defer fileReader.Close()
+
+	for {
+		url, err := fileReader.ReadURL()
+		if err != nil {
+			if errors.Is(io.EOF, err) {
+				break
+			}
+			return nil, err
+		}
+
+		if len(urlQuery.OriginalURLs) > 0 {
+			for _, originalURL := range urlQuery.OriginalURLs {
+				if url.OriginalURL == originalURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+
+		if len(urlQuery.ShortURLs) > 0 {
+			for _, shortURL := range urlQuery.ShortURLs {
+				if url.ShortURL == shortURL {
+					resultURLs = append(resultURLs, *url)
+					continue
+				}
+			}
+		}
+	}
+	return resultURLs, nil
+}
+
 func (repository *FileURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	return repository.findOneByCondition(func(url entity.URL) bool {
 		return url.OriginalURL == originalURL
@@ -108,6 +148,26 @@ func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []ent
 }
 
 func (repository *FileURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
+	return repository.rewriteFile(ctx, func(fileURLs map[string]*entity.URL) error {
+		for _, shortURL := range shortURLs {
+			delete(fileURLs, shortURL)
+		}
+		return nil
+	})
+}
+
+func (repository *FileURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
+	return repository.rewriteFile(ctx, func(fileURLs map[string]*entity.URL) error {
+		for _, shortURL := range shortURLs {
+			if item, ok := fileURLs[shortURL]; ok {
+				item.IsDeleted = isDeleted
+			}
+		}
+		return nil
+	})
+}
+
+func (repository *FileURLRepository) rewriteFile(ctx context.Context, callback func(fileURLs map[string]*entity.URL) error) error {
 	fileReader, err := reader.NewURLFileReader(repository.filename)
 	if err != nil {
 		return nil
@@ -128,10 +188,11 @@ func (repository *FileURLRepository) DeleteURLBatch(ctx context.Context, shortUR
 		fileURLs[url.ShortURL] = url
 	}
 
-	//Удаляем лишние
-	for _, shortURL := range shortURLs {
-		delete(fileURLs, shortURL)
+	err = callback(fileURLs)
+	if err != nil {
+		return err
 	}
+
 	//Перезаписываем файл заново
 	fileWriter, err := writer.NewURLFileEmptyWriter(repository.filename)
 	if err != nil {
