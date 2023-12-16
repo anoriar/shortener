@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  postgres:
+    container_name: ${POSTGRES_HOST}
+    image: postgres:16
+    ports:
+      - ${POSTGRES_PORT}:5432
+    volumes:
+      - ./.docker/data/db/postgres_data:/var/lib/postgresql/data:delegated
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: GMT+0
+
