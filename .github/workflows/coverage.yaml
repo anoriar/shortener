@@ -25,8 +25,3 @@ jobs:
           coverage=$(go tool cover -func=coverage.out | grep total: | grep -Eo '[0-9]+\.[0-9]+')
           echo "Total coverage: $coverage%"
           echo "::set-output name=coverage::$coverage" # Set output for further use
-
-      - name: Create coverage badge
-        run: |
-          coverage=$(echo ${{ steps.test-and-display-coverage.outputs.coverage }})
-          curl -o coverage.svg "https://img.shields.io/badge/coverage-$coverage%25-brightgreen"
