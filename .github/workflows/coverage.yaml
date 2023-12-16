@@ -1,6 +1,7 @@
-name: Generate Coverage Report
+name: coverage
 
 on:
+  pull_request:
   push:
     branches:
       - main
@@ -16,13 +17,10 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: ^1.19
+          go-version: 1.19
 
       - name: Run tests with coverage
-        run: go test -coverprofile=coverage.out ./...
-
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-report
-          path: coverage.out
+        run: |
+          go test -coverprofile=coverage.out ./...
+          coverage=$(go tool cover -func=coverage.out | grep total: | grep -Eo '[0-9]+\.[0-9]+')
+          echo "Total coverage: $coverage%"

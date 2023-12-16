@@ -81,3 +81,5 @@ SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^T
 Для ubuntu - statictest
 2. Поместить в корень проекта. Дать права 777
 3. go vet -vettool=/home/loginarea/GolangProjects/shortener/statictest ./...
+
+test
