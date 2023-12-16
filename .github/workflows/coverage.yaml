@@ -30,9 +30,3 @@ jobs:
         run: |
           coverage=$(echo ${{ steps.test-and-display-coverage.outputs.coverage }})
           curl -o coverage.svg "https://img.shields.io/badge/coverage-$coverage%25-brightgreen"
-
-      - name: Upload badge as artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: coverage-badge
-          path: coverage.svg
