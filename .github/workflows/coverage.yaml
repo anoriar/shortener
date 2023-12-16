@@ -24,4 +24,3 @@ jobs:
           go test -coverprofile=coverage.out ./...
           coverage=$(go tool cover -func=coverage.out | grep total: | grep -Eo '[0-9]+\.[0-9]+')
           echo "Total coverage: $coverage%"
-          echo "::set-output name=coverage::$coverage" # Set output for further use
