@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
@@ -8,6 +9,7 @@ import (
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
 	"net/http"
+	_ "net/http/pprof"
 )
 
 func main() {
@@ -22,6 +24,8 @@ func run() {
 	if err != nil {
 		panic(err)
 	}
+
+	runProfiler(conf)
 
 	logger, err := logger.Initialize(conf.LogLevel)
 	if err != nil {
@@ -47,5 +51,17 @@ func run() {
 	if err != nil {
 		logger.Fatal("Server exception", zap.String("exception", err.Error()))
 		panic(err)
+	}
+}
+
+func runProfiler(cnf *config.Config) {
+	if cnf.ProfilerHost != "" {
+		go func() {
+			fmt.Println("Starting pprof server at " + cnf.Host)
+			err := http.ListenAndServe(cnf.ProfilerHost, nil)
+			if err != nil {
+				panic(err)
+			}
+		}()
 	}
 }

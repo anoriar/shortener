@@ -29,7 +29,11 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 			acceptEncoding := r.Header.Get("Accept-Encoding")
 			supportsGzip := strings.Contains(acceptEncoding, "gzip")
 			if supportsGzip {
-				cw := responsewriter.NewCompressWriter(w)
+				cw, err := responsewriter.NewKlauspostGzipCompressWriter(w)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 				ow = cw
 				defer cw.Close()
 			}
@@ -39,7 +43,7 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 		contentEncoding := r.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
 		if sendsGzip {
-			cr, err := compress2.NewCompressReader(r.Body)
+			cr, err := compress2.NewKlauspostGzipCompressReader(r.Body)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return

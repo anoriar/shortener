@@ -82,4 +82,8 @@ SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^T
 2. Поместить в корень проекта. Дать права 777
 3. go vet -vettool=/home/loginarea/GolangProjects/shortener/statictest ./...
 
-test
+## Profiling
+curl http://127.0.0.1:8081/debug/pprof/heap > ./profiles/result.prof
+go tool pprof -http=":9090" profiles/result.prof
+Сравнить резуьтаты
+pprof -top -diff_base=profiles/base.pprof profiles/result.pprof

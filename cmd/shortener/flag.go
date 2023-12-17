@@ -11,6 +11,7 @@ func parseFlags(config *config.Config) {
 	flag.StringVar(&config.FileStoragePath, "f", "/tmp/short-url_gen-db.json", "File storage path")
 	flag.StringVar(&config.DatabaseDSN, "d", "", "Database DSN")
 	flag.StringVar(&config.AuthSecretKey, "ask", "secret-key", "Auth secret key")
+	flag.StringVar(&config.ProfilerHost, "profiler", "", "Profiler host")
 
 	flag.Parse()
 }

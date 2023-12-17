@@ -7,6 +7,7 @@ type Config struct {
 	FileStoragePath string `env:"FILE_STORAGE_PATH"`
 	DatabaseDSN     string `env:"DATABASE_DSN"`
 	AuthSecretKey   string `env:"AUTH_SECRET_KEY"`
+	ProfilerHost    string `env:"PROFILER_HOST"`
 }
 
 func NewConfig() *Config {
