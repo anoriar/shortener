@@ -83,7 +83,32 @@ SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^T
 3. go vet -vettool=/home/loginarea/GolangProjects/shortener/statictest ./...
 
 ## Profiling
-curl http://127.0.0.1:8081/debug/pprof/heap > ./profiles/result.prof
-go tool pprof -http=":9090" profiles/result.prof
-Сравнить резуьтаты
+Вручную:
+Создать профиль base.pprof
+
+curl http://127.0.0.1:8081/debug/pprof/heap > ./profiles/base.pprof
+
+Зайти в анализатор через: 
+
+go tool pprof -http=":9090" profiles/base.pprof
+
+После оптимизации проделать тоже самое для результируюещего файла result.pprof
+
+Сравнить результаты
+
 pprof -top -diff_base=profiles/base.pprof profiles/result.pprof
+
+## Benchmarks
+Создать профили для бенчмарка
+
+В папке cmd/benchmark
+
+go test -bench=. -cpuprofile=cpu.out -memprofile=mem.out
+
+Проанализировать
+
+go tool pprof -http=":9090" benchmark.test mem.out
+
+После оптимизации go test -bench=. -cpuprofile=result-cpu.out -memprofile=result-mem.out
+
+Сравнить pprof -top -diff_base=mem.out result-mem.out
