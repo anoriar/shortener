@@ -116,3 +116,10 @@ go tool pprof -http=":9090" benchmark.test mem.out
 
 # Убрать лишние импорты + gofmt
 goimports -local github.com/anoriar/shortener -w ./
+
+## Godoc
+
+godoc -http=:8080
+
+Перейти на
+http://localhost:8080/pkg/github.com/anoriar/shortener/
