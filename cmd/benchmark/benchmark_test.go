@@ -53,15 +53,15 @@ func Benchmark_Shortener(b *testing.B) {
 	b.ResetTimer()
 	pprof.WriteHeapProfile(memProfileFile)
 	b.Run("1", func(b *testing.B) {
-		for _, addUrlRequest := range urlAddRequests {
+		for _, addURLRequest := range urlAddRequests {
 
 			b.StopTimer()
-			addUrlWriter := httptest.NewRecorder()
+			addURLWriter := httptest.NewRecorder()
 			b.StartTimer()
 
-			addHandler.AddURL(addUrlWriter, addUrlRequest)
+			addHandler.AddURL(addURLWriter, addURLRequest)
 
-			location := addUrlWriter.Header().Get("Location")
+			location := addURLWriter.Header().Get("Location")
 
 			getURLRequest := httptest.NewRequest(http.MethodGet, "/"+location, nil)
 			getURLWriter := httptest.NewRecorder()

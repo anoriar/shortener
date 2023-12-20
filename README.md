@@ -80,7 +80,7 @@ SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^T
 Ссылка  на скачивание бинарника https://github.com/Yandex-Practicum/go-autotests/releases/tag/v0.9.16
 Для ubuntu - statictest
 2. Поместить в корень проекта. Дать права 777
-3. go vet -vettool=/home/loginarea/GolangProjects/shortener/statictest ./...
+3. go vet -vettool=./statictest ./...
 
 ## Profiling
 Вручную:
@@ -114,8 +114,5 @@ go tool pprof -http=":9090" benchmark.test mem.out
 Сравнить pprof -top -diff_base=mem.out result-mem.out
 
 
-# Убрать лишние импорты
+# Убрать лишние импорты + gofmt
 goimports -local github.com/anoriar/shortener -w ./
-
-# Отформатировать весь код
-gofmt -w ./
