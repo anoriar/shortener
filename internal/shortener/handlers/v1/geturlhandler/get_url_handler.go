@@ -1,3 +1,4 @@
+// Package geturlhandler Редирект на URL
 package geturlhandler
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
+// GetHandler Обработчик редиректа по короткому URLу
 type GetHandler struct {
 	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
@@ -21,6 +23,8 @@ func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger)
 	}
 }
 
+// GetURL Получает URL из БД по-короткому URL. Затем возвращает в заголовке Location с 307 редиректом
+// На вход в URLе приходит сокращенный URL: JRU9a8
 func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "text/plain")
 

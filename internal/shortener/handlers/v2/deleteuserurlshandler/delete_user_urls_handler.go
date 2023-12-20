@@ -1,3 +1,4 @@
+// Package deleteuserurlshandler Модуль удаления URL, которые создал пользователь
 package deleteuserurlshandler
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor/message"
 )
 
+// DeleteUserURLsHandler Обработчик удаления URL, которые создал пользователь
 type DeleteUserURLsHandler struct {
 	deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor
 	logger                  *zap.Logger
@@ -21,6 +23,17 @@ func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.Delet
 	return &DeleteUserURLsHandler{deleteUserURLsProcessor: deleteUserURLsProcessor, logger: logger}
 }
 
+// DeleteUserURLs Удаляет несколько URL, которые создал пользователь
+// Под удалением подразумевается - пометить в БД фла is_deleted=true
+// Обработка происходит асинхронно
+// На вход
+// [
+//
+//	"6qxTVvsy",
+//	"RTfd56hn",
+//	"Jlfd67ds"
+//
+// ]
 func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
@@ -43,11 +56,6 @@ func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req 
 		return
 	}
 	if userID != "" && len(shortURLs) > 0 {
-		//#MENTOR: Не понял в задании
-		// "Для максимального наполнения буфера объектов обновления используйте паттерн fanIn"
-		// С точки зрения обще проектировки: сервер создает горутины - (fan-out)
-		// Здесь засовываем все сообщения в один канал - а обрабатывается он асинхронно
-		// Может в задании что-то другое подразумевалось?
 		handler.deleteUserURLsProcessor.AddMessage(message.DeleteUserURLsMessage{
 			UserID:    userID,
 			ShortURLs: shortURLs,

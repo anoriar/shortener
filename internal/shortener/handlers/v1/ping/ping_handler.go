@@ -1,3 +1,4 @@
+// Package ping Модуль проверки жизнеспособности сервиса
 package ping
 
 import (
@@ -8,6 +9,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
+// PingHandler Обработчик запроса проверки жизнеспособности сервиса
 type PingHandler struct {
 	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
@@ -17,6 +19,7 @@ func NewPingHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger
 	return &PingHandler{urlRepository: urlRepository, logger: logger}
 }
 
+// Ping Проверяет, все ли зависимости сервиса работают
 func (p *PingHandler) Ping(w http.ResponseWriter, req *http.Request) {
 	err := p.urlRepository.Ping(req.Context())
 	if err != nil {

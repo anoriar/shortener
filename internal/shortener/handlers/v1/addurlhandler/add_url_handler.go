@@ -1,3 +1,4 @@
+// Package addurlhandler Добавление URL V1
 package addurlhandler
 
 import (
@@ -17,6 +18,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 )
 
+// AddHandler Обработчик добавления нового URL
 type AddHandler struct {
 	urlRepository     url.URLRepositoryInterface
 	userService       user.UserServiceInterface
@@ -41,6 +43,16 @@ func NewAddHandler(
 	}
 }
 
+// AddURL Добавляет новый URL.
+// Алгоритм работы:
+// Генерирует для URL его короткую версию
+// Сохраняет в базу URL
+// Прикрепляет сохраненный URL к пользователю
+//
+// На вход приходит строка URL
+// https://www.google1.ru/
+// На выходе - готовая ссылка для редиректа
+// http://localhost:8080/HnsSMA
 func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)

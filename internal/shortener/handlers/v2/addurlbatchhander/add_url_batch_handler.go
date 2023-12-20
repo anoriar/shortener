@@ -1,3 +1,4 @@
+// Package addurlbatchhander Добавление урлов пачкой
 package addurlbatchhander
 
 import (
@@ -16,6 +17,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 )
 
+// AddURLBatchHandler Обработчик добавления урлов пачкой
 type AddURLBatchHandler struct {
 	urlRepository              url.URLRepositoryInterface
 	userService                user.UserServiceInterface
@@ -43,6 +45,27 @@ func NewAddURLBatchHandler(
 	}
 }
 
+// AddURLBatch Добавляет несколько URL из запроса
+// Алгоритм работы:
+// Генерирует для каждого урла его короткую версию
+// Сохраняет в БД все URL
+// Прикрепляет сохраненные URL к пользователю
+// Сопоставляет по correlation_id входные и выходные данные, возвращает сгенерированные короткие ссылки
+// На вход приходят пары:
+//
+//	{
+//	     "correlation_id": "by4564trg",
+//	     "original_url": "https://practicum3.yandex.ru"
+//	 }
+//
+// На выход:
+//
+//	 {
+//	    "correlation_id": "by4564trg",
+//	    "short_url": "http://localhost:8080/Ytq3tY"
+//	}
+//
+// correlation_id нужен для сопоставления урлов друг с другом. Поле не используется в БД
 func (handler *AddURLBatchHandler) AddURLBatch(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
