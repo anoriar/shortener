@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+
 	dtoRequestPkg "github.com/anoriar/shortener/internal/e2e/client/dto/request"
 	dtoResponsePkg "github.com/anoriar/shortener/internal/e2e/client/dto/response"
 	"github.com/anoriar/shortener/internal/e2e/config"
-	"io"
-	"net/http"
 )
 
 type ShortenerClient struct {

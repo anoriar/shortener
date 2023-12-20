@@ -1,8 +1,9 @@
 package db
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository/url/db/internal"
 	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/repository/url/db/internal"
 )
 
 func InitializeDBURLRepository(dsn string, logger *zap.Logger) (*DatabaseURLRepository, error) {

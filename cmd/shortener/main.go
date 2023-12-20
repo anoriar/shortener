@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
+
+	"github.com/caarlos0/env/v6"
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/router"
-	"github.com/caarlos0/env/v6"
-	"go.uber.org/zap"
-	"net/http"
-	_ "net/http/pprof"
 )
 
 func main() {

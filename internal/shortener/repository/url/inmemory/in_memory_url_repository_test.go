@@ -1,9 +1,11 @@
 package inmemory
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
 func TestInMemoryURLRepository_AddURL(t *testing.T) {

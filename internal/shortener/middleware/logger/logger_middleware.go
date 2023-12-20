@@ -1,10 +1,12 @@
 package logger
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/middleware/logger/internal/responsewriter"
-	"go.uber.org/zap"
 	"net/http"
 	"time"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/middleware/logger/internal/responsewriter"
 )
 
 type LoggerMiddleware struct {

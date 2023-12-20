@@ -1,9 +1,11 @@
 package ping
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
-	"go.uber.org/zap"
 	"net/http"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
 type PingHandler struct {

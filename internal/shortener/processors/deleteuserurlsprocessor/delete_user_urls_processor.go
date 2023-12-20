@@ -2,9 +2,11 @@ package deleteurlsprocessor
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor/message"
 	"github.com/anoriar/shortener/internal/shortener/services/deleteuserurls"
-	"go.uber.org/zap"
 )
 
 type DeleteUserURLsProcessor struct {

@@ -5,6 +5,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/entity"
@@ -13,12 +21,6 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
 	urlGenMock "github.com/anoriar/shortener/internal/shortener/services/url_gen/mock"
 	mock2 "github.com/anoriar/shortener/internal/shortener/services/user/mock"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 const expectedShortKey = "etw73C"

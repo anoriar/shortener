@@ -8,9 +8,10 @@ import (
 	context "context"
 	reflect "reflect"
 
+	gomock "github.com/golang/mock/gomock"
+
 	repository "github.com/anoriar/shortener/internal/shortener/dto/repository"
 	entity "github.com/anoriar/shortener/internal/shortener/entity"
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockURLRepositoryInterface is a mock of URLRepositoryInterface interface.

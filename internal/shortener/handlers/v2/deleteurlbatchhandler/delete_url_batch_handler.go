@@ -2,10 +2,12 @@ package deleteurlbatchhandler
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
 type DeleteURLBatchHandler struct {

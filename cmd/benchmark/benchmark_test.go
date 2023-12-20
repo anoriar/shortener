@@ -2,8 +2,15 @@ package benchmark
 
 import (
 	"bytes"
+	"net/http"
+	"net/http/httptest"
+	"os"
+	"runtime/pprof"
+	"strconv"
+	"testing"
+
 	"github.com/anoriar/shortener/internal/e2e/config"
-	addurlhandler2 "github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	inmemoryurl "github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
@@ -11,12 +18,6 @@ import (
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"net/http"
-	"net/http/httptest"
-	"os"
-	"runtime/pprof"
-	"strconv"
-	"testing"
 )
 
 const testURL = "https://github.com/"
@@ -45,7 +46,7 @@ func Benchmark_Shortener(b *testing.B) {
 	userRepository := inmemoryuser.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
-	addHandler := addurlhandler2.NewAddHandler(urlRepository, userService, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), logger, cnf.BaseURL)
+	addHandler := addurlhandler.NewAddHandler(urlRepository, userService, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), logger, cnf.BaseURL)
 
 	getHandler := geturlhandler.NewGetHandler(urlRepository, logger)
 

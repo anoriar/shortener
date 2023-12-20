@@ -1,8 +1,9 @@
 package responsewriter
 
 import (
-	"github.com/klauspost/compress/gzip"
 	"net/http"
+
+	"github.com/klauspost/compress/gzip"
 )
 
 type KlauspostGzipCompressResponseWriter struct {

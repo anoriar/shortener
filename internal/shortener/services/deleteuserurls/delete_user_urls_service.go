@@ -2,6 +2,7 @@ package deleteuserurls
 
 import (
 	"context"
+
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/repository/user"
 )

@@ -1,10 +1,11 @@
 package compress
 
 import (
-	compress2 "github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/reader"
-	"github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/responsewriter"
 	"net/http"
 	"strings"
+
+	compress2 "github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/reader"
+	"github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/responsewriter"
 )
 
 const (

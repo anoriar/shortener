@@ -2,8 +2,9 @@ package validator
 
 import (
 	"fmt"
-	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	neturl "net/url"
+
+	"github.com/anoriar/shortener/internal/shortener/dto/request"
 )
 
 type AddURLBatchValidator struct {

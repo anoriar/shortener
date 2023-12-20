@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+
 	"github.com/anoriar/shortener/internal/shortener/config"
 )
 

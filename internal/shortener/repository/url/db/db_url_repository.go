@@ -5,13 +5,15 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/anoriar/shortener/internal/shortener/dto/repository"
-	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
+	"strings"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"go.uber.org/zap"
-	"strings"
+
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
+	"github.com/anoriar/shortener/internal/shortener/entity"
+	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 )
 
 var ErrSliceCanNotBeEmpty = errors.New("slice can not be empty")

@@ -2,6 +2,7 @@ package urlgen
 
 import (
 	"fmt"
+
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/util"
 )

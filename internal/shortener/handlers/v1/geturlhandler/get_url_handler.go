@@ -1,10 +1,12 @@
 package geturlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
 type GetHandler struct {

@@ -2,6 +2,11 @@ package addurlbatchhander
 
 import (
 	"encoding/json"
+	"io"
+	"net/http"
+
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/entity"
@@ -9,9 +14,6 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/validator"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
-	"go.uber.org/zap"
-	"io"
-	"net/http"
 )
 
 type AddURLBatchHandler struct {

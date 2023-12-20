@@ -3,11 +3,12 @@ package file
 import (
 	"context"
 	"errors"
+	"io"
+
 	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/reader"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/writer"
-	"io"
 )
 
 type FileURLRepository struct {

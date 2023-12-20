@@ -4,13 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
+
+	"github.com/google/uuid"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/auth"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/user"
 	v1 "github.com/anoriar/shortener/internal/shortener/services/auth"
-	"github.com/google/uuid"
-	"net/http"
 )
 
 const cookieName = "token"

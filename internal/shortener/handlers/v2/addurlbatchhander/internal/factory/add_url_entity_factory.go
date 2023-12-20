@@ -1,10 +1,11 @@
 package factory
 
 import (
+	"github.com/google/uuid"
+
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"github.com/google/uuid"
 )
 
 type AddURLEntityFactory struct {

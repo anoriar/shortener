@@ -1,8 +1,9 @@
 package reader
 
 import (
-	"github.com/klauspost/compress/gzip"
 	"io"
+
+	"github.com/klauspost/compress/gzip"
 )
 
 type KlauspostGzipCompressReader struct {

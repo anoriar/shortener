@@ -2,17 +2,19 @@ package addurlhandler
 
 import (
 	"errors"
+	"io"
+	"net/http"
+	neturl "net/url"
+
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-	"io"
-	"net/http"
-	neturl "net/url"
 )
 
 type AddHandler struct {

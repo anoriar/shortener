@@ -1,12 +1,13 @@
 package addurlbatchhander
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/factory"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/validator"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"go.uber.org/zap"
 )
 
 func InitializeAddURLBatchHandler(

@@ -2,8 +2,9 @@ package writer
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/entity"
 	"os"
+
+	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
 type URLFileWriter struct {
