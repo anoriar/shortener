@@ -122,4 +122,4 @@ goimports -local github.com/anoriar/shortener -w ./
 godoc -http=:8080
 
 Перейти на
-http://localhost:8080/pkg/github.com/anoriar/shortener/
+http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
