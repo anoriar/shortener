@@ -5,16 +5,22 @@ import (
 	"time"
 )
 
+// KeyGen missing godoc.
 type KeyGen struct {
 }
 
+// NewKeyGen missing godoc.
 func NewKeyGen() *KeyGen {
 	return &KeyGen{}
 }
 
+// Charset missing godoc.
 const Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+// KeyLength missing godoc.
 const KeyLength = 6
 
+// Generate missing godoc.
 func (k *KeyGen) Generate() string {
 
 	src := rand.NewSource(time.Now().UnixNano())

@@ -7,15 +7,18 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/user"
 )
 
+// DeleteUserURLsService missing godoc.
 type DeleteUserURLsService struct {
 	urlRepository  url.URLRepositoryInterface
 	userRepository user.UserRepositoryInterface
 }
 
+// NewDeleteUserURLsService missing godoc.
 func NewDeleteUserURLsService(urlRepository url.URLRepositoryInterface, userRepository user.UserRepositoryInterface) *DeleteUserURLsService {
 	return &DeleteUserURLsService{urlRepository: urlRepository, userRepository: userRepository}
 }
 
+// DeleteUserURLs missing godoc.
 func (service *DeleteUserURLsService) DeleteUserURLs(ctx context.Context, userID string, shortURLs []string) error {
 	user, exist, err := service.userRepository.FindUserByID(userID)
 	if err != nil {

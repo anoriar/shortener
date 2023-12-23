@@ -17,6 +17,7 @@ type DeleteURLBatchHandler struct {
 	logger        *zap.Logger
 }
 
+// NewDeleteURLBatchHandler missing godoc.
 func NewDeleteURLBatchHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *DeleteURLBatchHandler {
 	return &DeleteURLBatchHandler{urlRepository: urlRepository, logger: logger}
 }

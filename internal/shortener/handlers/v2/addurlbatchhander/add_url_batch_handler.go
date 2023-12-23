@@ -27,6 +27,7 @@ type AddURLBatchHandler struct {
 	validator                  *validator.AddURLBatchValidator
 }
 
+// NewAddURLBatchHandler missing godoc.
 func NewAddURLBatchHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService user.UserServiceInterface,

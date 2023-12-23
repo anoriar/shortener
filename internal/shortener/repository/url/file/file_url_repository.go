@@ -11,20 +11,24 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/url/file/internal/writer"
 )
 
+// FileURLRepository missing godoc.
 type FileURLRepository struct {
 	filename string
 }
 
+// NewFileURLRepository missing godoc.
 func NewFileURLRepository(filename string) *FileURLRepository {
 	return &FileURLRepository{
 		filename: filename,
 	}
 }
 
+// Ping missing godoc.
 func (repository *FileURLRepository) Ping(ctx context.Context) error {
 	return nil
 }
 
+// AddURL missing godoc.
 func (repository *FileURLRepository) AddURL(url *entity.URL) error {
 
 	fileWriter, err := writer.NewURLFileWriter(repository.filename)
@@ -40,6 +44,7 @@ func (repository *FileURLRepository) AddURL(url *entity.URL) error {
 	return nil
 }
 
+// FindURLByShortURL missing godoc.
 func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
 	fileReader, err := reader.NewURLFileReader(repository.filename)
 	if err != nil {
@@ -63,6 +68,7 @@ func (repository *FileURLRepository) FindURLByShortURL(shortURL string) (*entity
 	}
 }
 
+// GetURLsByQuery missing godoc.
 func (repository *FileURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
 	var resultURLs []entity.URL
 
@@ -102,6 +108,7 @@ func (repository *FileURLRepository) GetURLsByQuery(ctx context.Context, urlQuer
 	return resultURLs, nil
 }
 
+// FindURLByOriginalURL missing godoc.
 func (repository *FileURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	return repository.findOneByCondition(func(url entity.URL) bool {
 		return url.OriginalURL == originalURL
@@ -131,6 +138,7 @@ func (repository *FileURLRepository) findOneByCondition(condition func(url entit
 	}
 }
 
+// AddURLBatch missing godoc.
 func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
 	fileWriter, err := writer.NewURLFileWriter(repository.filename)
 	if err != nil {
@@ -148,6 +156,7 @@ func (repository *FileURLRepository) AddURLBatch(ctx context.Context, urls []ent
 	return nil
 }
 
+// DeleteURLBatch missing godoc.
 func (repository *FileURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
 	return repository.rewriteFile(ctx, func(fileURLs map[string]*entity.URL) error {
 		for _, shortURL := range shortURLs {
@@ -157,6 +166,7 @@ func (repository *FileURLRepository) DeleteURLBatch(ctx context.Context, shortUR
 	})
 }
 
+// UpdateIsDeletedBatch missing godoc.
 func (repository *FileURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
 	return repository.rewriteFile(ctx, func(fileURLs map[string]*entity.URL) error {
 		for _, shortURL := range shortURLs {
@@ -211,6 +221,7 @@ func (repository *FileURLRepository) rewriteFile(ctx context.Context, callback f
 	return nil
 }
 
+// Close missing godoc.
 func (repository *FileURLRepository) Close() error {
 	return nil
 }

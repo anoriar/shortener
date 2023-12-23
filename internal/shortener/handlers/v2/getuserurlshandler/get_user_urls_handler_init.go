@@ -8,6 +8,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 )
 
+// InitializeGetUserURLsHandler missing godoc.
 func InitializeGetUserURLsHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService *user.UserService,

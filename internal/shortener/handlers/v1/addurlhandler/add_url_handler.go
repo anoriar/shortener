@@ -27,6 +27,7 @@ type AddHandler struct {
 	baseURL           string
 }
 
+// NewAddHandler missing godoc.
 func NewAddHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService user.UserServiceInterface,

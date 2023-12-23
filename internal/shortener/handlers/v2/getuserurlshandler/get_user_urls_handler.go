@@ -13,6 +13,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 )
 
+// GetUserURLsHandler missing godoc.
 type GetUserURLsHandler struct {
 	urlRepository   url.URLRepositoryInterface
 	userService     user.UserServiceInterface
@@ -20,6 +21,7 @@ type GetUserURLsHandler struct {
 	logger          *zap.Logger
 }
 
+// NewGetUserURLsHandler missing godoc.
 func NewGetUserURLsHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService user.UserServiceInterface,
@@ -34,6 +36,7 @@ func NewGetUserURLsHandler(
 	}
 }
 
+// GetUserURLs missing godoc.
 func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)

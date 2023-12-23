@@ -7,24 +7,30 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
+// InMemoryURLRepository missing godoc.
 type InMemoryURLRepository struct {
 	urls map[string]*entity.URL
 }
 
+// NewInMemoryURLRepository missing godoc.
 func NewInMemoryURLRepository() *InMemoryURLRepository {
 	return &InMemoryURLRepository{urls: make(map[string]*entity.URL)}
 }
 
+// Ping missing godoc.
 func (repository *InMemoryURLRepository) Ping(ctx context.Context) error {
 	return nil
 }
 
+// AddURL missing godoc.
 func (repository *InMemoryURLRepository) AddURL(url *entity.URL) error {
 
 	repository.urls[url.ShortURL] = url
 
 	return nil
 }
+
+// FindURLByOriginalURL missing godoc.
 func (repository *InMemoryURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	return repository.findOneByCondition(func(url entity.URL) bool {
 		return url.OriginalURL == originalURL
@@ -40,6 +46,7 @@ func (repository *InMemoryURLRepository) findOneByCondition(condition func(url e
 	return nil, nil
 }
 
+// FindURLByShortURL missing godoc.
 func (repository *InMemoryURLRepository) FindURLByShortURL(key string) (*entity.URL, error) {
 	url, exists := repository.urls[key]
 	if !exists {
@@ -48,6 +55,7 @@ func (repository *InMemoryURLRepository) FindURLByShortURL(key string) (*entity.
 	return url, nil
 }
 
+// GetURLsByQuery missing godoc.
 func (repository *InMemoryURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
 	var resultURLs []entity.URL
 
@@ -73,6 +81,7 @@ func (repository *InMemoryURLRepository) GetURLsByQuery(ctx context.Context, url
 	return resultURLs, nil
 }
 
+// AddURLBatch missing godoc.
 func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
 	for _, url := range urls {
 		err := repository.AddURL(&url)
@@ -83,6 +92,7 @@ func (repository *InMemoryURLRepository) AddURLBatch(ctx context.Context, urls [
 	return nil
 }
 
+// DeleteURLBatch missing godoc.
 func (repository *InMemoryURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
 	for _, shortURL := range shortURLs {
 		delete(repository.urls, shortURL)
@@ -90,6 +100,7 @@ func (repository *InMemoryURLRepository) DeleteURLBatch(ctx context.Context, sho
 	return nil
 }
 
+// UpdateIsDeletedBatch missing godoc.
 func (repository *InMemoryURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
 	for _, shortURL := range shortURLs {
 		if item, ok := repository.urls[shortURL]; ok {
@@ -99,6 +110,7 @@ func (repository *InMemoryURLRepository) UpdateIsDeletedBatch(ctx context.Contex
 	return nil
 }
 
+// Close missing godoc.
 func (repository *InMemoryURLRepository) Close() error {
 	return nil
 }

@@ -14,11 +14,13 @@ import (
 	"github.com/anoriar/shortener/internal/e2e/config"
 )
 
+// ShortenerClient missing godoc.
 type ShortenerClient struct {
 	httpClient *http.Client
 	baseURL    string
 }
 
+// NewShortenerClient missing godoc.
 func NewShortenerClient(httpClient *http.Client, baseURL string) *ShortenerClient {
 	return &ShortenerClient{
 		httpClient: httpClient,
@@ -26,6 +28,7 @@ func NewShortenerClient(httpClient *http.Client, baseURL string) *ShortenerClien
 	}
 }
 
+// InitializeShortenerClient missing godoc.
 func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface {
 	return &ShortenerClient{
 		httpClient: &http.Client{
@@ -48,6 +51,7 @@ func (client *ShortenerClient) getTokenFromResponse(resp *http.Response) string 
 	return ""
 }
 
+// AddURL missing godoc.
 func (client *ShortenerClient) AddURL(requestDto dtoRequestPkg.AddURLRequestDto) (*dtoResponsePkg.AddResponseDto, error) {
 	request, err := http.NewRequest(http.MethodPost, client.baseURL, bytes.NewReader([]byte(requestDto.URL)))
 	if err != nil {
@@ -81,6 +85,7 @@ func (client *ShortenerClient) AddURL(requestDto dtoRequestPkg.AddURLRequestDto)
 	), nil
 }
 
+// GetURL missing godoc.
 func (client *ShortenerClient) GetURL(requestDto dtoRequestPkg.GetURLRequestDto) (*dtoResponsePkg.GetResponseDto, error) {
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, requestDto.ShortKey), nil)
 	if err != nil {
@@ -102,6 +107,7 @@ func (client *ShortenerClient) GetURL(requestDto dtoRequestPkg.GetURLRequestDto)
 	), nil
 }
 
+// AddURLv2 missing godoc.
 func (client *ShortenerClient) AddURLv2(requestDto dtoRequestPkg.AddURLRequestDto) (*dtoResponsePkg.AddResponseV2Dto, error) {
 	requestJSON, err := json.Marshal(struct {
 		URL string `json:"url"`
@@ -160,6 +166,7 @@ func (client *ShortenerClient) AddURLv2(requestDto dtoRequestPkg.AddURLRequestDt
 	), nil
 }
 
+// AddURLv2WithCompress missing godoc.
 func (client *ShortenerClient) AddURLv2WithCompress(requestDto dtoRequestPkg.AddURLRequestDto, contentType string) (*dtoResponsePkg.AddResponseV2EncodingDto, error) {
 	requestJSON, err := json.Marshal(struct {
 		URL string `json:"url"`
@@ -227,6 +234,7 @@ func (client *ShortenerClient) AddURLv2WithCompress(requestDto dtoRequestPkg.Add
 	), nil
 }
 
+// Ping missing godoc.
 func (client *ShortenerClient) Ping() (dtoResponsePkg.PingResponseDto, error) {
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/ping", client.baseURL), nil)
 	if err != nil {
@@ -245,6 +253,7 @@ func (client *ShortenerClient) Ping() (dtoResponsePkg.PingResponseDto, error) {
 	), nil
 }
 
+// DeleteURLBatch missing godoc.
 func (client *ShortenerClient) DeleteURLBatch(shortURLs []string) (*dtoResponsePkg.DeleteURLBatchResponseDto, error) {
 	requestJSON, err := json.Marshal(shortURLs)
 	if err != nil {
@@ -271,6 +280,7 @@ func (client *ShortenerClient) DeleteURLBatch(shortURLs []string) (*dtoResponseP
 	), nil
 }
 
+// AddURLBatch missing godoc.
 func (client *ShortenerClient) AddURLBatch(requestDto dtoRequestPkg.AddURLBatchRequestDTO) (*dtoResponsePkg.AddURLBatchResponseDto, error) {
 	requestJSON, err := json.Marshal(requestDto.Items)
 	if err != nil {
@@ -323,6 +333,7 @@ func (client *ShortenerClient) AddURLBatch(requestDto dtoRequestPkg.AddURLBatchR
 	), nil
 }
 
+// GetUserURLs missing godoc.
 func (client *ShortenerClient) GetUserURLs(requestDto dtoRequestPkg.AuthRequest) (*dtoResponsePkg.GetUserURLsResponseDto, error) {
 	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/%s", client.baseURL, "api/user/urls"), nil)
 	if err != nil {
@@ -367,6 +378,7 @@ func (client *ShortenerClient) GetUserURLs(requestDto dtoRequestPkg.AuthRequest)
 	), nil
 }
 
+// DeleteUserURLs missing godoc.
 func (client *ShortenerClient) DeleteUserURLs(requestDto dtoRequestPkg.DeleteUserURLsRequestDto) (*dtoResponsePkg.DeleteUserURLsResponseDto, error) {
 	requestJSON, err := json.Marshal(requestDto.ShortURLs)
 	if err != nil {

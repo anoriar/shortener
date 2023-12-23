@@ -13,13 +13,16 @@ const (
 	textHTML        = "text/html"
 )
 
+// CompressMiddleware missing godoc.
 type CompressMiddleware struct {
 }
 
+// NewCompressMiddleware missing godoc.
 func NewCompressMiddleware() *CompressMiddleware {
 	return &CompressMiddleware{}
 }
 
+// Compress missing godoc.
 func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ow := w

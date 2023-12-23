@@ -16,6 +16,7 @@ import (
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
 )
 
+// Router missing godoc.
 type Router struct {
 	addHandler            *addurlhandler.AddHandler
 	getHandler            *geturlhandler.GetHandler
@@ -30,6 +31,7 @@ type Router struct {
 	authMiddleware        *auth.AuthMiddleware
 }
 
+// NewRouter missing godoc.
 func NewRouter(
 	addHandler *addurlhandler.AddHandler,
 	getHandler *geturlhandler.GetHandler,
@@ -58,6 +60,7 @@ func NewRouter(
 	}
 }
 
+// Route missing godoc.
 func (r *Router) Route() chi.Router {
 	router := chi.NewRouter()
 

@@ -25,6 +25,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
+// InitializeRouter missing godoc.
 func InitializeRouter(cnf *config.Config, urlRepository url.URLRepositoryInterface, logger *zap.Logger) (*Router, error) {
 	userRepository := inmemory.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)

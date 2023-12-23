@@ -15,6 +15,7 @@ type PingHandler struct {
 	logger        *zap.Logger
 }
 
+// NewPingHandler missing godoc.
 func NewPingHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *PingHandler {
 	return &PingHandler{urlRepository: urlRepository, logger: logger}
 }

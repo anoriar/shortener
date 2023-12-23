@@ -10,6 +10,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
+// InitializeAddURLBatchHandler missing godoc.
 func InitializeAddURLBatchHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService *user.UserService,

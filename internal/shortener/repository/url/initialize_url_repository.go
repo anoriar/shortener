@@ -9,6 +9,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
 )
 
+// InitializeURLRepository missing godoc.
 func InitializeURLRepository(cnf *config.Config, logger *zap.Logger) (URLRepositoryInterface, error) {
 	switch {
 	case cnf.DatabaseDSN != "":

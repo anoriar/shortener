@@ -18,15 +18,18 @@ import (
 const cookieName = "token"
 const cookieAge = 3600
 
+// AuthMiddleware missing godoc.
 type AuthMiddleware struct {
 	signService    *v1.SignService
 	userRepository user.UserRepositoryInterface
 }
 
+// NewAuthMiddleware missing godoc.
 func NewAuthMiddleware(signService *v1.SignService, userRepository user.UserRepositoryInterface) *AuthMiddleware {
 	return &AuthMiddleware{signService: signService, userRepository: userRepository}
 }
 
+// Auth missing godoc.
 func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()

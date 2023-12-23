@@ -16,6 +16,7 @@ type GetHandler struct {
 	logger        *zap.Logger
 }
 
+// NewGetHandler missing godoc.
 func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *GetHandler {
 	return &GetHandler{
 		urlRepository: urlRepository,

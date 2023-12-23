@@ -19,6 +19,7 @@ type DeleteUserURLsHandler struct {
 	logger                  *zap.Logger
 }
 
+// NewDeleteUserURLsHandler missing godoc.
 func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor, logger *zap.Logger) *DeleteUserURLsHandler {
 	return &DeleteUserURLsHandler{deleteUserURLsProcessor: deleteUserURLsProcessor, logger: logger}
 }

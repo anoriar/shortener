@@ -5,6 +5,7 @@ import (
 	"github.com/anoriar/shortener/internal/e2e/client/dto/response"
 )
 
+// ShortenerClientInterface missing godoc.
 type ShortenerClientInterface interface {
 	AddURL(requestDto request.AddURLRequestDto) (*response.AddResponseDto, error)
 	AddURLv2(requestDto request.AddURLRequestDto) (*response.AddResponseV2Dto, error)
