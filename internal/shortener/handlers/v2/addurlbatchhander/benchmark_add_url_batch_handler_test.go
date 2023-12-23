@@ -64,7 +64,7 @@ func Benchmark_AddURLBatch(b *testing.B) {
 
 			req := httptest.NewRequest(http.MethodPost, "/api/shorten/batch", bytes.NewReader(batchRequest))
 			req.Header.Set("Content-Type", "application/json")
-			req.WithContext(ctxWithUser)
+			req = req.WithContext(ctxWithUser)
 			addURLWriter := httptest.NewRecorder()
 
 			b.StartTimer()

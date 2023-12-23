@@ -14,6 +14,7 @@ import (
 )
 
 const testURL = "https://github.com/"
+const urlCnt = 1000000
 
 func Benchmark_GetOneURLV1(b *testing.B) {
 	cnf := config.NewTestConfig()
@@ -27,8 +28,6 @@ func Benchmark_GetOneURLV1(b *testing.B) {
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
 
 	getHandler := NewGetHandler(urlRepository, logger)
-
-	const urlCnt = 10000
 
 	urlShortKeys := make([]string, 0, urlCnt)
 	for i := 0; i < urlCnt; i++ {
@@ -50,8 +49,10 @@ func Benchmark_GetOneURLV1(b *testing.B) {
 
 	b.Run("get url v1", func(b *testing.B) {
 		for _, key := range urlShortKeys {
+			b.StopTimer()
 			req := httptest.NewRequest(http.MethodGet, "/"+key, nil)
 			w := httptest.NewRecorder()
+			b.StartTimer()
 
 			getHandler.GetURL(w, req)
 		}

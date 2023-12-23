@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/e2e/config"
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/logger"
@@ -20,9 +19,10 @@ import (
 )
 
 const testURL = "https://github.com/"
+const urlCnt = 1000000
 
 func Benchmark_AddOneURLV2(b *testing.B) {
-	const urlCnt = 10000
+
 	urlAddRequests := make([][]byte, 0, urlCnt)
 	for i := 0; i < urlCnt; i++ {
 		requestDto := request.AddURLRequestDto{URL: testURL + strconv.Itoa(i)}
@@ -34,9 +34,6 @@ func Benchmark_AddOneURLV2(b *testing.B) {
 		urlAddRequests = append(urlAddRequests, successRequestBody)
 	}
 
-	cnf := config.NewTestConfig()
-	cnf.BaseURL = "http://localhost:8080"
-
 	logger, err := logger.Initialize("info")
 	if err != nil {
 		b.Fatalf("%s", err)
@@ -44,18 +41,17 @@ func Benchmark_AddOneURLV2(b *testing.B) {
 	userRepository := inmemoryuser.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
-	addHandler := NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, logger, cnf.BaseURL)
+	addHandler := NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, logger, "http://localhost:8080")
 
 	b.ResetTimer()
 	b.Run("add url v2", func(b *testing.B) {
 		for _, addURLRequest := range urlAddRequests {
 
 			b.StopTimer()
-			ctxWithUser := context.WithValue(context.Background(), context2.UserIDContextKey, "1")
-
 			req := httptest.NewRequest(http.MethodPost, "/api/shorten", bytes.NewReader(addURLRequest))
-			req.Header.Set("Content-Type", "application/json")
-			req.WithContext(ctxWithUser)
+
+			ctxWithUser := context.WithValue(context.Background(), context2.UserIDContextKey, "1")
+			req = req.WithContext(ctxWithUser)
 			addURLWriter := httptest.NewRecorder()
 
 			b.StartTimer()
