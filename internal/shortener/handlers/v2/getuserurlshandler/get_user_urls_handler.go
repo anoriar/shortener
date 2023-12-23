@@ -71,7 +71,7 @@ func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.
 	}
 
 	if len(resultURLs) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
