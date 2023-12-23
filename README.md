@@ -129,5 +129,3 @@ http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
 Команда godoc-generate
 
 Либа go install github.com/DimitarPetrov/godoc-generate@latest
-
-И не забывать про file templates в Golands
