@@ -2,6 +2,11 @@ package addurlhandler
 
 import (
 	"bytes"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	"github.com/anoriar/shortener/internal/e2e/config"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	inmemoryurl "github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
@@ -9,10 +14,6 @@ import (
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 const testURL = "https://github.com/"

@@ -2,6 +2,14 @@ package getuserurlshandler
 
 import (
 	"context"
+	"math"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
+	"github.com/google/uuid"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/getuserurlshandler/internal/factory"
@@ -10,12 +18,6 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/user/inmemory"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"github.com/google/uuid"
-	"math"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 const testURL = "https://github.com/"

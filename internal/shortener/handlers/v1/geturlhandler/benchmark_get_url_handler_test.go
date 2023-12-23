@@ -1,16 +1,18 @@
 package geturlhandler
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
+	"github.com/google/uuid"
+
 	"github.com/anoriar/shortener/internal/e2e/config"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	inmemoryurl "github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"github.com/google/uuid"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 const testURL = "https://github.com/"

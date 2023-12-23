@@ -4,6 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"math"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
+	"github.com/google/uuid"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/factory"
@@ -13,12 +21,6 @@ import (
 	inmemoryuser "github.com/anoriar/shortener/internal/shortener/repository/user/inmemory"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"github.com/google/uuid"
-	"math"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 const testURL = "https://github.com/"

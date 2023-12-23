@@ -4,6 +4,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"strconv"
+	"testing"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/logger"
@@ -12,10 +17,6 @@ import (
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"net/http"
-	"net/http/httptest"
-	"strconv"
-	"testing"
 )
 
 const testURL = "https://github.com/"

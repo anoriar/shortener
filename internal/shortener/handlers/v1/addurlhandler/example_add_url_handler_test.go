@@ -3,6 +3,11 @@ package addurlhandler
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
@@ -10,10 +15,6 @@ import (
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"log"
-	"net/http"
-	"net/http/httptest"
-	"strings"
 )
 
 // This example demonstrates how to use the AddURL.
