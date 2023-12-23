@@ -17,10 +17,11 @@ const KeyLength = 6
 
 func (k *KeyGen) Generate() string {
 
-	rand.Seed(time.Now().UnixNano())
+	src := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(src)
 	shortKey := make([]byte, KeyLength)
 	for i := range shortKey {
-		shortKey[i] = Charset[rand.Intn(len(Charset))]
+		shortKey[i] = Charset[r.Intn(len(Charset))]
 	}
 	return string(shortKey)
 }
