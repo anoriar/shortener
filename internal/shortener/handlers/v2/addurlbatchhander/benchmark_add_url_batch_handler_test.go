@@ -22,7 +22,7 @@ import (
 )
 
 const testURL = "https://github.com/"
-const urlCnt = 1000000
+const urlCnt = 10000
 const batchSize = 1000
 
 func Benchmark_AddURLBatch(b *testing.B) {

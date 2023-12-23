@@ -16,7 +16,7 @@ import (
 )
 
 const testURL = "https://github.com/"
-const urlCnt = 1000000
+const urlCnt = 10000
 
 func Benchmark_AddOneURLV1(b *testing.B) {
 	urlAddRequests := make([]*http.Request, 0, urlCnt)

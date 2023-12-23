@@ -19,7 +19,7 @@ import (
 )
 
 const testURL = "https://github.com/"
-const urlCnt = 1000000
+const urlCnt = 10000
 
 func Benchmark_AddOneURLV2(b *testing.B) {
 
