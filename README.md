@@ -123,3 +123,11 @@ godoc -http=:8080
 
 Перейти на 
 http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
+
+# Генерация заглушек godoc (для прохождения 18 теста)
+
+Команда godoc-generate
+
+Либа go install github.com/DimitarPetrov/godoc-generate@latest
+
+И не забывать про file templates в Golands
