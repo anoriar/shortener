@@ -38,7 +38,7 @@ func Benchmark_GetUserURLs(b *testing.B) {
 	getUserURLsHandler := NewGetUserURLsHandler(urlRepository, userService, getUserURLsResponseFactory, logger)
 
 	urlCntPerUser := int(math.Ceil(float64(urlCnt) / float64(userCnt)))
-	urlIDs := make([]string, 0, urlCntPerUser)
+	urlShortKeys := make([]string, 0, urlCntPerUser)
 	userIDs := make([]string, 0, userCnt)
 
 	for i := 0; i < urlCnt; i++ {
@@ -46,7 +46,7 @@ func Benchmark_GetUserURLs(b *testing.B) {
 		if i%urlCntPerUser == 0 {
 			userEntity := entity.User{
 				UUID:        uuid.NewString(),
-				SavedURLIDs: urlIDs,
+				SavedURLIDs: urlShortKeys,
 			}
 			err := userRepository.AddUser(userEntity)
 			if err != nil {
@@ -54,7 +54,7 @@ func Benchmark_GetUserURLs(b *testing.B) {
 			}
 			userIDs = append(userIDs, userEntity.UUID)
 
-			urlIDs = make([]string, 0, urlCntPerUser)
+			urlShortKeys = make([]string, 0, urlCntPerUser)
 		}
 		shortKey := keyGen.Generate()
 		urlEntity := entity.URL{
@@ -67,7 +67,7 @@ func Benchmark_GetUserURLs(b *testing.B) {
 		if err != nil {
 			b.Fatalf("%s", err)
 		}
-		urlIDs = append(urlIDs, urlEntity.UUID)
+		urlShortKeys = append(urlShortKeys, urlEntity.ShortURL)
 	}
 
 	b.ResetTimer()
