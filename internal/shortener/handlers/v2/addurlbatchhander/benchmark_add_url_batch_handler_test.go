@@ -24,7 +24,7 @@ import (
 )
 
 const testURL = "https://github.com/"
-const urlCnt = 10000
+const urlCnt = 1000000
 const batchSize = 1000
 
 func Benchmark_AddURLBatch(b *testing.B) {
@@ -32,7 +32,7 @@ func Benchmark_AddURLBatch(b *testing.B) {
 	generatedURLs := make([]request.AddURLBatchRequestDTO, 0, batchSize)
 	for i := 0; i < urlCnt; i++ {
 
-		if i%batchSize == 0 {
+		if i%batchSize == 0 && i != 0 {
 			batchRequest, err := json.Marshal(generatedURLs)
 			if err != nil {
 				b.Fatalf("%s", err)

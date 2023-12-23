@@ -17,7 +17,7 @@ func NewGetUSerURLsResponseFactory(baseURL string) *GetUSerURLsResponseFactory {
 
 // CreateResponse missing godoc.
 func (factory *GetUSerURLsResponseFactory) CreateResponse(urls []entity.URL) []response.GetUserURLsResponseDTO {
-	var responseURLs []response.GetUserURLsResponseDTO
+	responseURLs := make([]response.GetUserURLsResponseDTO, 0, len(urls))
 	for _, url := range urls {
 		responseURLs = append(responseURLs, response.GetUserURLsResponseDTO{
 			ShortURL:    factory.baseURL + "/" + url.ShortURL,

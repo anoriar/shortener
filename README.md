@@ -111,7 +111,9 @@ go tool pprof -http=":9090" benchmark.test mem.out
 
 После оптимизации go test -bench=. -cpuprofile=result-cpu.out -memprofile=result-mem.out
 
-Сравнить pprof -top -diff_base=mem.out result-mem.out
+Сравнить 
+
+go tool pprof -top -diff_base=mem.out result-mem.out
 
 
 # Убрать лишние импорты + gofmt

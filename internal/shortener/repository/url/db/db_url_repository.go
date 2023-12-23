@@ -127,7 +127,6 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 		queryString += " WHERE " + filterString
 	}
 
-	//#MENTOR: вот эта штука супернеочевидная. нужно именно тип interface, string не подходит
 	params := make([]interface{}, len(filterParams))
 	for i, filterParam := range filterParams {
 		params[i] = filterParam

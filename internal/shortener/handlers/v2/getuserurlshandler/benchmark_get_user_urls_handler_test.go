@@ -21,7 +21,7 @@ import (
 )
 
 const testURL = "https://github.com/"
-const urlCnt = 10000
+const urlCnt = 100000
 const userCnt = 1000
 
 func Benchmark_GetUserURLs(b *testing.B) {

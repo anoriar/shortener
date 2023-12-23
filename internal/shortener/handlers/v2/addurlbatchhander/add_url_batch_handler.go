@@ -95,9 +95,9 @@ func (handler *AddURLBatchHandler) AddURLBatch(w http.ResponseWriter, req *http.
 	}
 
 	urlsMap := handler.addURLBatchFactory.CreateURLsFromBatchRequest(requestItems)
-	var urls []entity.URL
-	for _, url := range urlsMap {
-		urls = append(urls, url)
+	urls := make([]entity.URL, 0, len(urlsMap))
+	for _, urlEntity := range urlsMap {
+		urls = append(urls, urlEntity)
 	}
 
 	err = handler.urlRepository.AddURLBatch(req.Context(), urls)
@@ -107,7 +107,7 @@ func (handler *AddURLBatchHandler) AddURLBatch(w http.ResponseWriter, req *http.
 		return
 	} else {
 		if userID != "" {
-			var shortKeys []string
+			shortKeys := make([]string, 0, len(urlsMap))
 			for _, val := range urlsMap {
 				shortKeys = append(shortKeys, val.ShortURL)
 			}
