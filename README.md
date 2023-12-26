@@ -83,12 +83,22 @@ SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^T
 3. go vet -vettool=./statictest ./...
 
 ## Profiling
-Вручную:
+
+Как профилировать:
+
+go tool pprof -http=":9090" -seconds=30 http://127.0.0.1:8081/debug/pprof/heap
+
+За эти 30 секунд создать нагрузку
+
+Смотреть отчет на 9090 порту
+
+С созданием файла:
+
 Создать профиль base.pprof
 
 curl http://127.0.0.1:8081/debug/pprof/heap > ./profiles/base.pprof
 
-Зайти в анализатор через: 
+Зайти в анализатор через:
 
 go tool pprof -http=":9090" profiles/base.pprof
 

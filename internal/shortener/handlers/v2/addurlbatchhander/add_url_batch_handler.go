@@ -46,27 +46,38 @@ func NewAddURLBatchHandler(
 	}
 }
 
-// AddURLBatch Добавляет несколько URL из запроса
-// Алгоритм работы:
-// Генерирует для каждого урла его короткую версию
-// Сохраняет в БД все URL
-// Прикрепляет сохраненные URL к пользователю
-// Сопоставляет по correlation_id входные и выходные данные, возвращает сгенерированные короткие ссылки
-// На вход приходят пары:
+// AddURLBatch добавляет несколько URL на основе входящего запроса.
+//
+// Процесс работы функции включает следующие шаги:
+// 1. Генерация короткой версии для каждого URL.
+// 2. Сохранение всех URL в базу данных.
+// 3. Прикрепление сохранённых URL к конкретному пользователю.
+// 4. Сопоставление входных и выходных данных по correlation_id и возврат сгенерированных коротких ссылок.
+//
+// Формат входных данных:
+// [
 //
 //	{
-//	     "correlation_id": "by4564trg",
-//	     "original_url": "https://practicum3.yandex.ru"
-//	 }
+//	  "correlation_id": "by4564trg",
+//	  "original_url": "https://practicum3.yandex.ru"
+//	},
+//	...
 //
-// На выход:
+// ]
 //
-//	 {
-//	    "correlation_id": "by4564trg",
-//	    "short_url": "http://localhost:8080/Ytq3tY"
-//	}
+// Формат выходных данных:
+// [
 //
-// correlation_id нужен для сопоставления урлов друг с другом. Поле не используется в БД
+//	{
+//	  "correlation_id": "by4564trg",
+//	  "short_url": "http://localhost:8080/Ytq3tY"
+//	},
+//	...
+//
+// ]
+//
+// Параметр correlation_id используется для сопоставления входных и выходных URL.
+// Обратите внимание, что это поле не используется в базе данных.
 func (handler *AddURLBatchHandler) AddURLBatch(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)

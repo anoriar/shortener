@@ -22,8 +22,8 @@ func NewDeleteURLBatchHandler(urlRepository url.URLRepositoryInterface, logger *
 	return &DeleteURLBatchHandler{urlRepository: urlRepository, logger: logger}
 }
 
-// DeleteURLBatch Удаляет несколько URL
-// На вход: сокращенные версии URL
+// DeleteURLBatch удаляет несколько URL.
+// На вход принимает сокращенные версии URL:
 // [
 //
 //	"g95W3D",

@@ -36,7 +36,17 @@ func NewGetUserURLsHandler(
 	}
 }
 
-// GetUserURLs missing godoc.
+// GetUserURLs получает URL, которые создал пользователь
+// Формат выходных данных:
+// [
+//
+//	{
+//	  "original_url": "https://www.google1.ru/",
+//	  "short_url": "http://localhost:8080/Ytq3tY"
+//	},
+//	...
+//
+// ]
 func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)

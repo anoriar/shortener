@@ -24,8 +24,10 @@ func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger)
 	}
 }
 
-// GetURL Получает URL из БД по-короткому URL. Затем возвращает в заголовке Location с 307 редиректом
+// GetURL получает URL из БД по короткому URL и осуществляет редирект по нему
+//
 // На вход в URLе приходит сокращенный URL: JRU9a8
+// На выход: 307 редирект с сокращенной версией URL в заголовке Location
 func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "text/plain")
 

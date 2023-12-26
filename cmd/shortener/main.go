@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
+	"os"
 
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
@@ -27,14 +28,14 @@ func run() {
 		panic(err)
 	}
 
-	runProfiler(conf)
-
 	logger, err := logger.Initialize(conf.LogLevel)
 	if err != nil {
 		panic(err)
 	}
 
 	defer logger.Sync()
+
+	runProfiler(conf, logger)
 
 	urlRepository, err := url.InitializeURLRepository(conf, logger)
 	if err != nil {
@@ -46,23 +47,24 @@ func run() {
 
 	if err != nil {
 		logger.Fatal("init error", zap.String("error", err.Error()))
-		panic(err)
+		os.Exit(1)
 	}
 
 	err = http.ListenAndServe(conf.Host, r.Route())
 	if err != nil {
 		logger.Fatal("Server exception", zap.String("exception", err.Error()))
-		panic(err)
+		os.Exit(1)
 	}
 }
 
-func runProfiler(cnf *config.Config) {
+func runProfiler(cnf *config.Config, logger *zap.Logger) {
 	if cnf.ProfilerHost != "" {
 		go func() {
 			fmt.Println("Starting pprof server at " + cnf.Host)
 			err := http.ListenAndServe(cnf.ProfilerHost, nil)
 			if err != nil {
-				panic(err)
+				logger.Fatal("internal server error", zap.String("error", err.Error()))
+				os.Exit(1)
 			}
 		}()
 	}
