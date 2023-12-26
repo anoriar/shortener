@@ -30,11 +30,12 @@ func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.Delet
 //
 // На вход принимает массив сокращенных версий URL, созданных пользователем:
 // [
-//    "6qxTVvsy",
-//    "RTfd56hn",
-//    "Jlfd67ds"
+//
+//	"6qxTVvsy",
+//	"RTfd56hn",
+//	"Jlfd67ds"
+//
 // ]
-
 func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)

@@ -54,15 +54,16 @@ func NewAddHandler(
 // - Прикрепляет сохраненный URL к пользователю.
 //
 // На вход приходит:
+//
 //	{
 //	   "url": "https://www.google1.ru/"
 //	}
 //
 // На выходе - готовая ссылка для редиректа:
+//
 //	{
 //	   "result": "http://localhost:8080/HnsSMA"
 //	}
-
 func (handler AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
