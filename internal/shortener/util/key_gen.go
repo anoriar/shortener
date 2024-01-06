@@ -1,26 +1,20 @@
 package util
 
 import (
-	"math/rand"
-	"time"
+	"github.com/google/uuid"
 )
 
+// KeyGen missing godoc.
 type KeyGen struct {
 }
 
+// NewKeyGen missing godoc.
 func NewKeyGen() *KeyGen {
 	return &KeyGen{}
 }
 
-const Charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-const KeyLength = 6
-
+// Generate missing godoc.
 func (k *KeyGen) Generate() string {
 
-	rand.Seed(time.Now().UnixNano())
-	shortKey := make([]byte, KeyLength)
-	for i := range shortKey {
-		shortKey[i] = Charset[rand.Intn(len(Charset))]
-	}
-	return string(shortKey)
+	return uuid.NewString()
 }

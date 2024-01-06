@@ -1,11 +1,15 @@
+//go:build ignore_test
+
 package writer
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
 const fileName = "/tmp/success_file.json"

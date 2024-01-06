@@ -4,27 +4,32 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
+
+	"github.com/google/uuid"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/auth"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/user"
 	v1 "github.com/anoriar/shortener/internal/shortener/services/auth"
-	"github.com/google/uuid"
-	"net/http"
 )
 
 const cookieName = "token"
 const cookieAge = 3600
 
+// AuthMiddleware missing godoc.
 type AuthMiddleware struct {
 	signService    *v1.SignService
 	userRepository user.UserRepositoryInterface
 }
 
+// NewAuthMiddleware missing godoc.
 func NewAuthMiddleware(signService *v1.SignService, userRepository user.UserRepositoryInterface) *AuthMiddleware {
 	return &AuthMiddleware{signService: signService, userRepository: userRepository}
 }
 
+// Auth missing godoc.
 func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		ctx := request.Context()

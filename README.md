@@ -80,6 +80,64 @@ SERVER_PORT=$(shuf -i 1024-49151 -n 1); ./shortenertestbeta -test.v -test.run=^T
 Ссылка  на скачивание бинарника https://github.com/Yandex-Practicum/go-autotests/releases/tag/v0.9.16
 Для ubuntu - statictest
 2. Поместить в корень проекта. Дать права 777
-3. go vet -vettool=/home/loginarea/GolangProjects/shortener/statictest ./...
+3. go vet -vettool=./statictest ./...
 
-test
+## Profiling
+
+Как профилировать:
+
+go tool pprof -http=":9090" -seconds=30 http://127.0.0.1:8081/debug/pprof/heap
+
+За эти 30 секунд создать нагрузку
+
+Смотреть отчет на 9090 порту
+
+С созданием файла:
+
+Создать профиль base.pprof
+
+curl http://127.0.0.1:8081/debug/pprof/heap > ./profiles/base.pprof
+
+Зайти в анализатор через:
+
+go tool pprof -http=":9090" profiles/base.pprof
+
+После оптимизации проделать тоже самое для результируюещего файла result.pprof
+
+Сравнить результаты
+
+pprof -top -diff_base=profiles/base.pprof profiles/result.pprof
+
+## Benchmarks
+Создать профили для бенчмарка
+
+В папке cmd/benchmark
+
+go test -bench=. -cpuprofile=cpu.out -memprofile=mem.out
+
+Проанализировать
+
+go tool pprof -http=":9090" benchmark.test mem.out
+
+После оптимизации go test -bench=. -cpuprofile=result-cpu.out -memprofile=result-mem.out
+
+Сравнить 
+
+go tool pprof -top -diff_base=mem.out result-mem.out
+
+
+# Убрать лишние импорты + gofmt
+goimports -local github.com/anoriar/shortener -w ./
+
+## Godoc
+
+godoc -http=:8080
+
+Перейти на 
+http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
+
+# Генерация заглушек godoc (для прохождения 18 теста)
+
+Команда godoc-generate
+
+Либа go install github.com/DimitarPetrov/godoc-generate@latest

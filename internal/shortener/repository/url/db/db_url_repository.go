@@ -5,31 +5,38 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/anoriar/shortener/internal/shortener/dto/repository"
-	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
+	"strings"
+
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"go.uber.org/zap"
-	"strings"
+
+	"github.com/anoriar/shortener/internal/shortener/dto/repository"
+	"github.com/anoriar/shortener/internal/shortener/entity"
+	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 )
 
+// ErrSliceCanNotBeEmpty missing godoc.
 var ErrSliceCanNotBeEmpty = errors.New("slice can not be empty")
 
+// DatabaseURLRepository missing godoc.
 type DatabaseURLRepository struct {
 	db     *sql.DB
 	logger *zap.Logger
 }
 
+// NewDBURLRepository missing godoc.
 func NewDBURLRepository(db *sql.DB, logger *zap.Logger) *DatabaseURLRepository {
 	return &DatabaseURLRepository{db: db, logger: logger}
 }
 
+// Ping missing godoc.
 func (repository *DatabaseURLRepository) Ping(ctx context.Context) error {
 	err := repository.db.PingContext(ctx)
 	return err
 }
 
+// AddURL missing godoc.
 func (repository *DatabaseURLRepository) AddURL(url *entity.URL) error {
 	_, err := repository.db.Exec("INSERT INTO urls (uuid, short_url, original_url) VALUES ($1, $2, $3);", url.UUID, url.ShortURL, url.OriginalURL)
 	if err != nil {
@@ -43,6 +50,7 @@ func (repository *DatabaseURLRepository) AddURL(url *entity.URL) error {
 	return nil
 }
 
+// FindURLByShortURL missing godoc.
 func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*entity.URL, error) {
 	rows, err := repository.db.Query("SELECT uuid, short_url, original_url, is_deleted FROM urls WHERE short_url = $1 LIMIT 1", shortURL)
 	if err != nil {
@@ -73,6 +81,7 @@ func (repository *DatabaseURLRepository) FindURLByShortURL(shortURL string) (*en
 	return &url, err
 }
 
+// FindURLByOriginalURL missing godoc.
 func (repository *DatabaseURLRepository) FindURLByOriginalURL(ctx context.Context, originalURL string) (*entity.URL, error) {
 	row := repository.db.QueryRowContext(ctx, "SELECT uuid, short_url, original_url, is_deleted FROM urls WHERE original_url = $1 LIMIT 1", originalURL)
 	var url entity.URL
@@ -85,6 +94,7 @@ func (repository *DatabaseURLRepository) FindURLByOriginalURL(ctx context.Contex
 	return &url, nil
 }
 
+// GetURLsByQuery missing godoc.
 func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error) {
 	var resultUrls []entity.URL
 
@@ -117,7 +127,6 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 		queryString += " WHERE " + filterString
 	}
 
-	//#MENTOR: вот эта штука супернеочевидная. нужно именно тип interface, string не подходит
 	params := make([]interface{}, len(filterParams))
 	for i, filterParam := range filterParams {
 		params[i] = filterParam
@@ -147,6 +156,7 @@ func (repository *DatabaseURLRepository) GetURLsByQuery(ctx context.Context, url
 	return resultUrls, nil
 }
 
+// AddURLBatch missing godoc.
 func (repository *DatabaseURLRepository) AddURLBatch(ctx context.Context, urls []entity.URL) error {
 	tx, err := repository.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -179,6 +189,7 @@ func (repository *DatabaseURLRepository) AddURLBatch(ctx context.Context, urls [
 	return nil
 }
 
+// DeleteURLBatch missing godoc.
 func (repository *DatabaseURLRepository) DeleteURLBatch(ctx context.Context, shortURLs []string) error {
 	tx, err := repository.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -211,6 +222,7 @@ func (repository *DatabaseURLRepository) DeleteURLBatch(ctx context.Context, sho
 	return nil
 }
 
+// UpdateIsDeletedBatch missing godoc.
 func (repository *DatabaseURLRepository) UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error {
 	if len(shortURLs) == 0 {
 		return ErrSliceCanNotBeEmpty
@@ -236,6 +248,7 @@ func (repository *DatabaseURLRepository) UpdateIsDeletedBatch(ctx context.Contex
 	return nil
 }
 
+// Close missing godoc.
 func (repository *DatabaseURLRepository) Close() error {
 	err := repository.db.Close()
 	if err != nil {

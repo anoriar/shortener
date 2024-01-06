@@ -2,16 +2,18 @@ package geturlhandler
 
 import (
 	"errors"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 const successRedirectLocation = "https://github.com"

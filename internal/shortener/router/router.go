@@ -1,6 +1,8 @@
 package router
 
 import (
+	"github.com/go-chi/chi/v5"
+
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/ping"
@@ -12,9 +14,9 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/middleware/auth"
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
-	"github.com/go-chi/chi/v5"
 )
 
+// Router missing godoc.
 type Router struct {
 	addHandler            *addurlhandler.AddHandler
 	getHandler            *geturlhandler.GetHandler
@@ -29,6 +31,7 @@ type Router struct {
 	authMiddleware        *auth.AuthMiddleware
 }
 
+// NewRouter missing godoc.
 func NewRouter(
 	addHandler *addurlhandler.AddHandler,
 	getHandler *geturlhandler.GetHandler,
@@ -57,6 +60,7 @@ func NewRouter(
 	}
 }
 
+// Route missing godoc.
 func (r *Router) Route() chi.Router {
 	router := chi.NewRouter()
 

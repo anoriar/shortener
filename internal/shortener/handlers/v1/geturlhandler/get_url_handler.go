@@ -1,17 +1,22 @@
+// Package geturlhandler Редирект на URL
 package geturlhandler
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
-	"go.uber.org/zap"
 	"net/http"
 	"strings"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
+// GetHandler Обработчик редиректа по короткому URLу
 type GetHandler struct {
 	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
 }
 
+// NewGetHandler missing godoc.
 func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *GetHandler {
 	return &GetHandler{
 		urlRepository: urlRepository,
@@ -19,6 +24,10 @@ func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger)
 	}
 }
 
+// GetURL получает URL из БД по короткому URL и осуществляет редирект по нему
+//
+// На вход в URLе приходит сокращенный URL: JRU9a8
+// На выход: 307 редирект с сокращенной версией URL в заголовке Location
 func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "text/plain")
 

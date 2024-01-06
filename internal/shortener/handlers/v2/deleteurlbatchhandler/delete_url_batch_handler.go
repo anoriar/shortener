@@ -1,22 +1,36 @@
+// Package deleteurlbatchhandler Удаление URL пачкой
 package deleteurlbatchhandler
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/repository/url"
 )
 
+// DeleteURLBatchHandler Обработчик удаления URL пачкой
 type DeleteURLBatchHandler struct {
 	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
 }
 
+// NewDeleteURLBatchHandler missing godoc.
 func NewDeleteURLBatchHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *DeleteURLBatchHandler {
 	return &DeleteURLBatchHandler{urlRepository: urlRepository, logger: logger}
 }
 
+// DeleteURLBatch удаляет несколько URL.
+// На вход принимает сокращенные версии URL:
+// [
+//
+//	"g95W3D",
+//	"L7ibuA",
+//	"TnZWBr"
+//
+// ]
 func (handler *DeleteURLBatchHandler) DeleteURLBatch(w http.ResponseWriter, req *http.Request) {
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {

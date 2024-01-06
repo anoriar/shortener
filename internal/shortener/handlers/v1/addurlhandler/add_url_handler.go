@@ -1,20 +1,24 @@
+// Package addurlhandler Добавление URL V1
 package addurlhandler
 
 import (
 	"errors"
+	"io"
+	"net/http"
+	neturl "net/url"
+
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-	"io"
-	"net/http"
-	neturl "net/url"
 )
 
+// AddHandler Обработчик добавления нового URL
 type AddHandler struct {
 	urlRepository     url.URLRepositoryInterface
 	userService       user.UserServiceInterface
@@ -23,6 +27,7 @@ type AddHandler struct {
 	baseURL           string
 }
 
+// NewAddHandler missing godoc.
 func NewAddHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService user.UserServiceInterface,
@@ -39,6 +44,17 @@ func NewAddHandler(
 	}
 }
 
+// AddURL добавляет новый URL.
+// Алгоритм работы:
+// - Генерирует для URL его короткую версию.
+// - Сохраняет в базу URL.
+// - Прикрепляет сохраненный URL к пользователю.
+//
+// На вход принимает строку URL:
+// https://www.google1.ru/
+//
+// На выходе - готовая ссылка для редиректа:
+// http://localhost:8080/HnsSMA
 func (handler *AddHandler) AddURL(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)

@@ -1,17 +1,19 @@
 package e2e
 
 import (
-	"github.com/anoriar/shortener/internal/e2e/client"
-	"github.com/anoriar/shortener/internal/e2e/client/dto/request"
-	response2 "github.com/anoriar/shortener/internal/e2e/client/dto/response"
-	"github.com/anoriar/shortener/internal/e2e/config"
-	"github.com/caarlos0/env/v6"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/caarlos0/env/v6"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/anoriar/shortener/internal/e2e/client"
+	"github.com/anoriar/shortener/internal/e2e/client/dto/request"
+	response2 "github.com/anoriar/shortener/internal/e2e/client/dto/response"
+	"github.com/anoriar/shortener/internal/e2e/config"
 )
 
 const testURL = "https://github.com/"

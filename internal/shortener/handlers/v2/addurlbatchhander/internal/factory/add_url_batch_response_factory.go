@@ -6,16 +6,19 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
+// AddURLBatchResponseFactory missing godoc.
 type AddURLBatchResponseFactory struct {
 	baseURL string
 }
 
+// NewAddURLBatchResponseFactory missing godoc.
 func NewAddURLBatchResponseFactory(baseURL string) *AddURLBatchResponseFactory {
 	return &AddURLBatchResponseFactory{baseURL: baseURL}
 }
 
+// CreateResponse missing godoc.
 func (factory *AddURLBatchResponseFactory) CreateResponse(urlsMap map[string]entity.URL, requestURLs []request.AddURLBatchRequestDTO) []response.AddURLBatchResponseDTO {
-	var responseURLs []response.AddURLBatchResponseDTO
+	responseURLs := make([]response.AddURLBatchResponseDTO, 0, len(urlsMap))
 	for _, reqURL := range requestURLs {
 		urlEntity, exists := urlsMap[reqURL.CorrelationID]
 		if exists {

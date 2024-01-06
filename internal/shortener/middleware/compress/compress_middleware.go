@@ -1,10 +1,11 @@
 package compress
 
 import (
-	compress2 "github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/reader"
-	"github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/responsewriter"
 	"net/http"
 	"strings"
+
+	compress2 "github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/reader"
+	"github.com/anoriar/shortener/internal/shortener/middleware/compress/internal/responsewriter"
 )
 
 const (
@@ -12,13 +13,16 @@ const (
 	textHTML        = "text/html"
 )
 
+// CompressMiddleware missing godoc.
 type CompressMiddleware struct {
 }
 
+// NewCompressMiddleware missing godoc.
 func NewCompressMiddleware() *CompressMiddleware {
 	return &CompressMiddleware{}
 }
 
+// Compress missing godoc.
 func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ow := w
@@ -29,7 +33,11 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 			acceptEncoding := r.Header.Get("Accept-Encoding")
 			supportsGzip := strings.Contains(acceptEncoding, "gzip")
 			if supportsGzip {
-				cw := responsewriter.NewCompressWriter(w)
+				cw, err := responsewriter.NewKlauspostGzipCompressWriter(w)
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+				}
 				ow = cw
 				defer cw.Close()
 			}
@@ -39,7 +47,7 @@ func (cm *CompressMiddleware) Compress(h http.Handler) http.Handler {
 		contentEncoding := r.Header.Get("Content-Encoding")
 		sendsGzip := strings.Contains(contentEncoding, "gzip")
 		if sendsGzip {
-			cr, err := compress2.NewCompressReader(r.Body)
+			cr, err := compress2.NewKlauspostGzipCompressReader(r.Body)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return

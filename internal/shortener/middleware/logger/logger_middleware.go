@@ -1,20 +1,25 @@
 package logger
 
 import (
-	"github.com/anoriar/shortener/internal/shortener/middleware/logger/internal/responsewriter"
-	"go.uber.org/zap"
 	"net/http"
 	"time"
+
+	"go.uber.org/zap"
+
+	"github.com/anoriar/shortener/internal/shortener/middleware/logger/internal/responsewriter"
 )
 
+// LoggerMiddleware missing godoc.
 type LoggerMiddleware struct {
 	logger *zap.Logger
 }
 
+// NewLoggerMiddleware missing godoc.
 func NewLoggerMiddleware(logger *zap.Logger) *LoggerMiddleware {
 	return &LoggerMiddleware{logger: logger}
 }
 
+// Log missing godoc.
 func (lm *LoggerMiddleware) Log(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, request *http.Request) {
 		timeStart := time.Now()

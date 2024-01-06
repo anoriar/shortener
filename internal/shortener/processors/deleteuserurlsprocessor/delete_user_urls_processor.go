@@ -2,17 +2,21 @@ package deleteurlsprocessor
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor/message"
 	"github.com/anoriar/shortener/internal/shortener/services/deleteuserurls"
-	"go.uber.org/zap"
 )
 
+// DeleteUserURLsProcessor missing godoc.
 type DeleteUserURLsProcessor struct {
 	deleteUserURLsService deleteuserurls.DeleteUserURLsInterface
 	logger                *zap.Logger
 	msgChan               chan message.DeleteUserURLsMessage
 }
 
+// NewDeleteUserURLsProcessor missing godoc.
 func NewDeleteUserURLsProcessor(deleteUserURLsService deleteuserurls.DeleteUserURLsInterface, logger *zap.Logger) *DeleteUserURLsProcessor {
 	instance := &DeleteUserURLsProcessor{
 		deleteUserURLsService: deleteUserURLsService,
@@ -24,6 +28,7 @@ func NewDeleteUserURLsProcessor(deleteUserURLsService deleteuserurls.DeleteUserU
 	return instance
 }
 
+// AddMessage missing godoc.
 func (p *DeleteUserURLsProcessor) AddMessage(msg message.DeleteUserURLsMessage) {
 	p.msgChan <- msg
 }

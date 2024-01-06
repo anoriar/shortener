@@ -2,10 +2,12 @@ package inmemory
 
 import (
 	"errors"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestInMemoryURLRepository_AddUser(t *testing.T) {

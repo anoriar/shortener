@@ -2,12 +2,14 @@ package urlgen
 
 import (
 	"errors"
+	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
 	utilMock "github.com/anoriar/shortener/internal/shortener/util/mock"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 const expectedShortKey = "s7Fh4G"

@@ -1,6 +1,8 @@
 package router
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
@@ -21,9 +23,9 @@ import (
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
 	"github.com/anoriar/shortener/internal/shortener/util"
-	"go.uber.org/zap"
 )
 
+// InitializeRouter missing godoc.
 func InitializeRouter(cnf *config.Config, urlRepository url.URLRepositoryInterface, logger *zap.Logger) (*Router, error) {
 	userRepository := inmemory.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)

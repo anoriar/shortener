@@ -2,17 +2,21 @@ package validator
 
 import (
 	"fmt"
-	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	neturl "net/url"
+
+	"github.com/anoriar/shortener/internal/shortener/dto/request"
 )
 
+// AddURLBatchValidator missing godoc.
 type AddURLBatchValidator struct {
 }
 
+// NewAddURLBatchValidator missing godoc.
 func NewAddURLBatchValidator() *AddURLBatchValidator {
 	return &AddURLBatchValidator{}
 }
 
+// Validate missing godoc.
 func (validator *AddURLBatchValidator) Validate(urls []request.AddURLBatchRequestDTO) error {
 	if len(urls) == 0 {
 		return fmt.Errorf("array of URL must be not empty")

@@ -1,24 +1,41 @@
+// Package deleteuserurlshandler Модуль удаления URL, которые создал пользователь
 package deleteuserurlshandler
 
 import (
 	"encoding/json"
+	"io"
+	"net/http"
+
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/context"
 	deleteurlsprocessor "github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor"
 	"github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor/message"
-	"go.uber.org/zap"
-	"io"
-	"net/http"
 )
 
+// DeleteUserURLsHandler Обработчик удаления URL, которые создал пользователь
 type DeleteUserURLsHandler struct {
 	deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor
 	logger                  *zap.Logger
 }
 
+// NewDeleteUserURLsHandler missing godoc.
 func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor, logger *zap.Logger) *DeleteUserURLsHandler {
 	return &DeleteUserURLsHandler{deleteUserURLsProcessor: deleteUserURLsProcessor, logger: logger}
 }
 
+// DeleteUserURLs удаляет несколько URL, которые создал пользователь.
+// Под удалением подразумевается пометка в БД флага is_deleted=true.
+// Обработка происходит асинхронно.
+//
+// На вход принимает массив сокращенных версий URL, созданных пользователем:
+// [
+//
+//	"6qxTVvsy",
+//	"RTfd56hn",
+//	"Jlfd67ds"
+//
+// ]
 func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
@@ -41,11 +58,6 @@ func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req 
 		return
 	}
 	if userID != "" && len(shortURLs) > 0 {
-		//#MENTOR: Не понял в задании
-		// "Для максимального наполнения буфера объектов обновления используйте паттерн fanIn"
-		// С точки зрения обще проектировки: сервер создает горутины - (fan-out)
-		// Здесь засовываем все сообщения в один канал - а обрабатывается он асинхронно
-		// Может в задании что-то другое подразумевалось?
 		handler.deleteUserURLsProcessor.AddMessage(message.DeleteUserURLsMessage{
 			UserID:    userID,
 			ShortURLs: shortURLs,

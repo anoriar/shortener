@@ -1,13 +1,15 @@
 package url
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/config"
 	dbURLRepository "github.com/anoriar/shortener/internal/shortener/repository/url/db"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/file"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
-	"go.uber.org/zap"
 )
 
+// InitializeURLRepository missing godoc.
 func InitializeURLRepository(cnf *config.Config, logger *zap.Logger) (URLRepositoryInterface, error) {
 	switch {
 	case cnf.DatabaseDSN != "":

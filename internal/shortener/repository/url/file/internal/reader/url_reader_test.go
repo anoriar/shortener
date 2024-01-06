@@ -2,11 +2,13 @@ package reader
 
 import (
 	"encoding/json"
-	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/anoriar/shortener/internal/shortener/entity"
 )
 
 const (

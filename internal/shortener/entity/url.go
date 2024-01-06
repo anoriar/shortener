@@ -1,5 +1,6 @@
 package entity
 
+// URL missing godoc.
 type URL struct {
 	UUID        string `json:"uuid" db:"uuid"`
 	ShortURL    string `json:"short_url" db:"short_url"`

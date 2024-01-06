@@ -4,14 +4,17 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/repository/user"
 )
 
+// UserService missing godoc.
 type UserService struct {
 	userRepository user.UserRepositoryInterface
 }
 
+// NewUserService missing godoc.
 func NewUserService(userRepository user.UserRepositoryInterface) *UserService {
 	return &UserService{userRepository: userRepository}
 }
 
+// AddShortURLsToUser missing godoc.
 func (us *UserService) AddShortURLsToUser(userID string, shortURLs []string) error {
 	user, exists, err := us.userRepository.FindUserByID(userID)
 	if err != nil {
@@ -27,6 +30,7 @@ func (us *UserService) AddShortURLsToUser(userID string, shortURLs []string) err
 	return nil
 }
 
+// GetUserShortURLs missing godoc.
 func (us *UserService) GetUserShortURLs(userID string) ([]string, error) {
 	user, exists, err := us.userRepository.FindUserByID(userID)
 	if err != nil {

@@ -2,15 +2,18 @@ package getuserurlshandler
 
 import (
 	"encoding/json"
+	"net/http"
+
+	"go.uber.org/zap"
+
 	"github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/repository"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/getuserurlshandler/internal/factory"
 	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/services/user"
-	"go.uber.org/zap"
-	"net/http"
 )
 
+// GetUserURLsHandler missing godoc.
 type GetUserURLsHandler struct {
 	urlRepository   url.URLRepositoryInterface
 	userService     user.UserServiceInterface
@@ -18,6 +21,7 @@ type GetUserURLsHandler struct {
 	logger          *zap.Logger
 }
 
+// NewGetUserURLsHandler missing godoc.
 func NewGetUserURLsHandler(
 	urlRepository url.URLRepositoryInterface,
 	userService user.UserServiceInterface,
@@ -32,6 +36,17 @@ func NewGetUserURLsHandler(
 	}
 }
 
+// GetUserURLs получает URL, которые создал пользователь
+// Формат выходных данных:
+// [
+//
+//	{
+//	  "original_url": "https://www.google1.ru/",
+//	  "short_url": "http://localhost:8080/Ytq3tY"
+//	},
+//	...
+//
+// ]
 func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.Request) {
 	userID := ""
 	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
@@ -54,7 +69,7 @@ func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.
 	}
 
 	if len(shortURLs) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
@@ -69,7 +84,7 @@ func (handler *GetUserURLsHandler) GetUserURLs(w http.ResponseWriter, req *http.
 	}
 
 	if len(resultURLs) == 0 {
-		w.WriteHeader(http.StatusNoContent)
+		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 

@@ -7,8 +7,9 @@ package mock
 import (
 	reflect "reflect"
 
-	entity "github.com/anoriar/shortener/internal/shortener/entity"
 	gomock "github.com/golang/mock/gomock"
+
+	entity "github.com/anoriar/shortener/internal/shortener/entity"
 )
 
 // MockUserRepositoryInterface is a mock of UserRepositoryInterface interface.

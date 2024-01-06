@@ -1,6 +1,6 @@
 module github.com/anoriar/shortener
 
-go 1.19
+go 1.21
 
 require (
 	github.com/caarlos0/env/v6 v6.10.1
@@ -10,6 +10,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/jackc/pgerrcode v0.0.0-20220416144525-469b46aa5efa
 	github.com/jackc/pgx/v5 v5.4.3
+	github.com/klauspost/compress v1.17.4
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.26.0
 )
