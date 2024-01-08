@@ -141,3 +141,9 @@ http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
 Команда godoc-generate
 
 Либа go install github.com/DimitarPetrov/godoc-generate@latest
+
+# Кастомный линтер (статический анализатор)
+См файл cmd/staticlint/main.go
+сгенерировать бинарник (go generate)
+
+Команда go vet -vettool=./bin/staticlint ./...

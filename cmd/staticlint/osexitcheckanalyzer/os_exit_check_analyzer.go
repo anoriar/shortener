@@ -1,8 +1,9 @@
-// Package osexitchecker Запрещает использовать прямой вызов os.Exit в функции main пакета main
+// Package osexitcheckanalyzer Запрещает использовать прямой вызов os.Exit в функции main пакета main
 package osexitcheckanalyzer
 
 import (
 	"go/ast"
+
 	"golang.org/x/tools/go/analysis"
 )
 
