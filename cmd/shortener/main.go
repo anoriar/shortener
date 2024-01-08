@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
 
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
@@ -16,21 +16,17 @@ import (
 )
 
 func main() {
-	run()
-}
-
-func run() {
 	conf := config.NewConfig()
 	parseFlags(conf)
 
 	err := env.Parse(conf)
 	if err != nil {
-		panic(err)
+		log.Fatalf("parse config error %v", err.Error())
 	}
 
 	logger, err := logger.Initialize(conf.LogLevel)
 	if err != nil {
-		panic(err)
+		log.Fatalf("init logger error %v", err.Error())
 	}
 
 	defer logger.Sync()
@@ -39,21 +35,19 @@ func run() {
 
 	urlRepository, err := url.InitializeURLRepository(conf, logger)
 	if err != nil {
-		panic(err)
+		log.Fatalf("init repository error %v", err.Error())
 	}
 	defer urlRepository.Close()
 
 	r, err := router.InitializeRouter(conf, urlRepository, logger)
 
 	if err != nil {
-		logger.Fatal("init error", zap.String("error", err.Error()))
-		os.Exit(1)
+		log.Fatalf("init router error %v", err.Error())
 	}
 
 	err = http.ListenAndServe(conf.Host, r.Route())
 	if err != nil {
-		logger.Fatal("Server exception", zap.String("exception", err.Error()))
-		os.Exit(1)
+		log.Fatalf("server error %v", err.Error())
 	}
 }
 
@@ -63,8 +57,7 @@ func runProfiler(cnf *config.Config, logger *zap.Logger) {
 			fmt.Println("Starting pprof server at " + cnf.Host)
 			err := http.ListenAndServe(cnf.ProfilerHost, nil)
 			if err != nil {
-				logger.Fatal("internal server error", zap.String("error", err.Error()))
-				os.Exit(1)
+				log.Fatalf("profiler server error %v", err.Error())
 			}
 		}()
 	}
