@@ -39,6 +39,9 @@ git fetch template && git checkout template/main .github
 2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/shortener```
 3. ENVIRONMENT скопировать из ```.env.server-example```
 
+# Компиляция проекта с версией, датой и коммитом
+В папке cmd/shortener
+go build -ldflags="-X main.buildVersion=1.0.0 -X main.buildDate=$(date -u '+%Y-%m-%dT%H:%M:%S') -X main.buildCommit=abc123" .
 
 ## Запуск e2e теста:
 
