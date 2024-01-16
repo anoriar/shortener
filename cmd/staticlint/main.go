@@ -3,6 +3,8 @@ package main
 import (
 	"strings"
 
+	"github.com/anoriar/shortener/pkg/osexitcheckanalyzer"
+
 	"github.com/jingyugao/rowserrcheck/passes/rowserr"
 	"github.com/kkHAIKE/contextcheck"
 	"golang.org/x/tools/go/analysis"
@@ -35,8 +37,6 @@ import (
 	"golang.org/x/tools/go/analysis/passes/unusedresult"
 	"golang.org/x/tools/go/analysis/passes/unusedwrite"
 	"honnef.co/go/tools/staticcheck"
-
-	"github.com/anoriar/shortener/cmd/staticlint/osexitcheckanalyzer"
 )
 
 var includedStaticChecks = map[string]struct{}{
