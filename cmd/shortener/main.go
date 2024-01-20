@@ -6,6 +6,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
+	"github.com/anoriar/shortener/internal/shortener/util/tls"
+
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
 
@@ -53,7 +55,19 @@ func main() {
 		log.Fatalf("init router error %v", err.Error())
 	}
 
-	err = http.ListenAndServe(conf.Host, r.Route())
+	runServer(conf, r)
+
+}
+
+func runServer(conf *config.Config, r *router.Router) {
+	var err error
+	if conf.EnableHttps {
+		tls.GenerateTLSCert()
+		err = http.ListenAndServeTLS(conf.Host, tls.CertFilePath, tls.PrivateKeyFilePath, r.Route())
+	} else {
+		err = http.ListenAndServe(conf.Host, r.Route())
+	}
+
 	if err != nil {
 		log.Fatalf("server error %v", err.Error())
 	}
