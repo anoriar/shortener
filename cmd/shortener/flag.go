@@ -13,7 +13,7 @@ func parseFlags(config *config.Config) {
 	flag.StringVar(&config.DatabaseDSN, "d", "", "Database DSN")
 	flag.StringVar(&config.AuthSecretKey, "ask", "secret-key", "Auth secret key")
 	flag.StringVar(&config.ProfilerHost, "profiler", "", "Profiler host")
-	flag.BoolVar(&config.EnableHttps, "s", false, "Enable https")
+	flag.BoolVar(&config.EnableHTTPS, "s", false, "Enable https")
 
 	flag.Parse()
 }

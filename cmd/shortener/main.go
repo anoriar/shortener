@@ -61,7 +61,7 @@ func main() {
 
 func runServer(conf *config.Config, r *router.Router) {
 	var err error
-	if conf.EnableHttps {
+	if conf.EnableHTTPS {
 		tls.GenerateTLSCert()
 		err = http.ListenAndServeTLS(conf.Host, tls.CertFilePath, tls.PrivateKeyFilePath, r.Route())
 	} else {
