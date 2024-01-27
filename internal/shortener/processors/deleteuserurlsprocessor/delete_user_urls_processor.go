@@ -48,6 +48,8 @@ func (p *DeleteUserURLsProcessor) Start(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			p.logger.Info("Delete user URLs task: cancel")
+			//#MENTOR: Возможно здесь стоит сделать получение всех оставшихся сообщений из канала и их обработку
+			// Как это можно реализовать? Сделал через sync.WaitGroup в этом классе
 			p.wg.Wait()
 			close(p.msgChan)
 			return
