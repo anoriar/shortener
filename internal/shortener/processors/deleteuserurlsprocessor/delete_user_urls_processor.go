@@ -64,11 +64,11 @@ func (p *DeleteUserURLsProcessor) Start(ctx context.Context) {
 }
 
 func (p *DeleteUserURLsProcessor) process(ctx context.Context, msg message.DeleteUserURLsMessage) {
-	msgJson, err := json.Marshal(msg)
+	msgJSON, err := json.Marshal(msg)
 	if err != nil {
 		p.logger.Error("Delete user URLs task: json marshal error", zap.String("error", err.Error()))
 	}
-	p.logger.Info("Delete user URLs task: received message:", zap.String("msg", string(msgJson)))
+	p.logger.Info("Delete user URLs task: received message:", zap.String("msg", string(msgJSON)))
 
 	err = p.deleteUserURLsService.DeleteUserURLs(ctx, msg.UserID, msg.ShortURLs)
 	if err != nil {

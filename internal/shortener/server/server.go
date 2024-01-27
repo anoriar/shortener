@@ -76,7 +76,7 @@ func createServer(conf *config.Config, r *router.Router) (*http.Server, error) {
 		tlscert.GenerateTLSCert()
 		cert, err := tls.LoadX509KeyPair(tlscert.CertFilePath, tlscert.PrivateKeyFilePath)
 		if err != nil {
-			return nil, fmt.Errorf("Error loading certificate and key: %v\n", err)
+			return nil, fmt.Errorf("error loading certificate and key: %v", err)
 		}
 
 		tlsConfig := &tls.Config{
