@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	// CertDir missing godoc.
 	certDir = "tls"
 	// CertFilePath missing godoc.
 	CertFilePath = certDir + "/cert.crt"
