@@ -6,6 +6,8 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
+	"github.com/anoriar/shortener/internal/shortener/config/file"
+
 	"github.com/anoriar/shortener/internal/shortener/util/tls"
 
 	"github.com/caarlos0/env/v6"
@@ -26,12 +28,9 @@ func main() {
 	fmt.Printf("Build date: %s\n", buildDate)
 	fmt.Printf("Build commit: %s\n", buildCommit)
 
-	conf := config.NewConfig()
-	parseFlags(conf)
-
-	err := env.Parse(conf)
+	conf, err := createConfig()
 	if err != nil {
-		log.Fatalf("parse config error %v", err.Error())
+		log.Fatalf("create config error %v", err.Error())
 	}
 
 	logger, err := logger.Initialize(conf.LogLevel)
@@ -57,6 +56,23 @@ func main() {
 
 	runServer(conf, r)
 
+}
+
+func createConfig() (*config.Config, error) {
+	conf := config.NewConfig()
+	parseFlags(conf)
+
+	err := env.Parse(conf)
+	if err != nil {
+		return nil, fmt.Errorf("parse env error: %v", err)
+	}
+
+	err = file.LoadAndMergeConfig(conf)
+	if err != nil {
+		return nil, fmt.Errorf("parse config from file error: %v", err)
+	}
+
+	return conf, nil
 }
 
 func runServer(conf *config.Config, r *router.Router) {

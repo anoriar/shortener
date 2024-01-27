@@ -14,6 +14,7 @@ func parseFlags(config *config.Config) {
 	flag.StringVar(&config.AuthSecretKey, "ask", "secret-key", "Auth secret key")
 	flag.StringVar(&config.ProfilerHost, "profiler", "", "Profiler host")
 	flag.BoolVar(&config.EnableHTTPS, "s", false, "Enable https")
+	flag.StringVar(&config.Config, "c", "", "Config from file")
 
 	flag.Parse()
 }

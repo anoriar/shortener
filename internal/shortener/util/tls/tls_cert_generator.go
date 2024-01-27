@@ -16,11 +16,14 @@ import (
 )
 
 const (
-	certDir            = "tls"
-	CertFilePath       = certDir + "/cert.crt"
+	certDir = "tls"
+	// CertFilePath missing godoc.
+	CertFilePath = certDir + "/cert.crt"
+	// PrivateKeyFilePath missing godoc.
 	PrivateKeyFilePath = certDir + "/key.pem"
 )
 
+// GenerateTLSCert missing godoc.
 func GenerateTLSCert() {
 	cert := &x509.Certificate{
 		// указываем уникальный номер сертификата
