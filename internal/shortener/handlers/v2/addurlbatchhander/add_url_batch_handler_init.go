@@ -13,7 +13,7 @@ import (
 // InitializeAddURLBatchHandler missing godoc.
 func InitializeAddURLBatchHandler(
 	urlRepository url.URLRepositoryInterface,
-	userService *user.UserService,
+	userService user.UserServiceInterface,
 	keyGen util.KeyGenInterface,
 	logger *zap.Logger,
 	baseURL string,

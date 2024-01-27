@@ -6,16 +6,15 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
+	appPkg "github.com/anoriar/shortener/internal/app"
 	"github.com/anoriar/shortener/internal/shortener/config/file"
-
-	"github.com/anoriar/shortener/internal/shortener/util/tls"
+	"github.com/anoriar/shortener/internal/shortener/server"
 
 	"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
 
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/logger"
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
 	"github.com/anoriar/shortener/internal/shortener/router"
 )
 
@@ -42,19 +41,17 @@ func main() {
 
 	runProfiler(conf, logger)
 
-	urlRepository, err := url.InitializeURLRepository(conf, logger)
+	app, err := appPkg.NewApp(conf, logger)
 	if err != nil {
-		log.Fatalf("init repository error %v", err.Error())
+		log.Fatalf("init app error %v", err.Error())
 	}
-	defer urlRepository.Close()
 
-	r, err := router.InitializeRouter(conf, urlRepository, logger)
+	r := router.InitializeRouter(app)
 
+	err = server.RunServer(app, r)
 	if err != nil {
 		log.Fatalf("init router error %v", err.Error())
 	}
-
-	runServer(conf, r)
 
 }
 
@@ -73,20 +70,6 @@ func createConfig() (*config.Config, error) {
 	}
 
 	return conf, nil
-}
-
-func runServer(conf *config.Config, r *router.Router) {
-	var err error
-	if conf.EnableHTTPS {
-		tls.GenerateTLSCert()
-		err = http.ListenAndServeTLS(conf.Host, tls.CertFilePath, tls.PrivateKeyFilePath, r.Route())
-	} else {
-		err = http.ListenAndServe(conf.Host, r.Route())
-	}
-
-	if err != nil {
-		log.Fatalf("server error %v", err.Error())
-	}
 }
 
 func runProfiler(cnf *config.Config, logger *zap.Logger) {

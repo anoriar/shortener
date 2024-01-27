@@ -1,4 +1,4 @@
-package tls
+package tlscert
 
 import (
 	"bufio"
