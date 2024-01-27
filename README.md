@@ -49,8 +49,6 @@ go build -ldflags="-X main.buildVersion=1.0.0 -X main.buildDate=$(date -u '+%Y-%
 2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/e2e```
 3. ENVIRONMENT скопировать из ```.env.e2e-example```
 
-
-
 ## Запуск автотестов локально
 Подготовка:
 1 Скачать тест и положить в корень проекта
@@ -150,3 +148,17 @@ http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
 сгенерировать бинарник (go generate)
 
 Команда go vet -vettool=./bin/staticlint ./...
+
+# Конфиги:
+Могут загружаться через флаги, переменные окружения и json файл конфигурации
+Чтобы подключить файл конфигурации: надо в переменной окружения CONFIG проставить путь к файлу
+формат файла:
+````
+{
+    "server_address": "localhost:8080",
+    "base_url": "http://localhost",
+    "file_storage_path": "/path/to/file.db",
+    "database_dsn": "",
+    "enable_https": true
+}
+````
