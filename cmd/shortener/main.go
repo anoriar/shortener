@@ -7,10 +7,10 @@ import (
 	_ "net/http/pprof"
 
 	appPkg "github.com/anoriar/shortener/internal/app"
-	"github.com/anoriar/shortener/internal/shortener/config/file"
+	//"github.com/anoriar/shortener/internal/shortener/config/file"
 	"github.com/anoriar/shortener/internal/shortener/server"
 
-	"github.com/caarlos0/env/v6"
+	//"github.com/caarlos0/env/v6"
 	"go.uber.org/zap"
 
 	"github.com/anoriar/shortener/internal/shortener/config"
@@ -27,7 +27,7 @@ func main() {
 	fmt.Printf("Build date: %s\n", buildDate)
 	fmt.Printf("Build commit: %s\n", buildCommit)
 
-	conf, err := createConfig()
+	conf, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("create config error %v", err.Error())
 	}
@@ -53,23 +53,6 @@ func main() {
 		log.Fatalf("init router error %v", err.Error())
 	}
 
-}
-
-func createConfig() (*config.Config, error) {
-	conf := config.NewConfig()
-	parseFlags(conf)
-
-	err := env.Parse(conf)
-	if err != nil {
-		return nil, fmt.Errorf("parse env error: %v", err)
-	}
-
-	err = file.LoadAndMergeConfig(conf)
-	if err != nil {
-		return nil, fmt.Errorf("parse config from file error: %v", err)
-	}
-
-	return conf, nil
 }
 
 func runProfiler(cnf *config.Config, logger *zap.Logger) {

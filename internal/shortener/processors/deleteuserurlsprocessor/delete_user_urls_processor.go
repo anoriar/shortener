@@ -3,7 +3,6 @@ package deleteurlsprocessor
 import (
 	"context"
 	"encoding/json"
-	"sync"
 
 	"go.uber.org/zap"
 
@@ -16,7 +15,6 @@ type DeleteUserURLsProcessor struct {
 	deleteUserURLsService deleteuserurls.DeleteUserURLsInterface
 	logger                *zap.Logger
 	msgChan               chan message.DeleteUserURLsMessage
-	wg                    sync.WaitGroup
 }
 
 // NewDeleteUserURLsProcessor missing godoc.
@@ -38,7 +36,6 @@ func (p *DeleteUserURLsProcessor) GetMessageChan() chan message.DeleteUserURLsMe
 // AddMessage missing godoc.
 func (p *DeleteUserURLsProcessor) AddMessage(msg message.DeleteUserURLsMessage) {
 	p.msgChan <- msg
-	p.wg.Add(1)
 }
 
 // Start missing godoc.
@@ -48,13 +45,9 @@ func (p *DeleteUserURLsProcessor) Start(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			p.logger.Info("Delete user URLs task: cancel")
-			//#MENTOR: Возможно здесь стоит сделать получение всех оставшихся сообщений из канала и их обработку
-			// Как это можно реализовать? Сделал через sync.WaitGroup в этом классе
-			p.wg.Wait()
 			close(p.msgChan)
 			return
 		case msg, ok := <-p.msgChan:
-			p.wg.Done()
 			if !ok {
 				p.logger.Info("Delete user URLs task: channel is closed")
 				return
