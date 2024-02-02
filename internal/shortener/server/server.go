@@ -55,11 +55,7 @@ func gracefulShutdown(srv *http.Server, app *app.App) {
 	}()
 
 	// background tasks
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		app.DeleteUserURLsProcessor.Start(ctx)
-	}()
+	app.DeleteUserURLsProcessor.Start(ctx, &wg)
 
 	wg.Wait()
 

@@ -3,6 +3,7 @@ package deleteurlsprocessor
 import (
 	"context"
 	"encoding/json"
+	"sync"
 
 	"go.uber.org/zap"
 
@@ -39,23 +40,23 @@ func (p *DeleteUserURLsProcessor) AddMessage(msg message.DeleteUserURLsMessage) 
 }
 
 // Start missing godoc.
-func (p *DeleteUserURLsProcessor) Start(ctx context.Context) {
+func (p *DeleteUserURLsProcessor) Start(ctx context.Context, wg *sync.WaitGroup) {
 
-	for {
-		select {
-		case <-ctx.Done():
-			p.logger.Info("Delete user URLs task: cancel")
-			close(p.msgChan)
-			return
-		case msg, ok := <-p.msgChan:
-			if !ok {
-				p.logger.Info("Delete user URLs task: channel is closed")
-				return
-			}
-			p.process(ctx, msg)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for msg := range p.msgChan {
+			p.process(context.Background(), msg)
 		}
-	}
+	}()
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		<-ctx.Done()
+		p.logger.Info("Delete user URLs task message channel canceled cancelled")
+		close(p.msgChan)
+	}()
 }
 
 func (p *DeleteUserURLsProcessor) process(ctx context.Context, msg message.DeleteUserURLsMessage) {
@@ -69,4 +70,6 @@ func (p *DeleteUserURLsProcessor) process(ctx context.Context, msg message.Delet
 	if err != nil {
 		p.logger.Error("Delete user URLs task: error", zap.String("error", err.Error()))
 	}
+
+	p.logger.Info("Delete user URLs task: success", zap.String("msg", string(msgJSON)))
 }
