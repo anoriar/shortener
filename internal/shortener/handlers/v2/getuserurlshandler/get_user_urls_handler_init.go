@@ -11,7 +11,7 @@ import (
 // InitializeGetUserURLsHandler missing godoc.
 func InitializeGetUserURLsHandler(
 	urlRepository url.URLRepositoryInterface,
-	userService *user.UserService,
+	userService user.UserServiceInterface,
 	logger *zap.Logger,
 	baseURL string,
 ) *GetUserURLsHandler {
