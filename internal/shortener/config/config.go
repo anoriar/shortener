@@ -11,6 +11,7 @@ type Config struct {
 	ProfilerHost    string `env:"PROFILER_HOST"`
 	EnableHTTPS     bool   `env:"ENABLE_HTTPS" json:"enable_https"`
 	Config          string `env:"CONFIG"`
+	TrustedSubnet   string `env:"TRUSTED_SUBNET"`
 }
 
 // NewConfig missing godoc.

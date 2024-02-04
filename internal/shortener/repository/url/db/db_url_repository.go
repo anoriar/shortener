@@ -248,6 +248,20 @@ func (repository *DatabaseURLRepository) UpdateIsDeletedBatch(ctx context.Contex
 	return nil
 }
 
+// GetAllURLsCount missing godoc.
+// Get all URLs count
+func (repository *DatabaseURLRepository) GetAllURLsCount(ctx context.Context) (int, error) {
+	var count int
+	err := repository.db.QueryRowContext(ctx, "SELECT count(*) FROM urls").Scan(&count)
+
+	if err != nil {
+		repository.logger.Error(err.Error())
+		return 0, fmt.Errorf("GetAllURLsCount error: %v", err)
+	}
+
+	return count, nil
+}
+
 // Close missing godoc.
 func (repository *DatabaseURLRepository) Close() error {
 	err := repository.db.Close()

@@ -30,4 +30,6 @@ type URLRepositoryInterface interface {
 	GetURLsByQuery(ctx context.Context, urlQuery repository.Query) ([]entity.URL, error)
 	// UpdateIsDeletedBatch Проставление флага is_deleted у нескольких URL
 	UpdateIsDeletedBatch(ctx context.Context, shortURLs []string, isDeleted bool) error
+	// GetAllURLsCount Получение количества URL
+	GetAllURLsCount(ctx context.Context) (int, error)
 }

@@ -1,6 +1,8 @@
 package inmemory
 
 import (
+	"context"
+
 	"github.com/anoriar/shortener/internal/shortener/entity"
 	"github.com/anoriar/shortener/internal/shortener/repository/repositoryerror"
 )
@@ -42,4 +44,9 @@ func (repository InMemoryUserRepository) FindUserByID(userID string) (entity.Use
 		return entity.User{}, false, nil
 	}
 	return user, true, nil
+}
+
+// GetAllUsersCount missing godoc.
+func (repository InMemoryUserRepository) GetAllUsersCount(ctx context.Context) (int, error) {
+	return len(repository.users), nil
 }

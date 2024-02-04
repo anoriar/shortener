@@ -1,7 +1,11 @@
 // Package user Пакет работы с хранилищем пользователей
 package user
 
-import "github.com/anoriar/shortener/internal/shortener/entity"
+import (
+	"context"
+
+	"github.com/anoriar/shortener/internal/shortener/entity"
+)
 
 // UserRepositoryInterface Интерфейс работы с хранилищем пользователей
 //
@@ -13,4 +17,6 @@ type UserRepositoryInterface interface {
 	UpdateUser(user entity.User) error
 	// FindUserByID Получение пользователя по ID
 	FindUserByID(userID string) (entity.User, bool, error)
+	// GetAllUsersCount Получение количества пользователей
+	GetAllUsersCount(ctx context.Context) (int, error)
 }

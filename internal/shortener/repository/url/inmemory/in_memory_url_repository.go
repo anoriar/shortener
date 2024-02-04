@@ -110,6 +110,11 @@ func (repository *InMemoryURLRepository) UpdateIsDeletedBatch(ctx context.Contex
 	return nil
 }
 
+// GetAllURLsCount missing godoc.
+func (repository *InMemoryURLRepository) GetAllURLsCount(ctx context.Context) (int, error) {
+	return len(repository.urls), nil
+}
+
 // Close missing godoc.
 func (repository *InMemoryURLRepository) Close() error {
 	return nil
