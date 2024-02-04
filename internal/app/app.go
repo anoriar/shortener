@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 
+	"github.com/anoriar/shortener/internal/shortener/services/stats"
+
 	"go.uber.org/zap"
 
 	"github.com/anoriar/shortener/internal/shortener/config"
@@ -23,6 +25,7 @@ type App struct {
 	URLRepository           url.URLRepositoryInterface
 	DeleteUserURLsService   *deleteuserurls.DeleteUserURLsService
 	DeleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor
+	StatsService            stats.StatsServiceInterface
 }
 
 // NewApp missing godoc.
@@ -35,6 +38,8 @@ func NewApp(cnf *config.Config, logger *zap.Logger) (*App, error) {
 	userService := userServicePkg.NewUserService(userRepository)
 	deleteUserURLsService := deleteuserurls.NewDeleteUserURLsService(urlRepository, userRepository)
 	deleteUserURLsProcessor := deleteurlsprocessor.NewDeleteUserURLsProcessor(deleteUserURLsService, logger)
+
+	statsService := stats.NewStatsService(urlRepository, userRepository)
 	return &App{
 		Config:                  cnf,
 		Logger:                  logger,
@@ -43,5 +48,6 @@ func NewApp(cnf *config.Config, logger *zap.Logger) (*App, error) {
 		URLRepository:           urlRepository,
 		DeleteUserURLsService:   deleteUserURLsService,
 		DeleteUserURLsProcessor: deleteUserURLsProcessor,
+		StatsService:            statsService,
 	}, nil
 }

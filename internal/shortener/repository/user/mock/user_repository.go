@@ -5,6 +5,7 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,7 +37,7 @@ func (m *MockUserRepositoryInterface) EXPECT() *MockUserRepositoryInterfaceMockR
 }
 
 // AddUser mocks base method.
-func (m *MockUserRepositoryInterface) AddUser(user *entity.User) error {
+func (m *MockUserRepositoryInterface) AddUser(user entity.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddUser", user)
 	ret0, _ := ret[0].(error)
@@ -50,12 +51,13 @@ func (mr *MockUserRepositoryInterfaceMockRecorder) AddUser(user interface{}) *go
 }
 
 // FindUserByID mocks base method.
-func (m *MockUserRepositoryInterface) FindUserByID(userID string) (*entity.User, error) {
+func (m *MockUserRepositoryInterface) FindUserByID(userID string) (entity.User, bool, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindUserByID", userID)
-	ret0, _ := ret[0].(*entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(entity.User)
+	ret1, _ := ret[1].(bool)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // FindUserByID indicates an expected call of FindUserByID.
@@ -64,8 +66,23 @@ func (mr *MockUserRepositoryInterfaceMockRecorder) FindUserByID(userID interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserByID", reflect.TypeOf((*MockUserRepositoryInterface)(nil).FindUserByID), userID)
 }
 
+// GetAllUsersCount mocks base method.
+func (m *MockUserRepositoryInterface) GetAllUsersCount(ctx context.Context) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllUsersCount", ctx)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllUsersCount indicates an expected call of GetAllUsersCount.
+func (mr *MockUserRepositoryInterfaceMockRecorder) GetAllUsersCount(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllUsersCount", reflect.TypeOf((*MockUserRepositoryInterface)(nil).GetAllUsersCount), ctx)
+}
+
 // UpdateUser mocks base method.
-func (m *MockUserRepositoryInterface) UpdateUser(user *entity.User) error {
+func (m *MockUserRepositoryInterface) UpdateUser(user entity.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateUser", user)
 	ret0, _ := ret[0].(error)

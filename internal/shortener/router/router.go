@@ -3,6 +3,8 @@ package router
 import (
 	"github.com/go-chi/chi/v5"
 
+	"github.com/anoriar/shortener/internal/shortener/handlers/v2/statshandler"
+
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/addurlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/geturlhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v1/ping"
@@ -18,17 +20,19 @@ import (
 
 // Router missing godoc.
 type Router struct {
-	addHandler            *addurlhandler.AddHandler
-	getHandler            *geturlhandler.GetHandler
-	addHandlerV2          *addURLHandlerV2.AddHandler
-	addURLBatchHandler    *addurlbatchhander.AddURLBatchHandler
-	getUserURLsHandler    *getuserurlshandler.GetUserURLsHandler
-	pingHandler           *ping.PingHandler
-	deleteURLBatchHandler *deleteurlbatchhandler.DeleteURLBatchHandler
-	deleteUserURLsHandler *deleteuserurlshandler.DeleteUserURLsHandler
-	loggerMiddleware      *loggerMiddlewarePkg.LoggerMiddleware
-	compressMiddleware    *compress.CompressMiddleware
-	authMiddleware        *auth.AuthMiddleware
+	addHandler             *addurlhandler.AddHandler
+	getHandler             *geturlhandler.GetHandler
+	addHandlerV2           *addURLHandlerV2.AddHandler
+	addURLBatchHandler     *addurlbatchhander.AddURLBatchHandler
+	getUserURLsHandler     *getuserurlshandler.GetUserURLsHandler
+	pingHandler            *ping.PingHandler
+	deleteURLBatchHandler  *deleteurlbatchhandler.DeleteURLBatchHandler
+	deleteUserURLsHandler  *deleteuserurlshandler.DeleteUserURLsHandler
+	statsHandler           *statshandler.StatsHandler
+	loggerMiddleware       *loggerMiddlewarePkg.LoggerMiddleware
+	compressMiddleware     *compress.CompressMiddleware
+	authMiddleware         *auth.AuthMiddleware
+	internalAuthMiddleware *auth.InternalAuthMiddleware
 }
 
 // NewRouter missing godoc.
@@ -41,22 +45,26 @@ func NewRouter(
 	pingHandler *ping.PingHandler,
 	deleteURLBatchHandler *deleteurlbatchhandler.DeleteURLBatchHandler,
 	deleteUserURLsHandler *deleteuserurlshandler.DeleteUserURLsHandler,
+	statsHandler *statshandler.StatsHandler,
 	loggerMiddleware *loggerMiddlewarePkg.LoggerMiddleware,
 	compressMiddleware *compress.CompressMiddleware,
 	authMiddleware *auth.AuthMiddleware,
+	internalAuthMiddleware *auth.InternalAuthMiddleware,
 ) *Router {
 	return &Router{
-		addHandler:            addHandler,
-		getHandler:            getHandler,
-		addHandlerV2:          addHandlerV2,
-		addURLBatchHandler:    addURLBatchHandler,
-		getUserURLsHandler:    getUserURLsHandler,
-		pingHandler:           pingHandler,
-		deleteURLBatchHandler: deleteURLBatchHandler,
-		deleteUserURLsHandler: deleteUserURLsHandler,
-		loggerMiddleware:      loggerMiddleware,
-		compressMiddleware:    compressMiddleware,
-		authMiddleware:        authMiddleware,
+		addHandler:             addHandler,
+		getHandler:             getHandler,
+		addHandlerV2:           addHandlerV2,
+		addURLBatchHandler:     addURLBatchHandler,
+		getUserURLsHandler:     getUserURLsHandler,
+		pingHandler:            pingHandler,
+		deleteURLBatchHandler:  deleteURLBatchHandler,
+		deleteUserURLsHandler:  deleteUserURLsHandler,
+		statsHandler:           statsHandler,
+		loggerMiddleware:       loggerMiddleware,
+		compressMiddleware:     compressMiddleware,
+		authMiddleware:         authMiddleware,
+		internalAuthMiddleware: internalAuthMiddleware,
 	}
 }
 
@@ -75,6 +83,7 @@ func (r *Router) Route() chi.Router {
 	router.With(r.authMiddleware.Auth).Delete("/api/shorten/batch", r.deleteURLBatchHandler.DeleteURLBatch)
 	router.With(r.authMiddleware.Auth).Get("/api/user/urls", r.getUserURLsHandler.GetUserURLs)
 	router.With(r.authMiddleware.Auth).Delete("/api/user/urls", r.deleteUserURLsHandler.DeleteUserURLs)
+	router.With(r.internalAuthMiddleware.InternalAuth).Get("/api/internal/stats", r.statsHandler.GetStats)
 
 	return router
 }

@@ -40,7 +40,7 @@ func (m *MockURLRepositoryInterface) EXPECT() *MockURLRepositoryInterfaceMockRec
 // AddURL mocks base method.
 func (m *MockURLRepositoryInterface) AddURL(url *entity.URL) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddURL", url)
+	ret := m.ctrl.Call(m, "GetStats", url)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -48,7 +48,7 @@ func (m *MockURLRepositoryInterface) AddURL(url *entity.URL) error {
 // AddURL indicates an expected call of AddURL.
 func (mr *MockURLRepositoryInterfaceMockRecorder) AddURL(url interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddURL", reflect.TypeOf((*MockURLRepositoryInterface)(nil).AddURL), url)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStats", reflect.TypeOf((*MockURLRepositoryInterface)(nil).AddURL), url)
 }
 
 // AddURLBatch mocks base method.
@@ -121,6 +121,21 @@ func (m *MockURLRepositoryInterface) FindURLByShortURL(shortURL string) (*entity
 func (mr *MockURLRepositoryInterfaceMockRecorder) FindURLByShortURL(shortURL interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindURLByShortURL", reflect.TypeOf((*MockURLRepositoryInterface)(nil).FindURLByShortURL), shortURL)
+}
+
+// GetAllURLsCount mocks base method.
+func (m *MockURLRepositoryInterface) GetAllURLsCount(ctx context.Context) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllURLsCount", ctx)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllURLsCount indicates an expected call of GetAllURLsCount.
+func (mr *MockURLRepositoryInterfaceMockRecorder) GetAllURLsCount(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllURLsCount", reflect.TypeOf((*MockURLRepositoryInterface)(nil).GetAllURLsCount), ctx)
 }
 
 // GetURLsByQuery mocks base method.

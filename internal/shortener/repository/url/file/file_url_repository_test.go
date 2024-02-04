@@ -52,7 +52,7 @@ func TestFileURLRepository_AddURL(t *testing.T) {
 			repository := NewFileURLRepository(filename)
 			err := repository.AddURL(tt.args.url)
 			if tt.wantErr != (err != nil) {
-				t.Errorf("AddURL() exception = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetStats() exception = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

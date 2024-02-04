@@ -17,7 +17,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
-// This example demonstrates how to use the AddURL.
+// This example demonstrates how to use the GetStats.
 func Example() {
 
 	urlRepository := inmemory.NewInMemoryURLRepository()

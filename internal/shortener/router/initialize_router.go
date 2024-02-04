@@ -10,6 +10,7 @@ import (
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/deleteurlbatchhandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/deleteuserurlshandler"
 	"github.com/anoriar/shortener/internal/shortener/handlers/v2/getuserurlshandler"
+	"github.com/anoriar/shortener/internal/shortener/handlers/v2/statshandler"
 	"github.com/anoriar/shortener/internal/shortener/middleware/auth"
 	"github.com/anoriar/shortener/internal/shortener/middleware/compress"
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
@@ -32,8 +33,10 @@ func InitializeRouter(app *app.App) *Router {
 		ping.NewPingHandler(urlRepository, app.Logger),
 		deleteurlbatchhandler.NewDeleteURLBatchHandler(urlRepository, app.Logger),
 		deleteuserurlshandler.NewDeleteUserURLsHandler(app.DeleteUserURLsProcessor, app.Logger),
+		statshandler.NewStatsHandler(app.StatsService, app.Logger),
 		loggerMiddlewarePkg.NewLoggerMiddleware(app.Logger),
 		compress.NewCompressMiddleware(),
 		auth.NewAuthMiddleware(v1.NewSignService(app.Config.AuthSecretKey), userRepository),
+		auth.NewInternalAuthMiddleware(app.Config, app.Logger),
 	)
 }
