@@ -2,25 +2,26 @@
 package geturlhandler
 
 import (
+	"errors"
 	"net/http"
-	"strings"
 
 	"go.uber.org/zap"
 
-	"github.com/anoriar/shortener/internal/shortener/repository/url"
+	"github.com/anoriar/shortener/internal/shortener/domainerror"
+	"github.com/anoriar/shortener/internal/shortener/usecases"
 )
 
 // GetHandler Обработчик редиректа по короткому URLу
 type GetHandler struct {
-	urlRepository url.URLRepositoryInterface
 	logger        *zap.Logger
+	getURLService *usecases.GetURLService
 }
 
 // NewGetHandler missing godoc.
-func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger) *GetHandler {
+func NewGetHandler(logger *zap.Logger, getURLService *usecases.GetURLService) *GetHandler {
 	return &GetHandler{
-		urlRepository: urlRepository,
 		logger:        logger,
+		getURLService: getURLService,
 	}
 }
 
@@ -31,27 +32,19 @@ func NewGetHandler(urlRepository url.URLRepositoryInterface, logger *zap.Logger)
 func (handler *GetHandler) GetURL(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("content-type", "text/plain")
 
-	shortKey := strings.Trim(req.URL.Path, "/")
-	if shortKey == "" {
-		http.Error(w, "Short key is empty", http.StatusBadRequest)
-		return
-	}
-
-	url, err := handler.urlRepository.FindURLByShortURL(shortKey)
+	url, err := handler.getURLService.GetURL(req.URL.Path)
 	if err != nil {
-		handler.logger.Error("get url error", zap.String("error", err.Error()))
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if url == nil {
-		http.Error(w, "URL does not exists", http.StatusBadRequest)
-		return
-	}
-	if url.IsDeleted {
-		http.Error(w, "URL deleted", http.StatusGone)
-		return
+		switch {
+		case errors.Is(err, domainerror.ErrURLDeleted):
+			http.Error(w, err.Error(), http.StatusGone)
+			return
+		default:
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
 	}
 
-	w.Header().Set("Location", url.OriginalURL)
+	w.Header().Set("Location", url)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases"
+
 	"github.com/google/uuid"
 
 	"github.com/anoriar/shortener/internal/shortener/entity"
@@ -39,7 +41,7 @@ func Example() {
 
 	w := httptest.NewRecorder()
 
-	NewGetHandler(urlRepository, logger).GetURL(w, req)
+	NewGetHandler(logger, usecases.NewGetURLService(urlRepository, logger)).GetURL(w, req)
 
 	fmt.Println(w.Code)
 	fmt.Println(w.Header().Get("Location"))

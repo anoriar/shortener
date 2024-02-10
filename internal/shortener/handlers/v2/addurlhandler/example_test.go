@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"strings"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases"
+
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	inmemoryurl "github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
 	inmemoryuser "github.com/anoriar/shortener/internal/shortener/repository/user/inmemory"
@@ -28,7 +30,7 @@ func Example() {
 	userRepository := inmemoryuser.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
-	addHandler := NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, logger, "http://localhost:8080")
+	addHandler := NewAddHandler(logger, usecases.NewAddURLService(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, logger, "http://localhost:8080"))
 
 	requestDto := request.AddURLRequestDto{URL: testURL}
 	successRequestBody, err := json.Marshal(requestDto)

@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package shortener;
+
+option go_package = "shortener/proto";
+
+message Empty {
+}
+
+message AddURLRequest {
+  string url = 1;
+}
+
+message AddURLResponse {
+  string result = 1;
+}
+
+service AddURLService {
+    rpc AddURL (AddURLRequest) returns (AddURLResponse);
+}
+
+message AddURLBatchRequest {
+  message Item {
+    string correlation_id = 1;
+    string original_url = 2;
+  }
+  repeated Item items = 1;
+}
+
+message AddURLBatchResponse {
+  message Item {
+    string correlation_id = 1;
+    string short_url = 2;
+  }
+  repeated Item items = 1;
+}
+
+service AddURLBatchService {
+  rpc AddURLBatch (AddURLBatchRequest) returns (AddURLBatchResponse);
+}
+
+message GetURLRequest {
+  string short_url = 1;
+}
+
+message GetURLResponse {
+  string original_url = 1;
+}
+
+service GetURLService {
+  rpc GetURL (GetURLRequest) returns (GetURLResponse);
+}
+
+message GetUserURLsResponse {
+  message URL {
+    string short_url = 1;
+    string original_url = 2;
+  }
+  repeated URL items = 1;
+}
+
+service GetUserURLsService {
+  rpc GetUserURLs (Empty) returns (GetUserURLsResponse);
+}
+
+message DeleteUserURLsRequest {
+  repeated string short_url = 1;
+}
+
+service DeleteUserURLsService {
+  rpc DeleteUserURLs (DeleteUserURLsRequest) returns (Empty);
+}
+
+message StatsResponse {
+  int32 urls = 1;
+  int32 users = 2;
+}
+
+service StatsService {
+  rpc GetStats(Empty) returns (Empty);
+}
+
+message DeleteURLBatchRequest {
+  repeated string short_url = 1;
+}
+
+service DeleteURLBatchService {
+  rpc DeleteURLBatch(DeleteUserURLsRequest) returns (Empty);
+}

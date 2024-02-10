@@ -16,6 +16,7 @@ import (
 	loggerMiddlewarePkg "github.com/anoriar/shortener/internal/shortener/middleware/logger"
 	v1 "github.com/anoriar/shortener/internal/shortener/services/auth"
 	urlgen "github.com/anoriar/shortener/internal/shortener/services/url_gen"
+	"github.com/anoriar/shortener/internal/shortener/usecases"
 	"github.com/anoriar/shortener/internal/shortener/util"
 )
 
@@ -26,8 +27,8 @@ func InitializeRouter(app *app.App) *Router {
 	userService := app.UserService
 	return NewRouter(
 		addurlhandler.NewAddHandler(urlRepository, userService, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), app.Logger, app.Config.BaseURL),
-		geturlhandler.NewGetHandler(urlRepository, app.Logger),
-		addURLHandlerV2.NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, app.Logger, app.Config.BaseURL),
+		geturlhandler.NewGetHandler(app.Logger, usecases.NewGetURLService(urlRepository, app.Logger)),
+		addURLHandlerV2.NewAddHandler(app.Logger, usecases.NewAddURLService(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, app.Logger, app.Config.BaseURL)),
 		addurlbatchhander.InitializeAddURLBatchHandler(urlRepository, userService, util.NewKeyGen(), app.Logger, app.Config.BaseURL),
 		getuserurlshandler.InitializeGetUserURLsHandler(urlRepository, userService, app.Logger, app.Config.BaseURL),
 		ping.NewPingHandler(urlRepository, app.Logger),

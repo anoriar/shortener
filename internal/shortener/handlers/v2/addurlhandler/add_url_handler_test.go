@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -180,7 +182,7 @@ func TestAddURL(t *testing.T) {
 			r = r.WithContext(tt.ctx)
 			w := httptest.NewRecorder()
 
-			NewAddHandler(urlRepositoryMock, urlGeneratorMock, userServiceMock, logger, baseURL).AddURL(w, r)
+			NewAddHandler(logger, usecases.NewAddURLService(urlRepositoryMock, urlGeneratorMock, userServiceMock, logger, baseURL)).AddURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

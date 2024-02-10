@@ -162,3 +162,7 @@ http://localhost:8080/pkg/github.com/anoriar/shortener/?m=all
     "enable_https": true
 }
 ````
+
+# Сгенерировать protobuf
+# Из корня проекта:
+./proto/generate-proto
