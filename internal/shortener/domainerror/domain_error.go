@@ -16,3 +16,7 @@ var ErrURLNotExist = errors.New("url does not exists")
 
 // ErrURLDeleted missing godoc.
 var ErrURLDeleted = errors.New("url deleted")
+
+var ErrNotValidRequest = errors.New("request not valid")
+
+var ErrUserUnauthorized = errors.New("user not authorized")

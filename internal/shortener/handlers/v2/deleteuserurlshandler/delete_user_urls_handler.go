@@ -6,22 +6,20 @@ import (
 	"io"
 	"net/http"
 
-	"go.uber.org/zap"
+	"github.com/anoriar/shortener/internal/shortener/usecases"
 
-	"github.com/anoriar/shortener/internal/shortener/context"
-	deleteurlsprocessor "github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor"
-	"github.com/anoriar/shortener/internal/shortener/processors/deleteuserurlsprocessor/message"
+	"go.uber.org/zap"
 )
 
 // DeleteUserURLsHandler Обработчик удаления URL, которые создал пользователь
 type DeleteUserURLsHandler struct {
-	deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor
-	logger                  *zap.Logger
+	logger                *zap.Logger
+	deleteUserURLsService *usecases.DeleteUserURLsService
 }
 
 // NewDeleteUserURLsHandler missing godoc.
-func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.DeleteUserURLsProcessor, logger *zap.Logger) *DeleteUserURLsHandler {
-	return &DeleteUserURLsHandler{deleteUserURLsProcessor: deleteUserURLsProcessor, logger: logger}
+func NewDeleteUserURLsHandler(deleteUserURLsService *usecases.DeleteUserURLsService, logger *zap.Logger) *DeleteUserURLsHandler {
+	return &DeleteUserURLsHandler{deleteUserURLsService: deleteUserURLsService, logger: logger}
 }
 
 // DeleteUserURLs удаляет несколько URL, которые создал пользователь.
@@ -37,12 +35,6 @@ func NewDeleteUserURLsHandler(deleteUserURLsProcessor *deleteurlsprocessor.Delet
 //
 // ]
 func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req *http.Request) {
-	userID := ""
-	userIDCtxParam := req.Context().Value(context.UserIDContextKey)
-	if userIDCtxParam != nil {
-		userID = userIDCtxParam.(string)
-	}
-
 	requestBody, err := io.ReadAll(req.Body)
 	if err != nil {
 		handler.logger.Error("read request error", zap.String("error", err.Error()))
@@ -57,11 +49,10 @@ func (handler *DeleteUserURLsHandler) DeleteUserURLs(w http.ResponseWriter, req 
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if userID != "" && len(shortURLs) > 0 {
-		handler.deleteUserURLsProcessor.AddMessage(message.DeleteUserURLsMessage{
-			UserID:    userID,
-			ShortURLs: shortURLs,
-		})
+	err = handler.deleteUserURLsService.DeleteUserURLs(req.Context(), shortURLs)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	w.Header().Set("content-type", "text/plain")
