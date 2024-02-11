@@ -10,7 +10,6 @@ import (
 
 	"github.com/anoriar/shortener/internal/shortener/config"
 	"github.com/anoriar/shortener/internal/shortener/logger"
-	"github.com/anoriar/shortener/internal/shortener/router"
 )
 
 var buildVersion string = "N/A"
@@ -39,9 +38,9 @@ func main() {
 		log.Fatalf("init app error %v", err.Error())
 	}
 
-	r := router.InitializeRouter(app)
+	grpcServer := server.NewGRPCServer(app)
+	err = grpcServer.RunGRPCServer()
 
-	err = server.RunServer(app, r)
 	if err != nil {
 		log.Fatalf("init router error %v", err.Error())
 	}

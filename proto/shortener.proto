@@ -15,10 +15,6 @@ message AddURLResponse {
   string result = 1;
 }
 
-service AddURLService {
-    rpc AddURL (AddURLRequest) returns (AddURLResponse);
-}
-
 message AddURLBatchRequest {
   message Item {
     string correlation_id = 1;
@@ -35,20 +31,12 @@ message AddURLBatchResponse {
   repeated Item items = 1;
 }
 
-service AddURLBatchService {
-  rpc AddURLBatch (AddURLBatchRequest) returns (AddURLBatchResponse);
-}
-
 message GetURLRequest {
   string short_url = 1;
 }
 
 message GetURLResponse {
   string original_url = 1;
-}
-
-service GetURLService {
-  rpc GetURL (GetURLRequest) returns (GetURLResponse);
 }
 
 message GetUserURLsResponse {
@@ -59,17 +47,23 @@ message GetUserURLsResponse {
   repeated URL items = 1;
 }
 
-service GetUserURLsService {
-  rpc GetUserURLs (Empty) returns (GetUserURLsResponse);
-}
-
 message DeleteUserURLsRequest {
-  repeated string short_url = 1;
+  repeated string short_urls = 1;
 }
 
-service DeleteUserURLsService {
-  rpc DeleteUserURLs (DeleteUserURLsRequest) returns (Empty);
+message DeleteURLBatchRequest {
+  repeated string short_urls = 1;
 }
+
+service URLService {
+  rpc AddURL (AddURLRequest) returns (AddURLResponse);
+  rpc AddURLBatch (AddURLBatchRequest) returns (AddURLBatchResponse);
+  rpc GetURL (GetURLRequest) returns (GetURLResponse);
+  rpc GetUserURLs (Empty) returns (GetUserURLsResponse);
+  rpc DeleteUserURLs (DeleteUserURLsRequest) returns (Empty);
+  rpc DeleteURLBatch(DeleteURLBatchRequest) returns (Empty);
+}
+
 
 message StatsResponse {
   int32 urls = 1;
@@ -77,13 +71,5 @@ message StatsResponse {
 }
 
 service StatsService {
-  rpc GetStats(Empty) returns (Empty);
-}
-
-message DeleteURLBatchRequest {
-  repeated string short_url = 1;
-}
-
-service DeleteURLBatchService {
-  rpc DeleteURLBatch(DeleteUserURLsRequest) returns (Empty);
+  rpc GetStats(Empty) returns (StatsResponse);
 }
