@@ -65,7 +65,7 @@ func NewURLServiceServer(
 //	   "result": "http://localhost:8080/HnsSMA"
 //	}
 func (service URLServiceServer) AddURL(ctx context.Context, in *pb.AddURLRequest) (*pb.AddURLResponse, error) {
-	var response *pb.AddURLResponse
+	var response pb.AddURLResponse
 
 	urlDto, err := service.addURLService.AddURL(ctx, request.AddURLRequestDto{URL: in.GetUrl()})
 
@@ -82,7 +82,7 @@ func (service URLServiceServer) AddURL(ctx context.Context, in *pb.AddURLRequest
 
 	response.Result = urlDto.Result
 
-	return response, nil
+	return &response, nil
 }
 
 // AddURLBatch добавляет несколько URL на основе входящего запроса.
@@ -90,7 +90,8 @@ func (service URLServiceServer) AddURL(ctx context.Context, in *pb.AddURLRequest
 // Процесс работы функции включает следующие шаги:
 // 1. Генерация короткой версии для каждого URL.
 // 2. Сохранение всех URL в базу данных.
-// 3. Прикрепление сохранённых URL к конкретному пользователю.
+// 3. Прикрепление сохранённых URL к конкретно
+// му пользователю.
 // 4. Сопоставление входных и выходных данных по correlation_id и возврат сгенерированных коротких ссылок.
 //
 // Формат входных данных:
@@ -118,7 +119,7 @@ func (service URLServiceServer) AddURL(ctx context.Context, in *pb.AddURLRequest
 // Параметр correlation_id используется для сопоставления входных и выходных URL.
 // Обратите внимание, что это поле не используется в базе данных.
 func (service URLServiceServer) AddURLBatch(ctx context.Context, in *pb.AddURLBatchRequest) (*pb.AddURLBatchResponse, error) {
-	var response *pb.AddURLBatchResponse
+	var response pb.AddURLBatchResponse
 	var requestItems []request.AddURLBatchRequestDTO
 	for _, inItem := range in.Items {
 		requestItems = append(requestItems, request.AddURLBatchRequestDTO{
@@ -144,7 +145,7 @@ func (service URLServiceServer) AddURLBatch(ctx context.Context, in *pb.AddURLBa
 		})
 	}
 
-	return response, nil
+	return &response, nil
 }
 
 // GetURL получает URL из БД по короткому URL и осуществляет редирект по нему
@@ -152,9 +153,9 @@ func (service URLServiceServer) AddURLBatch(ctx context.Context, in *pb.AddURLBa
 // На вход в URLе приходит сокращенный URL: JRU9a8
 // На выход: Оригинальный URL
 func (service URLServiceServer) GetURL(ctx context.Context, in *pb.GetURLRequest) (*pb.GetURLResponse, error) {
-	var response *pb.GetURLResponse
+	var response pb.GetURLResponse
 
-	url, err := service.getURLService.GetURL(in.GetShortUrl())
+	urlStr, err := service.getURLService.GetURL(in.GetShortUrl())
 	if err != nil {
 		switch {
 		case errors.Is(err, domainerror.ErrURLDeleted):
@@ -164,9 +165,9 @@ func (service URLServiceServer) GetURL(ctx context.Context, in *pb.GetURLRequest
 		}
 	}
 
-	response.OriginalUrl = url
+	response.OriginalUrl = urlStr
 
-	return response, nil
+	return &response, nil
 }
 
 // GetUserURLs получает URL, которые создал пользователь
@@ -181,7 +182,7 @@ func (service URLServiceServer) GetURL(ctx context.Context, in *pb.GetURLRequest
 //
 // ]
 func (service URLServiceServer) GetUserURLs(ctx context.Context, in *pb.Empty) (*pb.GetUserURLsResponse, error) {
-	var response *pb.GetUserURLsResponse
+	var response pb.GetUserURLsResponse
 
 	result, err := service.getUserURLBatchService.GetUserURLs(ctx)
 	if err != nil {
@@ -199,7 +200,7 @@ func (service URLServiceServer) GetUserURLs(ctx context.Context, in *pb.Empty) (
 			OriginalUrl: item.OriginalURL,
 		})
 	}
-	return response, nil
+	return &response, nil
 }
 
 // DeleteUserURLs удаляет несколько URL, которые создал пользователь.
@@ -219,7 +220,7 @@ func (service URLServiceServer) DeleteUserURLs(ctx context.Context, in *pb.Delet
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, `internal error`)
 	}
-	return nil, nil
+	return &pb.Empty{}, nil
 }
 
 // DeleteURLBatch удаляет несколько URL.
@@ -236,5 +237,5 @@ func (service URLServiceServer) DeleteURLBatch(ctx context.Context, in *pb.Delet
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, `internal error`)
 	}
-	return nil, nil
+	return &pb.Empty{}, nil
 }

@@ -39,7 +39,7 @@ func NewStatsServiceServer(
 //	  "users": 2
 //	},
 func (service StatsServiceServer) GetStats(ctx context.Context, empty *pb.Empty) (*pb.StatsResponse, error) {
-	var response *pb.StatsResponse
+	var response pb.StatsResponse
 
 	result, err := service.statsService.GetStats(ctx)
 	if err != nil {
@@ -49,5 +49,5 @@ func (service StatsServiceServer) GetStats(ctx context.Context, empty *pb.Empty)
 	response.Urls = int32(result.URLs)
 	response.Users = int32(result.Users)
 
-	return response, nil
+	return &response, nil
 }

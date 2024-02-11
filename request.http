@@ -1,0 +1,51 @@
+### AddURL - Add a single URL
+GRPC localhost:8080/shortener.URLService/AddURL
+Content-Type: application/grpc
+
+{
+  "url": "https://example.com"
+}
+
+### AddURLBatch - Add multiple URLs
+GRPC localhost:8080/shortener.URLService/AddURLBatch
+Content-Type: application/grpc
+
+{
+  "items": [
+    {
+      "correlation_id": "1",
+      "original_url": "https://example.com/1"
+    },
+    {
+      "correlation_id": "2",
+      "original_url": "https://example.com/2"
+    }
+  ]
+}
+
+### GetURL - Get the original URL
+GRPC localhost:8080/shortener.URLService/GetURL
+Content-Type: application/grpc
+
+{
+  "short_url": "81443167-5241-4ec5-b383-eb0d4505f262"
+}
+
+### GetUserURLs - Get URLs for a user
+GRPC localhost:8080/shortener.URLService/GetUserURLs
+
+### DeleteUserURLs - Delete URLs for a user
+GRPC localhost:8080/shortener.URLService/DeleteUserURLs
+Content-Type: application/grpc
+
+{
+  "short_urls": ["https://short.url/abc123", "https://short.url/def456"]
+}
+
+### DeleteURLBatch - Delete multiple URLs
+GRPC localhost:8080/shortener.URLService/DeleteURLBatch
+Content-Type: application/grpc
+
+{
+  "short_urls": ["https://short.url/abc123", "https://short.url/def456"]
+}

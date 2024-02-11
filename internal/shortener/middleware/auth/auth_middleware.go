@@ -37,12 +37,16 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 				return
 			}
 		} else {
-			_, tokenPayload, err := am.authenticator.GetToken(authCookie.Value)
+			isVerified, tokenPayload, err := am.authenticator.GetToken(authCookie.Value)
 			if err != nil {
 				http.Error(w, "get token error", http.StatusInternalServerError)
 				return
 			}
-			ctx = context.WithValue(request.Context(), context2.UserIDContextKey, tokenPayload.UserID)
+			if !isVerified {
+				shouldCreateNewToken = true
+			} else {
+				ctx = context.WithValue(request.Context(), context2.UserIDContextKey, tokenPayload.UserID)
+			}
 		}
 
 		if shouldCreateNewToken {

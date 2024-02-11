@@ -25,37 +25,34 @@ func NewAuthenticator(signService *SignService, userRepository user.UserReposito
 }
 
 // GetToken missing godoc.
-func (a *Authenticator) GetToken(srcToken string) (string, *auth.TokenPayload, error) {
-	if srcToken == "" {
-
-	}
+func (a *Authenticator) GetToken(srcToken string) (bool, *auth.TokenPayload, error) {
 
 	decodedToken, signature, err := a.signService.Decode(srcToken)
 	if err != nil {
 		a.logger.Error("decode token error", zap.String("error", err.Error()))
-		return "", nil, domainerror.ErrInternal
+		return false, nil, domainerror.ErrInternal
 	}
 	if a.signService.Verify(decodedToken, signature) {
 		tokenPayload := &auth.TokenPayload{}
 		err = json.Unmarshal(decodedToken, tokenPayload)
 		if err != nil {
 			a.logger.Error("unmarshal token error", zap.String("error", err.Error()))
-			return "", nil, domainerror.ErrInternal
+			return false, nil, domainerror.ErrInternal
 		}
 
 		_, exists, err := a.userRepository.FindUserByID(tokenPayload.UserID)
 		if err != nil {
 			a.logger.Error("find user error", zap.String("error", err.Error()))
-			return "", nil, domainerror.ErrInternal
+			return false, nil, domainerror.ErrInternal
 		}
 		if exists {
-			return "", tokenPayload, nil
+			return true, tokenPayload, nil
 		} else {
-			return a.CreateNewToken()
+			return false, nil, nil
 		}
 
 	} else {
-		return a.CreateNewToken()
+		return false, nil, nil
 	}
 }
 
@@ -70,10 +67,6 @@ func (a *Authenticator) CreateNewToken() (string, *auth.TokenPayload, error) {
 	}
 	newToken := a.signService.Sign([]byte(jsonTokenPayload))
 
-	if err != nil {
-		a.logger.Error("create newToken error", zap.String("error", err.Error()))
-		return "", nil, domainerror.ErrInternal
-	}
 	err = a.userRepository.AddUser(entity.User{
 		UUID: tokenPayload.UserID,
 	})

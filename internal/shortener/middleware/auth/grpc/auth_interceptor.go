@@ -38,12 +38,16 @@ func (ai *AuthInterceptor) Auth(ctx context.Context, req interface{}, info *grpc
 	if len(srcToken) == 0 {
 		shouldCreateNewToken = true
 	} else {
-		_, tokenPayload, err := ai.authenticator.GetToken(srcToken)
+		isVerified, tokenPayload, err := ai.authenticator.GetToken(srcToken)
 		if err != nil {
 			return nil, status.Error(codes.Internal, "internal error")
 		}
+		if !isVerified {
+			shouldCreateNewToken = true
+		} else {
+			ctx = context.WithValue(ctx, context2.UserIDContextKey, tokenPayload.UserID)
+		}
 
-		ctx = context.WithValue(ctx, context2.UserIDContextKey, tokenPayload.UserID)
 	}
 
 	if shouldCreateNewToken {

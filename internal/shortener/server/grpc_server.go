@@ -1,9 +1,11 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
+	"sync"
 
 	"google.golang.org/grpc"
 
@@ -39,8 +41,20 @@ func (grpcServer *GRPCServer) RunGRPCServer() error {
 
 	fmt.Println("Сервер gRPC начал работу")
 
-	if err := s.Serve(listen); err != grpc.ErrServerStopped {
-		log.Printf("Error starting the server: %v\n", err)
-	}
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		if err := s.Serve(listen); err != grpc.ErrServerStopped {
+			log.Printf("Error starting the server: %v\n", err)
+		}
+	}()
+
+	// background tasks
+	grpcServer.app.DeleteUserURLsProcessor.Start(context.Background(), &wg)
+	wg.Wait()
 	return nil
 }
