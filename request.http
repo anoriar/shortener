@@ -39,7 +39,7 @@ GRPC localhost:8080/shortener.URLService/DeleteUserURLs
 Content-Type: application/grpc
 
 {
-  "short_urls": ["https://short.url/abc123", "https://short.url/def456"]
+  "short_urls": ["81443167-5241-4ec5-b383-eb0d4505f262"]
 }
 
 ### DeleteURLBatch - Delete multiple URLs
@@ -47,5 +47,5 @@ GRPC localhost:8080/shortener.URLService/DeleteURLBatch
 Content-Type: application/grpc
 
 {
-  "short_urls": ["https://short.url/abc123", "https://short.url/def456"]
+  "short_urls": ["81443167-5241-4ec5-b383-eb0d4505f262"]
 }
