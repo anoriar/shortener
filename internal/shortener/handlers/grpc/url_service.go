@@ -160,6 +160,8 @@ func (service URLServiceServer) GetURL(ctx context.Context, in *pb.GetURLRequest
 		switch {
 		case errors.Is(err, domainerror.ErrURLDeleted):
 			return nil, status.Errorf(codes.FailedPrecondition, `url deleted`)
+		case errors.Is(err, domainerror.ErrURLNotExist):
+			return nil, status.Errorf(codes.NotFound, `url not found`)
 		default:
 			return nil, status.Errorf(codes.Internal, `internal error`)
 		}

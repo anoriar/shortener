@@ -28,17 +28,17 @@ func NewAuthInterceptor(authenticator *auth.Authenticator) *AuthInterceptor {
 func (ai *AuthInterceptor) Auth(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	shouldCreateNewToken := false
 
-	var srcToken string
+	var token string
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		values := md.Get(metadataTokenName)
 		if len(values) > 0 {
-			srcToken = values[0]
+			token = values[0]
 		}
 	}
-	if len(srcToken) == 0 {
+	if len(token) == 0 {
 		shouldCreateNewToken = true
 	} else {
-		isVerified, tokenPayload, err := ai.authenticator.GetToken(srcToken)
+		isVerified, tokenPayload, err := ai.authenticator.GetToken(token)
 		if err != nil {
 			return nil, status.Error(codes.Internal, "internal error")
 		}
@@ -56,11 +56,19 @@ func (ai *AuthInterceptor) Auth(ctx context.Context, req interface{}, info *grpc
 			return nil, status.Error(codes.Internal, "internal error")
 		}
 		ctx = context.WithValue(ctx, context2.UserIDContextKey, tokenPayload.UserID)
-		md := metadata.Pairs(metadataTokenName, newToken)
-		err = grpc.SendHeader(ctx, md)
-		if err != nil {
-			return nil, status.Error(codes.Internal, "internal error")
-		}
+		token = newToken
+
 	}
-	return handler(ctx, req)
+
+	resp, err := handler(ctx, req)
+	if err != nil {
+		return resp, err
+	}
+
+	md := metadata.Pairs(metadataTokenName, token)
+	err = grpc.SendHeader(ctx, md)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "internal error")
+	}
+	return resp, nil
 }

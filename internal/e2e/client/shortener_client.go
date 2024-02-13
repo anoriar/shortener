@@ -37,7 +37,7 @@ func InitializeShortenerClient(cnf *config.TestConfig) ShortenerClientInterface 
 				return http.ErrUseLastResponse
 			},
 		},
-		baseURL: cnf.BaseURL,
+		baseURL: cnf.ServerAddr,
 	}
 }
 
