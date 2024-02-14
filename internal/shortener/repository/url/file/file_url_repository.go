@@ -221,6 +221,28 @@ func (repository *FileURLRepository) rewriteFile(ctx context.Context, callback f
 	return nil
 }
 
+// GetAllURLsCount missing godoc.
+func (repository *FileURLRepository) GetAllURLsCount(ctx context.Context) (int, error) {
+	count := 0
+	fileReader, err := reader.NewURLFileReader(repository.filename)
+	if err != nil {
+		return 0, err
+	}
+
+	defer fileReader.Close()
+
+	for {
+		_, err := fileReader.ReadURL()
+		if err != nil {
+			if err == io.EOF {
+				return count, nil
+			}
+			return 0, err
+		}
+		count++
+	}
+}
+
 // Close missing godoc.
 func (repository *FileURLRepository) Close() error {
 	return nil

@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package shortener;
+
+option go_package = "shortener/proto";
+
+message Empty {
+}
+
+message AddURLRequest {
+  string url = 1;
+}
+
+message AddURLResponse {
+  string result = 1;
+}
+
+message AddURLBatchRequest {
+  message Item {
+    string correlation_id = 1;
+    string original_url = 2;
+  }
+  repeated Item items = 1;
+}
+
+message AddURLBatchResponse {
+  message Item {
+    string correlation_id = 1;
+    string short_url = 2;
+  }
+  repeated Item items = 1;
+}
+
+message GetURLRequest {
+  string short_url = 1;
+}
+
+message GetURLResponse {
+  string original_url = 1;
+}
+
+message GetUserURLsResponse {
+  message URL {
+    string short_url = 1;
+    string original_url = 2;
+  }
+  repeated URL items = 1;
+}
+
+message DeleteUserURLsRequest {
+  repeated string short_urls = 1;
+}
+
+message DeleteURLBatchRequest {
+  repeated string short_urls = 1;
+}
+
+service URLService {
+  rpc AddURL (AddURLRequest) returns (AddURLResponse);
+  rpc AddURLBatch (AddURLBatchRequest) returns (AddURLBatchResponse);
+  rpc GetURL (GetURLRequest) returns (GetURLResponse);
+  rpc GetUserURLs (Empty) returns (GetUserURLsResponse);
+  rpc DeleteUserURLs (DeleteUserURLsRequest) returns (Empty);
+  rpc DeleteURLBatch(DeleteURLBatchRequest) returns (Empty);
+}
+
+
+message StatsResponse {
+  int32 urls = 1;
+  int32 users = 2;
+}
+
+service StatsService {
+  rpc GetStats(Empty) returns (StatsResponse);
+}

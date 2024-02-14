@@ -8,11 +8,12 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases/getuserurlbatch"
+
 	"github.com/google/uuid"
 
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/handlers/v2/getuserurlshandler/internal/factory"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	inmemoryurl "github.com/anoriar/shortener/internal/shortener/repository/url/inmemory"
 	"github.com/anoriar/shortener/internal/shortener/repository/user/inmemory"
@@ -33,9 +34,8 @@ func Benchmark_GetUserURLs(b *testing.B) {
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
 	userRepository := inmemory.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)
-	getUserURLsResponseFactory := factory.NewGetUSerURLsResponseFactory("http://localhost:8080")
 
-	getUserURLsHandler := NewGetUserURLsHandler(urlRepository, userService, getUserURLsResponseFactory, logger)
+	getUserURLsHandler := NewGetUserURLsHandler(logger, getuserurlbatch.NewGetUserURLsService(urlRepository, userService, logger, "http://localhost:8080"))
 
 	urlCntPerUser := int(math.Ceil(float64(urlCnt) / float64(userCnt)))
 	urlShortKeys := make([]string, 0, urlCntPerUser)

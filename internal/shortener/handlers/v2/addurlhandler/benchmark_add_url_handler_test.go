@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases"
+
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/logger"
@@ -42,7 +44,7 @@ func Benchmark_AddOneURLV2(b *testing.B) {
 	userRepository := inmemoryuser.NewInMemoryUserRepository()
 	userService := user.NewUserService(userRepository)
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
-	addHandler := NewAddHandler(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, logger, "http://localhost:8080")
+	addHandler := NewAddHandler(logger, usecases.NewAddURLService(urlRepository, urlgen.NewShortURLGenerator(urlRepository, util.NewKeyGen()), userService, logger, "http://localhost:8080"))
 
 	b.ResetTimer()
 	b.Run("add url v2", func(b *testing.B) {

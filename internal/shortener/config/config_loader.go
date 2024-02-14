@@ -57,6 +57,10 @@ func mergeConfig(fileConfig file.FileConfig, config *Config) {
 	if !config.EnableHTTPS {
 		config.EnableHTTPS = fileConfig.EnableHTTPS
 	}
+
+	if config.TrustedSubnet == "" {
+		config.TrustedSubnet = fileConfig.TrustedSubnet
+	}
 }
 
 func parseFlags(config *Config) {
@@ -68,6 +72,7 @@ func parseFlags(config *Config) {
 	flag.StringVar(&config.ProfilerHost, "profiler", "", "Profiler host")
 	flag.BoolVar(&config.EnableHTTPS, "s", false, "Enable https")
 	flag.StringVar(&config.Config, "c", "", "Config from file")
+	flag.StringVar(&config.Config, "t", "", "Trusted utilip")
 
 	flag.Parse()
 }

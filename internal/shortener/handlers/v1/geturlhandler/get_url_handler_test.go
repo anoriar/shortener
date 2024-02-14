@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -112,7 +114,7 @@ func TestGetHandler_GetURL(t *testing.T) {
 			r := httptest.NewRequest(http.MethodGet, tt.request, nil)
 			w := httptest.NewRecorder()
 
-			NewGetHandler(urlRepositoryMock, logger).GetURL(w, r)
+			NewGetHandler(logger, usecases.NewGetURLService(urlRepositoryMock, logger)).GetURL(w, r)
 
 			assert.Equal(t, tt.want.status, w.Code)
 			assert.Equal(t, tt.want.contentType, w.Header().Get("Content-Type"))

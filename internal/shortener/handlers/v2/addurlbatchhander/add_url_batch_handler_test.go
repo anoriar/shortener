@@ -9,6 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases/addurlbatch"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,8 +18,6 @@ import (
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
 	"github.com/anoriar/shortener/internal/shortener/dto/request"
 	"github.com/anoriar/shortener/internal/shortener/dto/response"
-	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/factory"
-	"github.com/anoriar/shortener/internal/shortener/handlers/v2/addurlbatchhander/internal/validator"
 	"github.com/anoriar/shortener/internal/shortener/logger"
 	"github.com/anoriar/shortener/internal/shortener/repository/url/mock"
 	mock2 "github.com/anoriar/shortener/internal/shortener/services/user/mock"
@@ -95,9 +95,6 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 	require.NoError(t, err)
 
 	keyGenMock := utilMock.NewMockKeyGenInterface(ctrl)
-	addURLEntityFactory := factory.NewAddURLBatchFactory(keyGenMock)
-	addURLBatchResponseFactory := factory.NewAddURLBatchResponseFactory(baseURL)
-	reqValidator := validator.NewAddURLBatchValidator()
 	logger, err := logger.Initialize("debug")
 	require.NoError(t, err)
 
@@ -252,13 +249,16 @@ func TestAddURLBatchHandler_AddURLBatch(t *testing.T) {
 
 			tt.mockBehaviour()
 
+			addURLBatchService := addurlbatch.NewAddURLBatchService(
+				urlRepositoryMock,
+				userServiceMock,
+				keyGenMock,
+				baseURL,
+				logger,
+			)
 			handler := &AddURLBatchHandler{
-				urlRepository:              urlRepositoryMock,
-				userService:                userServiceMock,
-				addURLBatchFactory:         addURLEntityFactory,
-				addURLBatchResponseFactory: addURLBatchResponseFactory,
-				logger:                     logger,
-				validator:                  reqValidator,
+				logger:             logger,
+				addURLBatchService: addURLBatchService,
 			}
 			handler.AddURLBatch(w, r)
 			assert.Equal(t, tt.want.status, w.Code)

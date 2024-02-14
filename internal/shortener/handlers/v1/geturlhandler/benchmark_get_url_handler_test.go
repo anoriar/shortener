@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/anoriar/shortener/internal/shortener/usecases"
+
 	"github.com/google/uuid"
 
 	"github.com/anoriar/shortener/internal/e2e/config"
@@ -29,7 +31,7 @@ func Benchmark_GetOneURLV1(b *testing.B) {
 	keyGen := util.NewKeyGen()
 	urlRepository := inmemoryurl.NewInMemoryURLRepository()
 
-	getHandler := NewGetHandler(urlRepository, logger)
+	getHandler := NewGetHandler(logger, usecases.NewGetURLService(urlRepository, logger))
 
 	urlShortKeys := make([]string, 0, urlCnt)
 	for i := 0; i < urlCnt; i++ {

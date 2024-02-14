@@ -2,16 +2,10 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 
-	"github.com/google/uuid"
-
 	context2 "github.com/anoriar/shortener/internal/shortener/context"
-	"github.com/anoriar/shortener/internal/shortener/dto/auth"
-	"github.com/anoriar/shortener/internal/shortener/entity"
-	"github.com/anoriar/shortener/internal/shortener/repository/user"
 	v1 "github.com/anoriar/shortener/internal/shortener/services/auth"
 )
 
@@ -20,13 +14,12 @@ const cookieAge = 3600
 
 // AuthMiddleware missing godoc.
 type AuthMiddleware struct {
-	signService    *v1.SignService
-	userRepository user.UserRepositoryInterface
+	authenticator *v1.Authenticator
 }
 
 // NewAuthMiddleware missing godoc.
-func NewAuthMiddleware(signService *v1.SignService, userRepository user.UserRepositoryInterface) *AuthMiddleware {
-	return &AuthMiddleware{signService: signService, userRepository: userRepository}
+func NewAuthMiddleware(authenticator *v1.Authenticator) *AuthMiddleware {
+	return &AuthMiddleware{authenticator: authenticator}
 }
 
 // Auth missing godoc.
@@ -44,49 +37,22 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 				return
 			}
 		} else {
-			decodedToken, signature, err := am.signService.Decode(authCookie.Value)
+			isVerified, tokenPayload, err := am.authenticator.GetToken(authCookie.Value)
 			if err != nil {
-				http.Error(w, "decode token error", http.StatusInternalServerError)
+				http.Error(w, "get token error", http.StatusInternalServerError)
 				return
 			}
-			if am.signService.Verify(decodedToken, signature) {
-				tokenPayload := &auth.TokenPayload{}
-				err = json.Unmarshal(decodedToken, tokenPayload)
-				if err != nil {
-					http.Error(w, "unmarshal token error", http.StatusInternalServerError)
-					return
-				}
-
-				_, exists, err := am.userRepository.FindUserByID(tokenPayload.UserID)
-				if err != nil {
-					http.Error(w, "find user error", http.StatusInternalServerError)
-					return
-				}
-				if exists {
-					//#MENTOR: Лучше не передавать переменные через контекст, но тут пришлось
-					// Есть ли более хорошее решение, как можно передать userID в хендлеры?
-					ctx = context.WithValue(request.Context(), context2.UserIDContextKey, tokenPayload.UserID)
-				} else {
-					shouldCreateNewToken = true
-				}
-
-			} else {
+			if !isVerified {
 				shouldCreateNewToken = true
+			} else {
+				ctx = context.WithValue(request.Context(), context2.UserIDContextKey, tokenPayload.UserID)
 			}
 		}
 
 		if shouldCreateNewToken {
-			tokenPayload := auth.TokenPayload{UserID: uuid.NewString()}
-			token, err := am.createNewToken(tokenPayload)
+			token, tokenPayload, err := am.authenticator.CreateNewToken()
 			if err != nil {
 				http.Error(w, "create token error", http.StatusInternalServerError)
-				return
-			}
-			err = am.userRepository.AddUser(entity.User{
-				UUID: tokenPayload.UserID,
-			})
-			if err != nil {
-				http.Error(w, "create user error", http.StatusInternalServerError)
 				return
 			}
 
@@ -102,15 +68,4 @@ func (am *AuthMiddleware) Auth(h http.Handler) http.Handler {
 
 		h.ServeHTTP(w, request.WithContext(ctx))
 	})
-
-}
-
-func (am *AuthMiddleware) createNewToken(payload auth.TokenPayload) (string, error) {
-
-	jsonTokenPayload, err := json.Marshal(payload)
-	if err != nil {
-		return "", err
-	}
-	token := am.signService.Sign([]byte(jsonTokenPayload))
-	return token, nil
 }
