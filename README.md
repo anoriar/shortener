@@ -49,6 +49,10 @@ go build -ldflags="-X main.buildVersion=1.0.0 -X main.buildDate=$(date -u '+%Y-%
 2. Run kind = Directory; Directory = к значению, что ide прописало автоматически, надо добавить ```/cmd/e2e```
 3. ENVIRONMENT скопировать из ```.env.e2e-example```
 
+## e2e тесты для GRPC
+Запустить shortenergrpc/main.go
+Запустить e2egrpc/shortener_test
+
 ## Запуск автотестов локально
 Подготовка:
 1 Скачать тест и положить в корень проекта

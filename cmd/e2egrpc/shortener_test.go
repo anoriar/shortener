@@ -40,6 +40,9 @@ func (suite *ShortenerGRPCSuite) SetupSuite() {
 	suite.NoError(err)
 
 	suite.conf = conf
+	if conf.BaseURL == "" {
+		suite.T().Skip()
+	}
 
 	suite.Require().NotEmpty(conf.BaseURL)
 	suite.Require().NotEmpty(conf.ServerAddr)
